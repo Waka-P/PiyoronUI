@@ -201,7 +201,7 @@ private fun GenieDemo() {
 
 // -1〜1 の値を選ぶスライドバー(サンプル用)
 @Composable
-private fun BiasSlider(value: Float, onValue: (Float) -> Unit) {
+internal fun BiasSlider(value: Float, onValue: (Float) -> Unit) {
     val c = Piyo.colors
     // 横の位置から値を求める
     fun toValue(x: Float, width: Float) = ((x / width).coerceIn(0f, 1f) * 2 - 1)

@@ -52,7 +52,7 @@
       }
     },
     "menu": {
-      "fill": { "$type": "color", "$value": { "from": "{color.surface}", "alpha": 0.94 } },
+      "fill": { "$type": "color", "$value": { "from": "{color.surface}", "alpha": 0.85 } },
       "edge": { "$type": "color", "$value": { "from": "{color.primary}", "alpha": 0.16 } },
       "shadow": {
         "$type": "shadow",

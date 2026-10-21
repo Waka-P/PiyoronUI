@@ -13,6 +13,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.graphics.layer.GraphicsLayer
+import androidx.compose.ui.graphics.layer.drawLayer
+import androidx.compose.ui.graphics.rememberGraphicsLayer
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
@@ -43,6 +47,10 @@ internal class PiyoOverlay {
     var origin by mutableStateOf(Offset.Zero)
         internal set
 
+    // 層の下に描いた中身(メニューの後ろをぼかすときに使う)
+    var backdrop: GraphicsLayer? = null
+        internal set
+
     // 画面の左上から見た位置を、層から見た位置にする
     fun toLocal(root: Offset): Offset = root - origin
 
@@ -64,6 +72,8 @@ internal fun PiyoOverlayHost(content: @Composable () -> Unit) {
         return
     }
     val overlay = remember { PiyoOverlay() }
+    val backdrop = rememberGraphicsLayer()
+    overlay.backdrop = backdrop
     CompositionLocalProvider(LocalPiyoOverlay provides overlay) {
         Box(
             modifier = Modifier
@@ -89,7 +99,14 @@ internal fun PiyoOverlayHost(content: @Composable () -> Unit) {
                 },
             propagateMinConstraints = true,
         ) {
-            content()
+            // 中身を描くとき、同じものを層にも記録しておく
+            Box(
+                modifier = Modifier.drawWithContent {
+                    backdrop.record { this@drawWithContent.drawContent() }
+                    drawLayer(backdrop)
+                },
+                propagateMinConstraints = true,
+            ) { content() }
             Box(Modifier.matchParentSize()) {
                 overlay.entries.forEach { entry -> key(entry) { entry.content() } }
             }

@@ -61,7 +61,9 @@
     "minWidth": {"$type": "dimension", "$value": 140},
     "padding": {"$type": "dimension", "$value": 5},
     "radius": {"$type": "dimension", "$value": 14},
-    "gap": {"$type": "dimension", "$description": "ボタンとメニューの間", "$value": 4},
+    "overlap": {"$type": "dimension", "$description": "メニューをボタンに重ねる幅", "$value": 10},
+    "backdropBlur": {"$type": "dimension", "$description": "メニューの後ろの画面をぼかす強さ(Android 12 以上)", "$value": 8},
+    "notchGap": {"$type": "dimension", "$description": "重なった所をくり抜くときの、ボタンのまわりの余白", "$value": 4},
     "margin": {"$type": "dimension", "$description": "画面の端から空ける幅", "$value": 8},
     "itemPaddingX": {"$type": "dimension", "$value": 12},
     "itemPaddingY": {"$type": "dimension", "$value": 8},
@@ -77,6 +79,7 @@
     "openDuration": {"$type": "duration", "$value": 200},
     "fadeDuration": {"$type": "duration", "$value": 160},
     "slideDuration": {"$type": "duration", "$value": 220},
+    "resizeDuration": {"$type": "duration", "$description": "中身で大きさが変わるときの時間(イージングは easing)", "$value": 220},
     "itemDuration": {"$type": "duration", "$description": "項目の背景と文字の色が変わる時間", "$value": 120},
     "easing": {"$type": "cubicBezier", "$value": [0.2, 0.8, 0.2, 1]},
     "fadeEasing": {"$type": "cubicBezier", "$description": "CSS の ease-out", "$value": [0, 0, 0.58, 1]}

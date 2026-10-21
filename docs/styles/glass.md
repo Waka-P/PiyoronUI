@@ -72,7 +72,7 @@
 | `TabTrack` | `tabs.trackFill`(極薄) | なし | スイープを不透明度 .3 | なし | `PiyoTabs` の土台、ひょうたん |
 | `TabThumb` | 通常ボタンと選んだチップの中間(`tabs.thumbFill`) | `tabs.thumbShadow`(立体的な内側の影) | 通常と Primary のスイープを半々 | `tabs.ring*`(枠の上に重ねる) | タブのつまみ、ひょうたんの印 |
 | `Card` | 160deg の斜めグラデーション(`card.fill`) | なし | スイープを不透明度 .5 | .5px を (1.5, 1.5) ずらす(`card.ring*`) | `PiyoCard`、ひょうたんとパネル、ジニーの面 |
-| `Menu` | 面の色 .94(`menu.fill`。参照実装は .8 + 背景ぼかし) | 2段の外の影(`menu.shadow`) | 主な色 .16 の単色の線(`menu.edge`) | なし | `PiyoMenu` |
+| `Menu` | 面の色 .85(`menu.fill`)+ 後ろの画面のぼかし 8dp(参照実装は .8 + ぼかし 18px) | 2段の外の影(`menu.shadow`) | 主な色 .16 の単色の線(`menu.edge`) | なし | `PiyoMenu` |
 | `MenuItem` | マウスを乗せる・フォーカス・押すと `menu.itemHover`(Danger は `itemDangerHover`) | なし | なし | なし | `PiyoMenuItem` |
 | `Divider` | `menu.divider` | なし | なし | なし | `PiyoMenuDivider` |
 | `Field` | `Button` と同じ(仮) | | | | 入力欄を作るときに決める |
@@ -119,7 +119,7 @@
 | `--seg-*` | `glass.tabs.*` | 枠(`--seg-track-edge`、`--seg-thumb-edge`)は移さず、`edgeStops` に変えた(下記) |
 | `.segmented` の `padding: 3px` と枠 1px | `tabs.trackPadding` / `tabs.trackBorder`(core) | 部品の配置に使うので共通側 |
 | `--glass-card-*`、`--card-ring-*` | `glass.card.*` | |
-| `--menu-fill` / `--menu-edge` / `--menu-shadow` | `glass.menu.fill` / `edge` / `shadow` | 面の不透明度は .8 → .94(背景ぼかしを使わないため) |
+| `--menu-fill` / `--menu-edge` / `--menu-shadow` | `glass.menu.fill` / `edge` / `shadow` | 面の不透明度は .8 → .85、背景ぼかしは 18px → 8dp(`menu.backdropBlur`) |
 | `--color-primary-soft`、`--color-danger-soft`、`--color-border`(メニューの項目と区切り線) | `glass.menu.itemHover` / `itemDangerHover` / `divider` | 直書きの色は役割の色の混色にした |
 | `.menu` の寸法と動き(`MENU_MARGIN`、`MENU_SLIDE_MS` など) | `menu.*`(core) | |
 | `--press-*` | `press.*`(core) | スタイルではなく共通の動き |
@@ -147,7 +147,7 @@
 | タブの枠が、主な色の直線グラデーションから、ボタンと同じスイープグラデーションに | 参照実装ではほぼ1色に見え、他の部品と比べて色の変化が乏しい。このライブラリでは揃える。土台は不透明度 .3 |
 | タブのつまみの塗りと枠が、通常ボタンと選んだチップの中間に | 選んだ印として通常ボタンより目立たせつつ、チップほど強くしないため |
 | カードの枠の不透明度が .7 → .5、線状の影のずれが (2, 2) → (1.5, 1.5) | カードは面が大きく、枠と影が強いと輪郭が重く見えた。ボタンより控えめにして、面の上の中身を引き立てる |
-| メニューの面の不透明度が .8 → .94 | 参照実装は背景ぼかしで下の文字をぼかす。ぼかしを使わないので、下の文字が透けないよう不透明度で補う |
+| メニューの面の不透明度が .8 → .85、背景ぼかしが 18px → 8dp | ぼかしは控えめにし、その分だけ面を少し不透明にして下の文字が読みにくくならないようにした |
 | メニューの区切り線と削除の背景が、直書きの色から役割の色の混色に | シードや危険の色を変えても合うように |
 
 ## 青紫の例

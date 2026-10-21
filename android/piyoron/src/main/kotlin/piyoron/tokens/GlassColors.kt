@@ -64,7 +64,7 @@ fun glassColors(roles: PiyoColorRoles): GlassColors {
         toneDangerFillHover = dangerStrong.alpha(0.94).toColor(),
         toneEdgePrimary = roles.toneEdge ?: listOf(0f to mix(primary, surface, 0.55).toColor(), 0.25f to mix(primary, surface, 0.85).toColor(), 0.4444444444444444f to mix(primary, surface, 1.0).toColor(), 0.6666666666666666f to mix(primary, surface, 0.6).toColor(), 0.8666666666666667f to mix(primary, surface, 0.3).toColor(), 1f to mix(primary, surface, 0.55).toColor()),
         toneEdgeDanger = listOf(0f to mix(danger, surface, 0.55).toColor(), 0.25f to mix(danger, surface, 0.85).toColor(), 0.4444444444444444f to mix(danger, surface, 1.0).toColor(), 0.6666666666666666f to mix(danger, surface, 0.6).toColor(), 0.8666666666666667f to mix(danger, surface, 0.3).toColor(), 1f to mix(danger, surface, 0.55).toColor()),
-        menuFill = surface.alpha(0.94).toColor(),
+        menuFill = surface.alpha(0.85).toColor(),
         menuEdge = primary.alpha(0.16).toColor(),
         menuShadow = listOf(PiyoShadow(contentDefault.alpha(0.08).toColor(), 0.dp, 1.dp, 2.dp, 0.dp, false), PiyoShadow(primaryStrong.alpha(0.22).toColor(), 0.dp, 12.dp, 32.dp, -6.dp, false)),
         menuItemHover = mix(primary, surface, 0.09).toColor(),

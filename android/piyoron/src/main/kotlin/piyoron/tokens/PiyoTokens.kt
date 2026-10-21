@@ -83,8 +83,12 @@ object PiyoTokens {
         val MinWidth = 140.dp
         val Padding = 5.dp
         val Radius = 14.dp
-        // ボタンとメニューの間
-        val Gap = 4.dp
+        // メニューをボタンに重ねる幅
+        val Overlap = 10.dp
+        // メニューの後ろの画面をぼかす強さ(Android 12 以上)
+        val BackdropBlur = 8.dp
+        // 重なった所をくり抜くときの、ボタンのまわりの余白
+        val NotchGap = 4.dp
         // 画面の端から空ける幅
         val Margin = 8.dp
         val ItemPaddingX = 12.dp
@@ -105,6 +109,8 @@ object PiyoTokens {
         val OpenDuration = 200
         val FadeDuration = 160
         val SlideDuration = 220
+        // 中身で大きさが変わるときの時間(イージングは easing)
+        val ResizeDuration = 220
         // 項目の背景と文字の色が変わる時間
         val ItemDuration = 120
         val Easing = CubicBezierEasing(0.2f, 0.8f, 0.2f, 1f)

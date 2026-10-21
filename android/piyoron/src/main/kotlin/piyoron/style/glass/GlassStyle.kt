@@ -45,7 +45,7 @@ internal object GlassStyle : PiyoStyle {
 
     // role ごとにガラスの面を組み立てる
     @Composable
-    override fun Modifier.surface(shape: Shape, role: SurfaceRole, state: PiyoState, tone: PiyoTone): Modifier {
+    override fun Modifier.surface(shape: Shape, role: SurfaceRole, state: PiyoState, tone: PiyoTone, fill: Color?): Modifier {
         val roles = Piyo.colors
         val glass = remember(roles) { glassColors(roles) }
         val look = when (role) {
@@ -58,7 +58,8 @@ internal object GlassStyle : PiyoStyle {
             SurfaceRole.MenuItem -> menuItemLook(glass, state, tone)
             SurfaceRole.Divider -> GlassLook(fill = solidFill(glass.menuDivider), shadows = emptyList(), ring = null, edge = null)
         }
-        return glassLayers(shape, look)
+        val painted = if (fill == null) look else GlassLook(solidFill(fill), look.shadows, look.ring, look.edge, look.ringOnTop)
+        return glassLayers(shape, painted)
     }
 
     // 面の上の文字・アイコンの色

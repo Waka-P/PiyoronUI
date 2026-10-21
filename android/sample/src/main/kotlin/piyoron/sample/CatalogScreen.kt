@@ -45,9 +45,11 @@ import androidx.compose.ui.unit.sp
 import piyoron.components.PiyoButton
 import piyoron.components.PiyoCard
 import piyoron.components.PiyoMenu
+import piyoron.components.PiyoMenuAlignment
 import piyoron.components.PiyoMenuDivider
 import piyoron.components.PiyoMenuGroup
 import piyoron.components.PiyoMenuItem
+import piyoron.components.PiyoMenuSide
 import piyoron.components.PiyoMenuTransition
 import piyoron.components.PiyoChip
 import piyoron.components.PiyoChipGroup
@@ -170,7 +172,20 @@ private fun CatalogContent(
             Caption("開いている間に、ほかのボタンへマウスを乗せる(スマホでは押す)と、滑って切り替わる")
             Caption("開閉の動き")
             PiyoChipGroup(PiyoMenuTransition.entries, transition, { transition = it }, label = { MenuTransitionNames.getValue(it) })
-            PiyoMenuGroup(transition = transition) {
+            var alignment by remember { mutableStateOf(PiyoMenuAlignment.EndCorner) }
+            var bias by rememberSaveable { mutableFloatStateOf(1f) }
+            Caption("ボタンに対する位置(名前で選ぶ)")
+            PiyoChipGroup(
+                MenuAlignmentNames.keys.toList(),
+                MenuAlignmentNames.entries.firstOrNull { it.value == alignment }?.key,
+                { alignment = MenuAlignmentNames.getValue(it) },
+            )
+            Caption("数値で決める: PiyoMenuAlignment(%.2f)(-1 でボタンの中心が始まりの角、1 で終わりの角)".format(bias))
+            BiasSlider(bias, {
+                bias = it
+                alignment = PiyoMenuAlignment(it)
+            })
+            PiyoMenuGroup(transition = transition, alignment = alignment) {
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.End)) {
                     PiyoMenu(SampleIcons.Copy, "コピー") {
                         PiyoMenuItem("テキスト", { last = "テキストをコピー" }, detail = "本文と日付")
@@ -183,7 +198,13 @@ private fun CatalogContent(
                     }
                     PiyoMenu(SampleIcons.Gear, "表示", minWidth = 220.dp) {
                         // 中身を自由に作る例(PiyoMenuItem を使わない)
-                        Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                        // 行の間隔で中身の高さが変わる(大きさはなめらかに変わる)
+                        val space = when (density) {
+                            "詰める" -> 4.dp
+                            "広く" -> 24.dp
+                            else -> 10.dp
+                        }
+                        Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(space)) {
                             PiyoText("行の間隔", style = LocalPiyoTextStyle.current.copy(fontWeight = FontWeight.Bold))
                             PiyoChipGroup(listOf("詰める", "ふつう", "広く"), density, { density = it })
                             PiyoButton("閉じる", onClick = { close() })
@@ -198,6 +219,25 @@ private fun CatalogContent(
                 }
             }
             Caption("選んだもの: $last、行の間隔: $density")
+            Caption("縦に並べたボタン(右に出す。位置は上の選択と同じ)")
+            PiyoMenuGroup(transition = transition, side = PiyoMenuSide.Right, alignment = alignment) {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    PiyoMenu(SampleIcons.Home, "ホーム") {
+                        PiyoMenuItem("最近の項目", { last = "最近の項目" })
+                        PiyoMenuItem("お気に入り", { last = "お気に入り" }, icon = SampleIcons.Star)
+                    }
+                    PiyoMenu(SampleIcons.Search, "検索") {
+                        PiyoMenuItem("すべて", { last = "すべてを検索" })
+                        PiyoMenuItem("画像だけ", { last = "画像を検索" })
+                        PiyoMenuItem("文書だけ", { last = "文書を検索" })
+                    }
+                    PiyoMenu(SampleIcons.More, "その他") {
+                        PiyoMenuItem("設定", { last = "設定" }, icon = SampleIcons.Gear)
+                        PiyoMenuDivider()
+                        PiyoMenuItem("削除", { last = "削除" }, icon = SampleIcons.Trash, tone = PiyoTone.Danger)
+                    }
+                }
+            }
         }
 
         Section("カード") {
@@ -255,6 +295,15 @@ private fun Swatches() {
     }
     Caption("seed #%06X".format(c.seed.toArgb() and 0xFFFFFF))
 }
+
+// ボタンに対する位置の名前の選択肢
+private val MenuAlignmentNames = linkedMapOf(
+    "左の角" to PiyoMenuAlignment.StartCorner,
+    "左端" to PiyoMenuAlignment.StartEdge,
+    "中央" to PiyoMenuAlignment.Center,
+    "右端" to PiyoMenuAlignment.EndEdge,
+    "右の角" to PiyoMenuAlignment.EndCorner,
+)
 
 // 開閉の動きの表示名
 private val MenuTransitionNames = mapOf(

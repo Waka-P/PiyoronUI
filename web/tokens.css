@@ -41,7 +41,9 @@
   --piyo-menu-min-width: 140px;
   --piyo-menu-padding: 5px;
   --piyo-menu-radius: 14px;
-  --piyo-menu-gap: 4px;
+  --piyo-menu-overlap: 10px;
+  --piyo-menu-backdrop-blur: 8px;
+  --piyo-menu-notch-gap: 4px;
   --piyo-menu-margin: 8px;
   --piyo-menu-item-padding-x: 12px;
   --piyo-menu-item-padding-y: 8px;
@@ -57,6 +59,7 @@
   --piyo-menu-open-duration: 200ms;
   --piyo-menu-fade-duration: 160ms;
   --piyo-menu-slide-duration: 220ms;
+  --piyo-menu-resize-duration: 220ms;
   --piyo-menu-item-duration: 120ms;
   --piyo-menu-easing: cubic-bezier(0.2, 0.8, 0.2, 1);
   --piyo-menu-fade-easing: cubic-bezier(0, 0, 0.58, 1);
@@ -369,7 +372,7 @@
   --piyo-glass-tone-danger-fill-hover: color-mix(in srgb, var(--piyo-color-danger-strong) 94%, transparent);
   --piyo-glass-tone-edge-primary: conic-gradient(from 0deg, color-mix(in srgb, var(--piyo-color-primary) 55%, var(--piyo-color-surface)) 0deg, color-mix(in srgb, var(--piyo-color-primary) 85%, var(--piyo-color-surface)) 90deg, color-mix(in srgb, var(--piyo-color-primary) 100%, var(--piyo-color-surface)) 160deg, color-mix(in srgb, var(--piyo-color-primary) 60%, var(--piyo-color-surface)) 240deg, color-mix(in srgb, var(--piyo-color-primary) 30%, var(--piyo-color-surface)) 312deg, color-mix(in srgb, var(--piyo-color-primary) 55%, var(--piyo-color-surface)) 360deg);
   --piyo-glass-tone-edge-danger: conic-gradient(from 0deg, color-mix(in srgb, var(--piyo-color-danger) 55%, var(--piyo-color-surface)) 0deg, color-mix(in srgb, var(--piyo-color-danger) 85%, var(--piyo-color-surface)) 90deg, color-mix(in srgb, var(--piyo-color-danger) 100%, var(--piyo-color-surface)) 160deg, color-mix(in srgb, var(--piyo-color-danger) 60%, var(--piyo-color-surface)) 240deg, color-mix(in srgb, var(--piyo-color-danger) 30%, var(--piyo-color-surface)) 312deg, color-mix(in srgb, var(--piyo-color-danger) 55%, var(--piyo-color-surface)) 360deg);
-  --piyo-glass-menu-fill: color-mix(in srgb, var(--piyo-color-surface) 94%, transparent);
+  --piyo-glass-menu-fill: color-mix(in srgb, var(--piyo-color-surface) 85%, transparent);
   --piyo-glass-menu-edge: color-mix(in srgb, var(--piyo-color-primary) 16%, transparent);
   --piyo-glass-menu-shadow: 0px 1px 2px 0px color-mix(in srgb, var(--piyo-color-content-default) 8%, transparent), 0px 12px 32px -6px color-mix(in srgb, var(--piyo-color-primary-strong) 22%, transparent);
   --piyo-glass-menu-item-hover: color-mix(in srgb, var(--piyo-color-primary) 9%, var(--piyo-color-surface));

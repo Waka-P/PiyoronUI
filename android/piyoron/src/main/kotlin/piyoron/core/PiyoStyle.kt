@@ -28,9 +28,9 @@ data class PiyoState(
 @Stable
 interface PiyoStyle {
 
-    // 面(塗り、枠、影)を描く
+    // 面(塗り、枠、影)を描く。fill を渡すと、塗りの色だけを部品側の色にする
     @Composable
-    fun Modifier.surface(shape: Shape, role: SurfaceRole, state: PiyoState, tone: PiyoTone): Modifier
+    fun Modifier.surface(shape: Shape, role: SurfaceRole, state: PiyoState, tone: PiyoTone, fill: Color? = null): Modifier
 
     // 面の上の文字・アイコンの色
     @Composable
@@ -48,4 +48,5 @@ fun Modifier.piyoSurface(
     role: SurfaceRole,
     state: PiyoState = PiyoState(),
     tone: PiyoTone = PiyoTone.Default,
-): Modifier = with(Piyo.style) { this@piyoSurface.surface(shape, role, state, tone) }
+    fill: Color? = null,
+): Modifier = with(Piyo.style) { this@piyoSurface.surface(shape, role, state, tone, fill) }
