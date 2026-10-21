@@ -1,0 +1,19 @@
+{
+  "gourd": {
+    "buttonSize": { "$type": "dimension", "$value": 48 },
+    "gap": { "$type": "dimension", "$value": 12 },
+    "padding": { "$type": "dimension", "$value": 6 },
+    "iconSize": { "$type": "dimension", "$value": 22 },
+    "fillet": { "$type": "dimension", "$value": 12 },
+    "panelLeft": { "$type": "dimension", "$description": "ひょうたんの左端からパネルの左端まで(ボタンの大きさ / 1.1 + 余白)", "$value": 49.6 },
+    "switchDuration": { "$type": "duration", "$value": 380 },
+    "switchEasing": { "$type": "cubicBezier", "$description": "印の前の端と後ろの端の動き(初動はゆっくり)", "$value": [0.7, 0, 0.4, 1] },
+    "trail": { "$type": "number", "$description": "印の後ろの端が前の端より遅れて動き出す時点(移動の時間に対する割合)", "$value": 0.2 },
+    "bounceDuration": { "$type": "duration", "$description": "弾みありの印の移動の時間", "$value": 560 },
+    "waist": { "$type": "number", "$description": "伸びた印の最も細い幅(ボタンの大きさに対する割合)", "$value": 0.7 },
+    "anticipation": { "$type": "dimension", "$description": "弾みを付けたとき、伸びる前に印が縮んで後ろへためる量", "$value": 4 },
+    "overshoot": { "$type": "dimension", "$description": "弾みを付けたとき、印の先が行き先を通り過ぎる量", "$value": 5 },
+    "fitInset": { "$type": "dimension", "$description": "印をくびれに合わせるときの、ひょうたんの縁からの余白", "$value": 4 },
+    "arriveAt": { "$type": "number", "$description": "移った先のアイコンの色が変わる時点(移動の時間に対する割合)", "$value": 0.55 }
+  }
+}

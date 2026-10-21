@@ -1,0 +1,388 @@
+/* Piyoron トークン(自動生成。手で書き換えない。元は tokens/) */
+
+/* 共通 */
+:root {
+  --piyo-radius-sm: 8px;
+  --piyo-radius-md: 12px;
+  --piyo-radius-lg: 20px;
+  --piyo-radius-pill: 999px;
+  --piyo-space-xs: 4px;
+  --piyo-space-sm: 8px;
+  --piyo-space-md: 12px;
+  --piyo-space-lg: 16px;
+  --piyo-space-xl: 20px;
+  --piyo-space-xxl: 24px;
+  --piyo-duration-fast: 150ms;
+  --piyo-duration-toggle: 180ms;
+  --piyo-duration-segmented: 250ms;
+  --piyo-easing-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --piyo-font-family: "Zen Kaku Gothic New", "Hiragino Sans", "Meiryo", sans-serif;
+  --piyo-press-hover-scale: 1.04;
+  --piyo-press-active-shrink: 0.03;
+  --piyo-press-touch-shrink: 0.04;
+  --piyo-press-hover-duration: 180ms;
+  --piyo-press-active-duration: 70ms;
+  --piyo-touch-min-size: 48px;
+  --piyo-text-size: 14px;
+  --piyo-text-size-small: 13px;
+  --piyo-text-weight: 500;
+  --piyo-control-height: 38px;
+  --piyo-control-padding-x: 16px;
+  --piyo-control-gap: 6px;
+  --piyo-control-icon-size: 20px;
+  --piyo-control-disabled-opacity: 0.45;
+  --piyo-control-focus-width: 2px;
+  --piyo-control-focus-offset: 2px;
+  --piyo-chip-padding-x: 14px;
+  --piyo-chip-padding-y: 6px;
+  --piyo-chip-gap: 8px;
+  --piyo-card-padding-x: 24px;
+  --piyo-card-padding-y: 20.8px;
+  --piyo-tabs-track-padding: 3px;
+  --piyo-tabs-track-border: 1px;
+  --piyo-tabs-item-padding-x: 4px;
+  --piyo-tabs-item-padding-y: 7px;
+  --piyo-genie-duration: 340ms;
+  --piyo-genie-easing: cubic-bezier(0.45, 0, 0.8, 0.4);
+  --piyo-genie-neck: 16px;
+  --piyo-gourd-button-size: 48px;
+  --piyo-gourd-gap: 12px;
+  --piyo-gourd-padding: 6px;
+  --piyo-gourd-icon-size: 22px;
+  --piyo-gourd-fillet: 12px;
+  --piyo-gourd-panel-left: 49.6px;
+  --piyo-gourd-switch-duration: 380ms;
+  --piyo-gourd-switch-easing: cubic-bezier(0.7, 0, 0.4, 1);
+  --piyo-gourd-trail: 0.2;
+  --piyo-gourd-bounce-duration: 560ms;
+  --piyo-gourd-waist: 0.7;
+  --piyo-gourd-anticipation: 4px;
+  --piyo-gourd-overshoot: 5px;
+  --piyo-gourd-fit-inset: 4px;
+  --piyo-gourd-arrive-at: 0.55;
+}
+
+/* 色: ocean(既定) */
+:root, [data-piyoron-palette="ocean"] {
+  --piyo-color-seed: #2293c7;
+  --piyo-color-primary: #2293c7;
+  --piyo-color-primary-strong: #1d7bbf;
+  --piyo-color-surface: #ffffff;
+  --piyo-color-surface-muted: #f6f9fa;
+  --piyo-color-background: #f1f5f7;
+  --piyo-color-fill-top: #ffffff9e;
+  --piyo-color-fill-bottom: #e4f2f880;
+  --piyo-color-fill-selected-top: #ebf5fa8d;
+  --piyo-color-fill-selected-bottom: #2293c71a;
+  --piyo-color-ring-shadow: #1d4b7261;
+  --piyo-color-inner-glow: #2293c724;
+  --piyo-color-inner-highlight: #ffffffb3;
+  --piyo-color-content-default: #1d2433;
+  --piyo-color-content-muted: #697284;
+  --piyo-color-content-selected: #1073b7;
+  --piyo-color-content-on-primary: #ffffff;
+  --piyo-color-danger: #e5484d;
+  --piyo-color-danger-strong: #c9363b;
+  --piyo-color-ok: #1e9e6a;
+  --piyo-color-warn: #e8920c;
+  --piyo-color-edge-0: #84a8ea;
+  --piyo-color-edge-1: #93b3ec;
+  --piyo-color-edge-2: #7fc4f0;
+  --piyo-color-edge-3: #8fbdf0;
+  --piyo-color-edge-4: #7fd8d0;
+  --piyo-color-edge-5: #a3e2e2;
+  --piyo-color-edge-6: #78cfc4;
+  --piyo-color-edge-7: #7fa6e4;
+  --piyo-color-edge-8: #5f8fdc;
+  --piyo-color-edge-9: #7396e2;
+  --piyo-color-edge-10: #8cb6ee;
+  --piyo-color-edge-11: #9ad6f0;
+  --piyo-color-edge-12: #7fa8ea;
+}
+
+/* 色: mint */
+[data-piyoron-palette="mint"] {
+  --piyo-color-seed: #14a08e;
+  --piyo-color-primary: #14a08e;
+  --piyo-color-primary-strong: #008b81;
+  --piyo-color-surface: #ffffff;
+  --piyo-color-surface-muted: #f6f9f8;
+  --piyo-color-background: #f1f5f4;
+  --piyo-color-fill-top: #ffffff9e;
+  --piyo-color-fill-bottom: #e3f4f180;
+  --piyo-color-fill-selected-top: #e9f6f58d;
+  --piyo-color-fill-selected-bottom: #14a08e1a;
+  --piyo-color-ring-shadow: #0a555061;
+  --piyo-color-inner-glow: #14a08e24;
+  --piyo-color-inner-highlight: #ffffffb3;
+  --piyo-color-content-default: #132828;
+  --piyo-color-content-muted: #607677;
+  --piyo-color-content-selected: #007c73;
+  --piyo-color-content-on-primary: #ffffff;
+  --piyo-color-danger: #e5484d;
+  --piyo-color-danger-strong: #c9363b;
+  --piyo-color-ok: #1e9e6a;
+  --piyo-color-warn: #e8920c;
+  --piyo-color-edge-0: #55bbba;
+  --piyo-color-edge-1: #70c3c2;
+  --piyo-color-edge-2: #79cdbf;
+  --piyo-color-edge-3: #79cac3;
+  --piyo-color-edge-4: #9ad5b2;
+  --piyo-color-edge-5: #b4e1c9;
+  --piyo-color-edge-6: #93cca8;
+  --piyo-color-edge-7: #56b7b5;
+  --piyo-color-edge-8: #00a4a2;
+  --piyo-color-edge-9: #25acad;
+  --piyo-color-edge-10: #6ec5c0;
+  --piyo-color-edge-11: #9fdacb;
+  --piyo-color-edge-12: #51bab8;
+}
+
+/* 色: rose */
+[data-piyoron-palette="rose"] {
+  --piyo-color-seed: #dd84af;
+  --piyo-color-primary: #dd84af;
+  --piyo-color-primary-strong: #ce6d98;
+  --piyo-color-surface: #ffffff;
+  --piyo-color-surface-muted: #faf7f9;
+  --piyo-color-background: #f7f3f5;
+  --piyo-color-fill-top: #ffffff9e;
+  --piyo-color-fill-bottom: #fbf0f580;
+  --piyo-color-fill-selected-top: #fcf4f88d;
+  --piyo-color-fill-selected-bottom: #dd84af1a;
+  --piyo-color-ring-shadow: #77425861;
+  --piyo-color-inner-glow: #dd84af24;
+  --piyo-color-inner-highlight: #ffffffb3;
+  --piyo-color-content-default: #301e24;
+  --piyo-color-content-muted: #836d73;
+  --piyo-color-content-selected: #ae507c;
+  --piyo-color-content-on-primary: #ffffff;
+  --piyo-color-danger: #e5484d;
+  --piyo-color-danger-strong: #c9363b;
+  --piyo-color-ok: #1e9e6a;
+  --piyo-color-warn: #e8920c;
+  --piyo-color-edge-0: #dd8ca7;
+  --piyo-color-edge-1: #e19bb2;
+  --piyo-color-edge-2: #e9a3c2;
+  --piyo-color-edge-3: #e6a2bb;
+  --piyo-color-edge-4: #eab1da;
+  --piyo-color-edge-5: #f1c5e2;
+  --piyo-color-edge-6: #e0a8d2;
+  --piyo-color-edge-7: #d78aa5;
+  --piyo-color-edge-8: #cb6c8f;
+  --piyo-color-edge-9: #d27896;
+  --piyo-color-edge-10: #e39bb5;
+  --piyo-color-edge-11: #efbad4;
+  --piyo-color-edge-12: #dc8ba7;
+}
+
+/* 色: violet */
+[data-piyoron-palette="violet"] {
+  --piyo-color-seed: #7a5fd6;
+  --piyo-color-primary: #7a5fd6;
+  --piyo-color-primary-strong: #7243c5;
+  --piyo-color-surface: #ffffff;
+  --piyo-color-surface-muted: #f8f8fc;
+  --piyo-color-background: #f4f4f9;
+  --piyo-color-fill-top: #ffffff9e;
+  --piyo-color-fill-bottom: #efecfa80;
+  --piyo-color-fill-selected-top: #f3f0fb8d;
+  --piyo-color-fill-selected-bottom: #7a5fd61a;
+  --piyo-color-ring-shadow: #4a2f7661;
+  --piyo-color-inner-glow: #7a5fd624;
+  --piyo-color-inner-highlight: #ffffffb3;
+  --piyo-color-content-default: #291f35;
+  --piyo-color-content-muted: #776c87;
+  --piyo-color-content-selected: #7243c5;
+  --piyo-color-content-on-primary: #ffffff;
+  --piyo-color-danger: #e5484d;
+  --piyo-color-danger-strong: #c9363b;
+  --piyo-color-ok: #1e9e6a;
+  --piyo-color-warn: #e8920c;
+  --piyo-color-edge-0: #b598de;
+  --piyo-color-edge-1: #bea5e2;
+  --piyo-color-edge-2: #bbb0f3;
+  --piyo-color-edge-3: #bfadea;
+  --piyo-color-edge-4: #aec4ff;
+  --piyo-color-edge-5: #c6d3ff;
+  --piyo-color-edge-6: #a4bbf5;
+  --piyo-color-edge-7: #b096da;
+  --piyo-color-edge-8: #9e7bcf;
+  --piyo-color-edge-9: #a885d4;
+  --piyo-color-edge-10: #bca6e6;
+  --piyo-color-edge-11: #c8c6f9;
+  --piyo-color-edge-12: #b397df;
+}
+
+/* 色: amber */
+[data-piyoron-palette="amber"] {
+  --piyo-color-seed: #d48a0a;
+  --piyo-color-primary: #d48a0a;
+  --piyo-color-primary-strong: #b0640a;
+  --piyo-color-surface: #ffffff;
+  --piyo-color-surface-muted: #faf8f6;
+  --piyo-color-background: #f7f4f0;
+  --piyo-color-fill-top: #ffffff9e;
+  --piyo-color-fill-bottom: #faf1e280;
+  --piyo-color-fill-selected-top: #fbf4e88d;
+  --piyo-color-fill-selected-bottom: #d48a0a1a;
+  --piyo-color-ring-shadow: #67411461;
+  --piyo-color-inner-glow: #d48a0a24;
+  --piyo-color-inner-highlight: #ffffffb3;
+  --piyo-color-content-default: #2b241d;
+  --piyo-color-content-muted: #736a60;
+  --piyo-color-content-selected: #a75d00;
+  --piyo-color-content-on-primary: #ffffff;
+  --piyo-color-danger: #e5484d;
+  --piyo-color-danger-strong: #c9363b;
+  --piyo-color-ok: #1e9e6a;
+  --piyo-color-warn: #e8920c;
+  --piyo-color-edge-0: #cba057;
+  --piyo-color-edge-1: #d1ac6f;
+  --piyo-color-edge-2: #e0b176;
+  --piyo-color-edge-3: #d9b278;
+  --piyo-color-edge-4: #f1b88e;
+  --piyo-color-edge-5: #f5cbab;
+  --piyo-color-edge-6: #e8af86;
+  --piyo-color-edge-7: #c79d58;
+  --piyo-color-edge-8: #b9841c;
+  --piyo-color-edge-9: #be8f34;
+  --piyo-color-edge-10: #d4ac6e;
+  --piyo-color-edge-11: #ebc49a;
+  --piyo-color-edge-12: #cb9f54;
+}
+
+/* 色: gold */
+[data-piyoron-palette="gold"] {
+  --piyo-color-seed: #d4b045;
+  --piyo-color-primary: #d4b045;
+  --piyo-color-primary-strong: #8d7023;
+  --piyo-color-surface: #ffffff;
+  --piyo-color-surface-muted: #f9f8f6;
+  --piyo-color-background: #f6f4f0;
+  --piyo-color-fill-top: #ffffff9e;
+  --piyo-color-fill-bottom: #faf6e980;
+  --piyo-color-fill-selected-top: #fbf8ee8d;
+  --piyo-color-fill-selected-bottom: #d4b0451a;
+  --piyo-color-ring-shadow: #57471f61;
+  --piyo-color-inner-glow: #d4b04524;
+  --piyo-color-inner-highlight: #ffffffb3;
+  --piyo-color-content-default: #2a261b;
+  --piyo-color-content-muted: #726b5c;
+  --piyo-color-content-selected: #8b6e21;
+  --piyo-color-content-on-primary: #ffffff;
+  --piyo-color-danger: #e5484d;
+  --piyo-color-danger-strong: #c9363b;
+  --piyo-color-ok: #1e9e6a;
+  --piyo-color-warn: #e8920c;
+  --piyo-color-edge-0: #e3d18c;
+  --piyo-color-edge-1: #c8a747;
+  --piyo-color-edge-2: #ab862a;
+  --piyo-color-edge-3: #d7bc66;
+  --piyo-color-edge-4: #eddfa2;
+  --piyo-color-edge-5: #f0e8b6;
+  --piyo-color-edge-6: #e3cd80;
+  --piyo-color-edge-7: #bd9939;
+  --piyo-color-edge-8: #a4802b;
+  --piyo-color-edge-9: #cbaa4b;
+  --piyo-color-edge-10: #e8d897;
+  --piyo-color-edge-11: #eee6b5;
+  --piyo-color-edge-12: #dabf69;
+}
+
+/* 色: bubble */
+[data-piyoron-palette="bubble"] {
+  --piyo-color-seed: #71adda;
+  --piyo-color-primary: #71adda;
+  --piyo-color-primary-strong: #6796ce;
+  --piyo-color-surface: #ffffff;
+  --piyo-color-surface-muted: #f7f9fa;
+  --piyo-color-background: #f2f5f6;
+  --piyo-color-fill-top: #ffffff9e;
+  --piyo-color-fill-bottom: #eef5fb80;
+  --piyo-color-fill-selected-top: #f2f7fc8d;
+  --piyo-color-fill-selected-bottom: #71adda1a;
+  --piyo-color-ring-shadow: #40577761;
+  --piyo-color-inner-glow: #71adda24;
+  --piyo-color-inner-highlight: #ffffffb3;
+  --piyo-color-content-default: #20242f;
+  --piyo-color-content-muted: #6f7381;
+  --piyo-color-content-selected: #3376a6;
+  --piyo-color-content-on-primary: #ffffff;
+  --piyo-color-danger: #e5484d;
+  --piyo-color-danger-strong: #c9363b;
+  --piyo-color-ok: #1e9e6a;
+  --piyo-color-warn: #e8920c;
+  --piyo-color-edge-0: #c5c1f5;
+  --piyo-color-edge-1: #9fcef2;
+  --piyo-color-edge-2: #8ddcf1;
+  --piyo-color-edge-3: #b4e2d4;
+  --piyo-color-edge-4: #aee5c4;
+  --piyo-color-edge-5: #9ee4ca;
+  --piyo-color-edge-6: #83e2e4;
+  --piyo-color-edge-7: #97bafa;
+  --piyo-color-edge-8: #9ea6f7;
+  --piyo-color-edge-9: #bcacf6;
+  --piyo-color-edge-10: #e4a2f3;
+  --piyo-color-edge-11: #e1b3f6;
+  --piyo-color-edge-12: #cabdf9;
+}
+
+/* Glass */
+:root, [data-piyoron-style="glass"], [data-piyoron-palette] {
+  --piyo-glass-edge-width: 1px;
+  --piyo-glass-fill-hover-top: color-mix(in srgb, var(--piyo-color-surface) 82%, transparent);
+  --piyo-glass-fill-hover-bottom: color-mix(in srgb, color-mix(in srgb, var(--piyo-color-primary) 9%, var(--piyo-color-surface)) 66%, transparent);
+  --piyo-glass-shadow-idle: inset 0px 0px 6px 0px var(--piyo-color-inner-glow), inset 4px 4px 8px -5px var(--piyo-color-inner-highlight);
+  --piyo-glass-shadow-hover: inset 0px 0px 6px 0px color-mix(in srgb, var(--piyo-color-primary) 10%, transparent), inset 4px 4px 8px -5px color-mix(in srgb, var(--piyo-color-surface) 85%, transparent);
+  --piyo-glass-ring-width: 1px;
+  --piyo-glass-ring-blur: 1px;
+  --piyo-glass-ring-offset-x: 1px;
+  --piyo-glass-ring-offset-y: 2px;
+  --piyo-glass-backdrop-blur: 12px;
+  --piyo-glass-backdrop-saturate: 1.4;
+  --piyo-glass-tone-primary-fill: color-mix(in srgb, var(--piyo-color-primary) 85%, transparent);
+  --piyo-glass-tone-primary-fill-hover: color-mix(in srgb, var(--piyo-color-primary-strong) 85%, transparent);
+  --piyo-glass-tone-danger-fill: color-mix(in srgb, var(--piyo-color-danger) 92%, transparent);
+  --piyo-glass-tone-danger-fill-hover: color-mix(in srgb, var(--piyo-color-danger-strong) 94%, transparent);
+  --piyo-glass-tone-edge-primary: conic-gradient(from 0deg, color-mix(in srgb, var(--piyo-color-primary) 55%, var(--piyo-color-surface)) 0deg, color-mix(in srgb, var(--piyo-color-primary) 85%, var(--piyo-color-surface)) 90deg, color-mix(in srgb, var(--piyo-color-primary) 100%, var(--piyo-color-surface)) 160deg, color-mix(in srgb, var(--piyo-color-primary) 60%, var(--piyo-color-surface)) 240deg, color-mix(in srgb, var(--piyo-color-primary) 30%, var(--piyo-color-surface)) 312deg, color-mix(in srgb, var(--piyo-color-primary) 55%, var(--piyo-color-surface)) 360deg);
+  --piyo-glass-tone-edge-danger: conic-gradient(from 0deg, color-mix(in srgb, var(--piyo-color-danger) 55%, var(--piyo-color-surface)) 0deg, color-mix(in srgb, var(--piyo-color-danger) 85%, var(--piyo-color-surface)) 90deg, color-mix(in srgb, var(--piyo-color-danger) 100%, var(--piyo-color-surface)) 160deg, color-mix(in srgb, var(--piyo-color-danger) 60%, var(--piyo-color-surface)) 240deg, color-mix(in srgb, var(--piyo-color-danger) 30%, var(--piyo-color-surface)) 312deg, color-mix(in srgb, var(--piyo-color-danger) 55%, var(--piyo-color-surface)) 360deg);
+  --piyo-glass-chip-gloss-top: color-mix(in srgb, var(--piyo-color-surface) 50%, transparent);
+  --piyo-glass-chip-gloss-bottom: color-mix(in srgb, var(--piyo-color-surface) 0%, transparent);
+  --piyo-glass-chip-tint-rest: 0.03;
+  --piyo-glass-chip-tint-hover: 0.08;
+  --piyo-glass-chip-edge-rest: 0.26;
+  --piyo-glass-chip-edge-hover: 0.6;
+  --piyo-glass-chip-edge-side-ratio: 0.65;
+  --piyo-glass-chip-edge-angle: 100;
+  --piyo-glass-chip-border: 1px;
+  --piyo-glass-chip-shadow-rest: inset 0px 0.5px 0px 0px color-mix(in srgb, var(--piyo-color-surface) 90%, transparent), 0px 0.5px 0.5px 0px color-mix(in srgb, var(--piyo-color-primary-strong) 10%, transparent);
+  --piyo-glass-chip-shadow-hover: inset 0px 1px 0px 0px color-mix(in srgb, var(--piyo-color-surface) 90%, transparent), 0px 1px 2px 0px color-mix(in srgb, var(--piyo-color-primary-strong) 18%, transparent);
+  --piyo-glass-chip-ring-width: 0.8px;
+  --piyo-glass-chip-ring-blur: 0.8px;
+  --piyo-glass-chip-ring-offset-x: 0.5px;
+  --piyo-glass-chip-ring-offset-y: 0.8px;
+  --piyo-glass-tabs-track-fill: linear-gradient(180deg, color-mix(in srgb, var(--piyo-color-primary) 1%, var(--piyo-color-surface)) 0%, color-mix(in srgb, var(--piyo-color-primary) 3%, var(--piyo-color-surface)) 100%);
+  --piyo-glass-tabs-thumb-fill: linear-gradient(180deg, color-mix(in srgb, var(--piyo-color-fill-top) 50%, var(--piyo-color-fill-selected-top)) 0%, color-mix(in srgb, var(--piyo-color-fill-bottom) 50%, var(--piyo-color-fill-selected-bottom)) 100%);
+  --piyo-glass-tabs-thumb-edge-blend: 0.5;
+  --piyo-glass-tabs-track-edge-opacity: 0.3;
+  --piyo-glass-tabs-thumb-shadow: 0px 1px 3px 0px color-mix(in srgb, var(--piyo-color-primary) 12%, transparent), inset 0px 2px 4px 0px color-mix(in srgb, var(--piyo-color-surface) 95%, transparent), inset 0px -2px 5px 0px color-mix(in srgb, var(--piyo-color-primary) 7%, transparent);
+  --piyo-glass-tabs-ring-color: color-mix(in srgb, var(--piyo-color-ring-shadow) 60%, transparent);
+  --piyo-glass-tabs-ring-blur: 0.7px;
+  --piyo-glass-tabs-ring-offset-x: 1px;
+  --piyo-glass-tabs-ring-offset-y: 1.5px;
+  --piyo-glass-card-fill: linear-gradient(160deg, color-mix(in srgb, var(--piyo-color-surface) 96%, transparent) 0%, color-mix(in srgb, color-mix(in srgb, var(--piyo-color-primary) 5%, var(--piyo-color-surface)) 90%, transparent) 100%);
+  --piyo-glass-card-edge-opacity: 0.7;
+  --piyo-glass-card-ring-width: 0.5px;
+  --piyo-glass-card-ring-blur: 1px;
+  --piyo-glass-card-ring-offset-x: 2px;
+  --piyo-glass-card-ring-offset-y: 2px;
+  --piyo-glass-card-backdrop-blur: 14px;
+  --piyo-glass-card-backdrop-saturate: 1.5;
+  --piyo-glass-edge: conic-gradient(from 0deg, var(--piyo-color-edge-0) 0deg, var(--piyo-color-edge-1) 35deg, var(--piyo-color-edge-2) 70deg, var(--piyo-color-edge-3) 100deg, var(--piyo-color-edge-4) 125deg, var(--piyo-color-edge-5) 150deg, var(--piyo-color-edge-6) 175deg, var(--piyo-color-edge-7) 200deg, var(--piyo-color-edge-8) 230deg, var(--piyo-color-edge-9) 260deg, var(--piyo-color-edge-10) 290deg, var(--piyo-color-edge-11) 315deg, var(--piyo-color-edge-12) 340deg, var(--piyo-color-edge-0) 360deg);
+}
+
+/* bubble: 色付きの枠も枠の色の並びにする */
+[data-piyoron-palette="bubble"] {
+  --piyo-glass-tone-edge-primary: var(--piyo-glass-edge);
+}

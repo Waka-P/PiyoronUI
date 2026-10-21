@@ -1,0 +1,7 @@
+{
+  "genie": {
+    "duration": { "$type": "duration", "$value": 340 },
+    "easing": { "$type": "cubicBezier", "$value": [0.45, 0, 0.8, 0.4] },
+    "neck": { "$type": "dimension", "$value": 16 }
+  }
+}

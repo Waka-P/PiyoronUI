@@ -1,0 +1,131 @@
+{
+  "glass": {
+    "edge": {
+      "width": { "$type": "dimension", "$value": 1 }
+    },
+    "fill": {
+      "hoverTop": { "$type": "color", "$value": { "from": "{color.surface}", "alpha": 0.82 } },
+      "hoverBottom": { "$type": "color", "$value": { "mix": ["{color.primary}", "{color.surface}", 0.09], "alpha": 0.66 } }
+    },
+    "shadow": {
+      "idle": {
+        "$type": "shadow",
+        "$value": [
+          { "color": "{color.innerGlow}", "x": 0, "y": 0, "blur": 6, "spread": 0, "inset": true },
+          { "color": "{color.innerHighlight}", "x": 4, "y": 4, "blur": 8, "spread": -5, "inset": true }
+        ]
+      },
+      "hover": {
+        "$type": "shadow",
+        "$value": [
+          { "color": { "from": "{color.primary}", "alpha": 0.1 }, "x": 0, "y": 0, "blur": 6, "spread": 0, "inset": true },
+          { "color": { "from": "{color.surface}", "alpha": 0.85 }, "x": 4, "y": 4, "blur": 8, "spread": -5, "inset": true }
+        ]
+      }
+    },
+    "ring": {
+      "width": { "$type": "dimension", "$value": 1 },
+      "blur": { "$type": "dimension", "$value": 1 },
+      "offsetX": { "$type": "dimension", "$value": 1 },
+      "offsetY": { "$type": "dimension", "$value": 2 }
+    },
+    "backdrop": {
+      "blur": { "$type": "dimension", "$value": 12 },
+      "saturate": { "$type": "number", "$value": 1.4 }
+    },
+    "tone": {
+      "primaryFill": { "$type": "color", "$value": { "from": "{color.primary}", "alpha": 0.85 } },
+      "primaryFillHover": { "$type": "color", "$value": { "from": "{color.primaryStrong}", "alpha": 0.85 } },
+      "dangerFill": { "$type": "color", "$value": { "from": "{color.danger}", "alpha": 0.92 } },
+      "dangerFillHover": { "$type": "color", "$value": { "from": "{color.dangerStrong}", "alpha": 0.94 } },
+      "edge": {
+        "$type": "toneStops",
+        "$description": "色付きの枠。amount は tone 色と surface の混色の割合",
+        "$value": [
+          { "angle": 0, "amount": 0.55 },
+          { "angle": 90, "amount": 0.85 },
+          { "angle": 160, "amount": 1 },
+          { "angle": 240, "amount": 0.6 },
+          { "angle": 312, "amount": 0.3 },
+          { "angle": 360, "amount": 0.55 }
+        ]
+      }
+    },
+    "chip": {
+      "glossTop": { "$type": "color", "$value": { "from": "{color.surface}", "alpha": 0.5 } },
+      "glossBottom": { "$type": "color", "$value": { "from": "{color.surface}", "alpha": 0 } },
+      "tintRest": { "$type": "number", "$value": 0.03 },
+      "tintHover": { "$type": "number", "$value": 0.08 },
+      "edgeRest": { "$type": "number", "$value": 0.26 },
+      "edgeHover": { "$type": "number", "$value": 0.6 },
+      "edgeSideRatio": { "$type": "number", "$value": 0.65 },
+      "edgeAngle": { "$type": "number", "$value": 100 },
+      "border": { "$type": "dimension", "$value": 1 },
+      "shadowRest": {
+        "$type": "shadow",
+        "$value": [
+          { "color": { "from": "{color.surface}", "alpha": 0.9 }, "x": 0, "y": 0.5, "blur": 0, "spread": 0, "inset": true },
+          { "color": { "from": "{color.primaryStrong}", "alpha": 0.1 }, "x": 0, "y": 0.5, "blur": 0.5, "spread": 0, "inset": false }
+        ]
+      },
+      "shadowHover": {
+        "$type": "shadow",
+        "$value": [
+          { "color": { "from": "{color.surface}", "alpha": 0.9 }, "x": 0, "y": 1, "blur": 0, "spread": 0, "inset": true },
+          { "color": { "from": "{color.primaryStrong}", "alpha": 0.18 }, "x": 0, "y": 1, "blur": 2, "spread": 0, "inset": false }
+        ]
+      },
+      "ringWidth": { "$type": "dimension", "$value": 0.8 },
+      "ringBlur": { "$type": "dimension", "$value": 0.8 },
+      "ringOffsetX": { "$type": "dimension", "$value": 0.5 },
+      "ringOffsetY": { "$type": "dimension", "$value": 0.8 }
+    },
+    "tabs": {
+      "trackFill": {
+        "$type": "gradient",
+        "$value": { "angle": 180, "stops": [
+          { "at": 0, "color": { "mix": ["{color.primary}", "{color.surface}", 0.01] } },
+          { "at": 1, "color": { "mix": ["{color.primary}", "{color.surface}", 0.03] } }
+        ] }
+      },
+      "thumbFill": {
+        "$type": "gradient",
+        "$description": "通常ボタンと選んだチップの中間の塗り",
+        "$value": { "angle": 180, "stops": [
+          { "at": 0, "color": { "mix": ["{color.fillTop}", "{color.fillSelectedTop}", 0.5] } },
+          { "at": 1, "color": { "mix": ["{color.fillBottom}", "{color.fillSelectedBottom}", 0.5] } }
+        ] }
+      },
+      "thumbEdgeBlend": { "$type": "number", "$description": "枠を通常ボタン(0)と選んだチップ(1)のどちらに寄せるか", "$value": 0.5 },
+      "trackEdgeOpacity": { "$type": "number", "$value": 0.3 },
+      "thumbShadow": {
+        "$type": "shadow",
+        "$value": [
+          { "color": { "from": "{color.primary}", "alpha": 0.12 }, "x": 0, "y": 1, "blur": 3, "spread": 0, "inset": false },
+          { "color": { "from": "{color.surface}", "alpha": 0.95 }, "x": 0, "y": 2, "blur": 4, "spread": 0, "inset": true },
+          { "color": { "from": "{color.primary}", "alpha": 0.07 }, "x": 0, "y": -2, "blur": 5, "spread": 0, "inset": true }
+        ]
+      },
+      "ringColor": { "$type": "color", "$value": { "from": "{color.ringShadow}", "alpha": 0.6 } },
+      "ringBlur": { "$type": "dimension", "$value": 0.7 },
+      "ringOffsetX": { "$type": "dimension", "$value": 1 },
+      "ringOffsetY": { "$type": "dimension", "$value": 1.5 }
+    },
+    "card": {
+      "fill": {
+        "$type": "gradient",
+        "$value": { "angle": 160, "stops": [
+          { "at": 0, "color": { "from": "{color.surface}", "alpha": 0.96 } },
+          { "at": 1, "color": { "mix": ["{color.primary}", "{color.surface}", 0.05], "alpha": 0.9 } }
+        ] }
+      },
+      "edgeOpacity": { "$type": "number", "$value": 0.7 },
+      "ringWidth": { "$type": "dimension", "$value": 0.5 },
+      "ringBlur": { "$type": "dimension", "$value": 1 },
+      "ringOffsetX": { "$type": "dimension", "$value": 2 },
+      "ringOffsetY": { "$type": "dimension", "$value": 2 },
+      "backdropBlur": { "$type": "dimension", "$value": 14 },
+      "backdropSaturate": { "$type": "number", "$value": 1.5 }
+    }
+  }
+}

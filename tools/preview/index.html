@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Piyoron 色の確認</title>
+<link rel="stylesheet" href="../../web/tokens.css">
+<style>
+  /* 確認用の簡易レシピ(部品の CSS は Web 版で作る) */
+  body { margin: 0; padding: 24px; font-family: var(--piyo-font-family); background: #fff; color: #1d2433; }
+  h2 { margin: 0 0 12px; font-size: 15px; }
+  .row { display: flex; flex-wrap: wrap; gap: 28px; align-items: center; padding: 20px 24px; margin-bottom: 16px; border-radius: 20px; background: var(--piyo-color-background); }
+  .swatches { display: flex; gap: 2px; }
+  .swatches span { width: 14px; height: 28px; }
+
+  /* ガラスの土台 */
+  .glass { position: relative; isolation: isolate; border: 0; font: inherit; background: linear-gradient(180deg, var(--piyo-color-fill-top), var(--piyo-color-fill-bottom)); box-shadow: var(--piyo-glass-shadow-idle); }
+  .glass::before { content: ""; position: absolute; z-index: -1; inset: 0; padding: var(--piyo-glass-edge-width); border-radius: inherit; background: var(--piyo-glass-edge);
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; }
+  .glass::after { content: ""; position: absolute; z-index: -2; inset: 0; border: var(--piyo-glass-ring-width) solid var(--piyo-color-ring-shadow); border-radius: inherit;
+    filter: blur(var(--piyo-glass-ring-blur)); transform: translate(var(--piyo-glass-ring-offset-x), var(--piyo-glass-ring-offset-y)); }
+
+  /* 円ボタン */
+  .circle { width: 64px; height: 64px; border-radius: 50%; font-size: 30px; color: var(--piyo-color-content-selected); }
+
+  /* 主な操作 */
+  .primary { padding: 10px 20px; border-radius: 999px; background: var(--piyo-glass-tone-primary-fill); color: var(--piyo-color-content-on-primary); }
+  .primary::before { background: var(--piyo-glass-tone-edge-primary); }
+
+  /* 選ぶボタン */
+  .chip { padding: 8px 18px; border-radius: 999px; font-size: 15px; font-weight: 500; color: var(--piyo-color-content-muted);
+    background: linear-gradient(180deg, var(--piyo-glass-chip-gloss-top), var(--piyo-glass-chip-gloss-bottom)), color-mix(in srgb, var(--piyo-color-primary) calc(var(--piyo-glass-chip-tint-rest) * 100%), transparent);
+    box-shadow: var(--piyo-glass-chip-shadow-rest); }
+  .chip::before { background: linear-gradient(100deg, color-mix(in srgb, var(--piyo-color-primary) 17%, var(--piyo-color-surface)), color-mix(in srgb, var(--piyo-color-primary) 26%, var(--piyo-color-surface)), color-mix(in srgb, var(--piyo-color-primary) 17%, var(--piyo-color-surface))); }
+  .chip::after { display: none; }
+  .chip.on { color: var(--piyo-color-content-selected); background: linear-gradient(180deg, var(--piyo-color-fill-selected-top), var(--piyo-color-fill-selected-bottom)); box-shadow: var(--piyo-glass-shadow-idle); }
+  .chip.on::before { background: var(--piyo-glass-tone-edge-primary); }
+  .chip.on::after { display: block; border: var(--piyo-glass-chip-ring-width) solid var(--piyo-color-ring-shadow); filter: blur(var(--piyo-glass-chip-ring-blur)); transform: translate(var(--piyo-glass-chip-ring-offset-x), var(--piyo-glass-chip-ring-offset-y)); }
+
+  /* タブ */
+  .tabs { display: flex; padding: var(--piyo-glass-tabs-padding); border: 1px solid transparent; border-radius: 999px; background: var(--piyo-glass-tabs-track-fill) padding-box, var(--piyo-glass-tabs-track-edge) border-box; }
+  .tabs span { padding: 6px 20px; font-size: 14px; color: var(--piyo-color-content-muted); border-radius: 999px; border: 1px solid transparent; }
+  .tabs .on { position: relative; color: var(--piyo-color-content-selected); background: var(--piyo-glass-tabs-thumb-fill) padding-box, var(--piyo-glass-tabs-thumb-edge) border-box; box-shadow: var(--piyo-glass-tabs-thumb-shadow); }
+</style>
+</head>
+<body>
+<div id="list"></div>
+<template id="row">
+  <h2></h2>
+  <div class="row">
+    <button class="glass circle">+</button>
+    <button class="glass primary">保存</button>
+    <span class="glass chip">新しい順</span>
+    <span class="glass chip on">古い順</span>
+    <div class="tabs"><span class="on">すべて</span><span>未読</span><span>既読</span></div>
+    <div class="swatches"></div>
+  </div>
+</template>
+<script>
+  // パレットごとに1行並べる
+  function render() {
+    const names = [...document.styleSheets[0].cssRules].map((r) => /palette="(\w+)"/.exec(r.selectorText ?? '')?.[1]).filter(Boolean);
+    const roles = ['primary', 'primary-strong', 'content-selected', 'content-muted', 'surface-muted', 'background', 'danger'];
+    for (const name of names) {
+      const node = document.getElementById('row').content.cloneNode(true);
+      const wrap = document.createElement('section');
+      wrap.dataset.piyoronPalette = name;
+      wrap.append(node);
+      wrap.querySelector('h2').textContent = name;
+      const sw = wrap.querySelector('.swatches');
+      for (const r of roles) {
+        const s = document.createElement('span');
+        s.style.background = `var(--piyo-color-${r})`;
+        s.title = r;
+        sw.append(s);
+      }
+      document.getElementById('list').append(wrap);
+    }
+  }
+  render();
+</script>
+</body>
+</html>

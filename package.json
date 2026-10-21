@@ -1,0 +1,10 @@
+{
+  "name": "piyoron-ui",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "tokens": "node tools/build/index.js",
+    "colors": "node tools/generate-colors/index.js",
+    "test": "node --test tools/test/*.test.js"
+  }
+}

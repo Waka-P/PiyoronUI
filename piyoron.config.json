@@ -1,0 +1,7 @@
+{
+  "name": "Piyoron",
+  "symbol": "Piyo",
+  "cssPrefix": "piyo",
+  "dataAttribute": "piyoron",
+  "kotlinPackage": "piyoron.tokens"
+}

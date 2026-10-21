@@ -1,0 +1,92 @@
+{
+  "hueSpread": {
+    "$type": "hueSpread",
+    "$description": "Ocean に合わせた色相のずらし幅を、シードの色相が離れるほど小さくする",
+    "$value": { "center": 234.6, "plateau": 15, "width": 60, "min": 0.3 }
+  },
+  "color": {
+    "seed": { "$type": "color", "$value": "#2293C7", "$description": "唯一の入力" },
+    "primary": { "$type": "color", "$value": "{color.seed}" },
+    "primaryStrong": {
+      "$type": "color",
+      "$value": { "from": "{color.seed}", "oklch": { "l": { "add": -0.0623 }, "c": { "scale": 1.0907 }, "h": { "add": 11.5, "spread": true } } }
+    },
+    "surface": { "$type": "color", "$value": "#FFFFFF" },
+    "surfaceMuted": {
+      "$type": "color",
+      "$value": { "from": "{color.seed}", "oklch": { "l": { "set": 0.9801 }, "c": { "scale": 0.0283 }, "h": { "add": -15.07, "spread": true } } }
+    },
+    "background": {
+      "$type": "color",
+      "$value": { "from": "{color.seed}", "oklch": { "l": { "set": 0.9677 }, "c": { "scale": 0.0412 }, "h": { "add": -5.79, "spread": true } } }
+    },
+    "fillTop": { "$type": "color", "$value": { "from": "{color.surface}", "alpha": 0.62 } },
+    "fillBottom": { "$type": "color", "$value": { "mix": ["{color.primary}", "{color.surface}", 0.12], "alpha": 0.5 } },
+    "fillSelectedTop": {
+      "$type": "color",
+      "$value": { "over": [{ "from": "{color.surface}", "alpha": 0.5 }, "{color.fillSelectedBottom}"] }
+    },
+    "fillSelectedBottom": { "$type": "color", "$value": { "from": "{color.primary}", "alpha": 0.1 } },
+    "edgeStops": {
+      "$type": "colorStops",
+      "$description": "枠のスイープグラデーション。h はシードからの色相差、c はシードの彩度に掛ける比",
+      "$value": {
+        "from": "{color.seed}",
+        "chromaCap": 0.1226,
+        "spread": true,
+        "stops": [
+          { "angle": 0, "l": 0.731, "c": 0.851, "h": 27.49 },
+          { "angle": 35, "l": 0.7642, "c": 0.7305, "h": 27.12 },
+          { "angle": 70, "l": 0.7908, "c": 0.7648, "h": 2.99 },
+          { "angle": 100, "l": 0.7845, "c": 0.7183, "h": 16.91 },
+          { "angle": 125, "l": 0.8242, "c": 0.708, "h": -46.38 },
+          { "angle": 150, "l": 0.8705, "c": 0.5183, "h": -38.56 },
+          { "angle": 175, "l": 0.7966, "c": 0.7023, "h": -49.36 },
+          { "angle": 200, "l": 0.721, "c": 0.8202, "h": 24.84 },
+          { "angle": 230, "l": 0.65, "c": 1.0365, "h": 24.88 },
+          { "angle": 260, "l": 0.6792, "c": 0.9758, "h": 30.01 },
+          { "angle": 290, "l": 0.767, "c": 0.7561, "h": 21.2 },
+          { "angle": 315, "l": 0.8442, "c": 0.5797, "h": -7.9 },
+          { "angle": 340, "l": 0.728, "c": 0.8687, "h": 25.06 }
+        ]
+      }
+    },
+    "ringShadow": {
+      "$type": "color",
+      "$value": { "mix": ["{color.primaryStrong}", "{color.contentDefault}", 0.45], "alpha": 0.38 }
+    },
+    "innerGlow": { "$type": "color", "$value": { "from": "{color.primary}", "alpha": 0.14 } },
+    "innerHighlight": { "$type": "color", "$value": { "from": "{color.surface}", "alpha": 0.7 } },
+    "contentDefault": {
+      "$type": "color",
+      "$value": {
+        "from": "{color.seed}",
+        "oklch": { "l": { "set": 0.2607 }, "c": { "scale": 0.2455 }, "h": { "add": 30.41, "spread": true } },
+        "contrast": { "against": ["{color.fillBottom}", "{color.surface}"], "min": 4.5 }
+      }
+    },
+    "contentMuted": {
+      "$type": "color",
+      "$value": {
+        "from": "{color.seed}",
+        "oklch": { "l": { "set": 0.5578 }, "c": { "scale": 0.2446 }, "h": { "add": 29.69, "spread": true } },
+        "contrast": { "against": ["{color.fillBottom}", "{color.surface}"], "min": 4.5 }
+      }
+    },
+    "contentSelected": {
+      "$type": "color",
+      "$value": {
+        "from": "{color.primaryStrong}",
+        "contrast": { "against": ["{color.fillSelectedBottom}", "{color.surface}"], "min": 4.5 }
+      }
+    },
+    "contentOnPrimary": { "$type": "color", "$value": "#FFFFFF" },
+    "danger": { "$type": "color", "$value": "#E5484D" },
+    "dangerStrong": {
+      "$type": "color",
+      "$value": { "from": "{color.danger}", "oklch": { "l": { "add": -0.0676 }, "c": { "scale": 0.9498 }, "h": { "add": 0.75 } } }
+    },
+    "ok": { "$type": "color", "$value": "#1E9E6A" },
+    "warn": { "$type": "color", "$value": "#E8920C" }
+  }
+}

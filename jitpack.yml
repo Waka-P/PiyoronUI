@@ -1,0 +1,5 @@
+# JitPack でのビルド(Gradle の設定は android/ の中にある)
+jdk:
+  - openjdk21
+install:
+  - cd android && ./gradlew :piyoron:publishToMavenLocal

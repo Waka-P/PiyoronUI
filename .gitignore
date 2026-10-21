@@ -1,0 +1,16 @@
+node_modules/
+.DS_Store
+.idea/
+
+# 仕様書(公開しない)
+PIYORON_SPEC.md
+
+# Claude 関連(公開しない)
+CLAUDE.md
+CLAUDE.local.md
+.claude/
+
+# 開発中の記録と参考画像(公開しない)
+docs/decisions.md
+docs/extraction-guide.md
+docs/reference/

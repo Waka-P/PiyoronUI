@@ -1,0 +1,46 @@
+{
+  "ocean": { "seed": "#2293C7", "overrides": {} },
+  "mint": { "seed": "#14A08E", "overrides": {} },
+  "rose": { "seed": "#DD84AF", "overrides": {} },
+  "violet": { "seed": "#7A5FD6", "overrides": {} },
+  "amber": { "seed": "#D48A0A", "overrides": {"primaryStrong": "#B0640A", "contentDefault": "#2B241D", "contentMuted": "#736A60"} },
+  "gold": {
+    "seed": "#D4B045",
+    "overrides": {"primaryStrong": "#8D7023", "contentDefault": "#2A261B", "contentMuted": "#726B5C"},
+    "edge": [
+      { "angle": 0, "color": "#E3D18C" },
+      { "angle": 35, "color": "#C8A747" },
+      { "angle": 70, "color": "#AB862A" },
+      { "angle": 100, "color": "#D7BC66" },
+      { "angle": 125, "color": "#EDDFA2" },
+      { "angle": 150, "color": "#F0E8B6" },
+      { "angle": 175, "color": "#E3CD80" },
+      { "angle": 200, "color": "#BD9939" },
+      { "angle": 230, "color": "#A4802B" },
+      { "angle": 260, "color": "#CBAA4B" },
+      { "angle": 290, "color": "#E8D897" },
+      { "angle": 315, "color": "#EEE6B5" },
+      { "angle": 340, "color": "#DABF69" }
+    ]
+  },
+  "bubble": {
+    "seed": "#71ADDA",
+    "overrides": {"contentSelected": "#3376A6"},
+    "toneUsesEdge": true,
+    "edge": [
+      { "angle": 0, "color": "#C5C1F5" },
+      { "angle": 35, "color": "#9FCEF2" },
+      { "angle": 70, "color": "#8DDCF1" },
+      { "angle": 100, "color": "#B4E2D4" },
+      { "angle": 125, "color": "#AEE5C4" },
+      { "angle": 150, "color": "#9EE4CA" },
+      { "angle": 175, "color": "#83E2E4" },
+      { "angle": 200, "color": "#97BAFA" },
+      { "angle": 230, "color": "#9EA6F7" },
+      { "angle": 260, "color": "#BCACF6" },
+      { "angle": 290, "color": "#E4A2F3" },
+      { "angle": 315, "color": "#E1B3F6" },
+      { "angle": 340, "color": "#CABDF9" }
+    ]
+  }
+}
