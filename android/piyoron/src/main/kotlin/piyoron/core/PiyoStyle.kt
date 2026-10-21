@@ -9,7 +9,7 @@ import androidx.compose.ui.graphics.Shape
 import piyoron.style.glass.GlassStyle
 
 // 面の種類。スタイルはこれを見て描き分ける
-enum class SurfaceRole { Button, Chip, TabTrack, TabThumb, Card, Field }
+enum class SurfaceRole { Button, Chip, TabTrack, TabThumb, Card, Field, Menu, MenuItem, Divider }
 
 // 色の調子
 enum class PiyoTone { Default, Primary, Danger }

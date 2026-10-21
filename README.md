@@ -55,6 +55,12 @@ PiyoChipGroup(listOf("新しい順", "古い順"), selected, { selected = it })
 PiyoMultiChipGroup(listOf("文書", "画像"), selectedSet, { selectedSet = it })
 PiyoTabs(listOf("すべて", "未読", "既読"), index, { index = it })
 PiyoCard { PiyoText("お知らせ") }
+PiyoMenuGroup {                                   // 開いている間にほかのボタンへ移ると、滑って切り替わる
+    Row {
+        PiyoMenu(copyIcon, "コピー") { PiyoMenuItem("テキスト", onClick = {}, detail = "本文と日付") }
+        PiyoMenu(moreIcon, "その他") { PiyoMenuItem("削除", onClick = {}, tone = PiyoTone.Danger) }
+    }
+}
 ```
 
 ### エフェクト

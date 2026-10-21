@@ -51,6 +51,20 @@
         ]
       }
     },
+    "menu": {
+      "fill": { "$type": "color", "$value": { "from": "{color.surface}", "alpha": 0.94 } },
+      "edge": { "$type": "color", "$value": { "from": "{color.primary}", "alpha": 0.16 } },
+      "shadow": {
+        "$type": "shadow",
+        "$value": [
+          { "color": { "from": "{color.contentDefault}", "alpha": 0.08 }, "x": 0, "y": 1, "blur": 2, "spread": 0, "inset": false },
+          { "color": { "from": "{color.primaryStrong}", "alpha": 0.22 }, "x": 0, "y": 12, "blur": 32, "spread": -6, "inset": false }
+        ]
+      },
+      "itemHover": { "$type": "color", "$value": { "mix": ["{color.primary}", "{color.surface}", 0.09] } },
+      "itemDangerHover": { "$type": "color", "$value": { "mix": ["{color.danger}", "{color.surface}", 0.11] } },
+      "divider": { "$type": "color", "$value": { "mix": ["{color.contentMuted}", "{color.surface}", 0.15] } }
+    },
     "chip": {
       "glossTop": { "$type": "color", "$value": { "from": "{color.surface}", "alpha": 0.5 } },
       "glossBottom": { "$type": "color", "$value": { "from": "{color.surface}", "alpha": 0 } },

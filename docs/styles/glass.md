@@ -72,6 +72,9 @@
 | `TabTrack` | `tabs.trackFill`(極薄) | なし | スイープを不透明度 .3 | なし | `PiyoTabs` の土台、ひょうたん |
 | `TabThumb` | 通常ボタンと選んだチップの中間(`tabs.thumbFill`) | `tabs.thumbShadow`(立体的な内側の影) | 通常と Primary のスイープを半々 | `tabs.ring*`(枠の上に重ねる) | タブのつまみ、ひょうたんの印 |
 | `Card` | 160deg の斜めグラデーション(`card.fill`) | なし | スイープを不透明度 .7 | .5px(`card.ring*`) | `PiyoCard`、ひょうたんとパネル、ジニーの面 |
+| `Menu` | 面の色 .94(`menu.fill`。参照実装は .8 + 背景ぼかし) | 2段の外の影(`menu.shadow`) | 主な色 .16 の単色の線(`menu.edge`) | なし | `PiyoMenu` |
+| `MenuItem` | マウスを乗せる・フォーカス・押すと `menu.itemHover`(Danger は `itemDangerHover`) | なし | なし | なし | `PiyoMenuItem` |
+| `Divider` | `menu.divider` | なし | なし | なし | `PiyoMenuDivider` |
 | `Field` | `Button` と同じ(仮) | | | | 入力欄を作るときに決める |
 
 ## なぜこの見た目か
@@ -85,7 +88,7 @@
 
 | 層 | 描き方 | 理由 |
 |---|---|---|
-| 外の影 | 少しずつ広げた形を薄く3枚重ね、形の外だけに描く | Compose の `dropShadow` は半透明の塗りの下に透ける。`BlurMaskFilter` は形が変わるたびに CPU で作り直して重い |
+| 外の影 | 少しずつ広げた形を薄く3枚重ね、形の外だけに描く。ぼかしが 8dp を超える影(メニュー)だけ、本物のぼかし(`BlurMaskFilter`) | Compose の `dropShadow` は半透明の塗りの下に透ける。`BlurMaskFilter` は形が変わるたびに CPU で作り直して重い。大きなぼかしは重ねた段が見えるので本物を使う |
 | 塗り | 形を `Brush` で塗る(色の混ぜ方は CSS と同じ sRGB の `mixSrgb`) | Compose の `lerp` は Oklab で混ぜるので、CSS の `color-mix` と色がずれる |
 | 内側の影 | Compose の `innerShadow`。毎コマ形が変わる面(`PiyoChangingShape`)だけ、縁から薄れるグラデーションの近似 | 形が変わるたびにぼかしを作り直すと重い |
 | 線状の影 | 太さと濃さの違う線を3本重ねる | 外の影と同じ |
@@ -116,6 +119,9 @@
 | `--seg-*` | `glass.tabs.*` | 枠(`--seg-track-edge`、`--seg-thumb-edge`)は移さず、`edgeStops` に変えた(下記) |
 | `.segmented` の `padding: 3px` と枠 1px | `tabs.trackPadding` / `tabs.trackBorder`(core) | 部品の配置に使うので共通側 |
 | `--glass-card-*`、`--card-ring-*` | `glass.card.*` | |
+| `--menu-fill` / `--menu-edge` / `--menu-shadow` | `glass.menu.fill` / `edge` / `shadow` | 面の不透明度は .8 → .94(背景ぼかしを使わないため) |
+| `--color-primary-soft`、`--color-danger-soft`、`--color-border`(メニューの項目と区切り線) | `glass.menu.itemHover` / `itemDangerHover` / `divider` | 直書きの色は役割の色の混色にした |
+| `.menu` の寸法と動き(`MENU_MARGIN`、`MENU_SLIDE_MS` など) | `menu.*`(core) | |
 | `--press-*` | `press.*`(core) | スタイルではなく共通の動き |
 | `--radius-*` | `radius.*`(core) | |
 | `--segmented-duration` | `duration.segmented`(core) | イージングは `easing.standard` |
@@ -140,6 +146,8 @@
 | 既定シードの `contentMuted` が `#6b7486` → `#697284` | 同上(塗りの上で 4.38:1) |
 | タブの枠が、主な色の直線グラデーションから、ボタンと同じスイープグラデーションに | 参照実装ではほぼ1色に見え、他の部品と比べて色の変化が乏しい。このライブラリでは揃える。土台は不透明度 .3 |
 | タブのつまみの塗りと枠が、通常ボタンと選んだチップの中間に | 選んだ印として通常ボタンより目立たせつつ、チップほど強くしないため |
+| メニューの面の不透明度が .8 → .94 | 参照実装は背景ぼかしで下の文字をぼかす。ぼかしを使わないので、下の文字が透けないよう不透明度で補う |
+| メニューの区切り線と削除の背景が、直書きの色から役割の色の混色に | シードや危険の色を変えても合うように |
 
 ## 青紫の例
 

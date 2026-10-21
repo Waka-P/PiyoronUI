@@ -2,6 +2,7 @@ package piyoron.core
 
 import android.graphics.Matrix
 import android.graphics.Bitmap
+import android.graphics.BlurMaskFilter
 import android.graphics.BitmapShader
 import android.graphics.Canvas
 import android.graphics.Paint
@@ -13,6 +14,9 @@ import androidx.compose.ui.graphics.ClipOp
 import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.asAndroidPath
+import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
+import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.addOutline
 import androidx.compose.ui.graphics.ShaderBrush
 import androidx.compose.ui.graphics.Shape
@@ -26,6 +30,7 @@ import androidx.compose.ui.graphics.shadow.Shadow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.dp
 import kotlin.math.abs
 import kotlin.math.ceil
 import kotlin.math.cos
@@ -166,11 +171,27 @@ private val RingLayers = listOf(4f to 0.12f, 2f to 0.16f, 0f to 0.2f)
 
 // 外側だけに影を描く(CSS の box-shadow と同じく形の内側には出さない)
 // ぼかしは、少しずつ広げた形を薄く重ねて近づける(線状の影と同じ理由で BlurMaskFilter は使わない)
+// ただし大きなぼかしは重ねた段が見えるので、本物のぼかしで描く(メニューの影など。形が変わらない面に使う)
 fun DrawScope.outerShadow(shape: Shape, shadow: PiyoShadow) {
     val spread = shadow.spread.toPx()
     val sigma = shadow.blur.toPx() / 2
     val inner = Path().apply { addOutline(shape.createOutline(size, layoutDirection, this@outerShadow)) }
     clipPath(inner, ClipOp.Difference) {
+        if (shadow.blur > SMOOTH_BLUR_FROM) {
+            val outline = shape.createOutline(Size(size.width + spread * 2, size.height + spread * 2), layoutDirection, this)
+            val path = Path().apply { addOutline(outline) }
+            translate(shadow.offsetX.toPx() - spread, shadow.offsetY.toPx() - spread) {
+                drawIntoCanvas { canvas ->
+                    val paint = Paint().apply {
+                        isAntiAlias = true
+                        color = shadow.color.toArgb()
+                        maskFilter = BlurMaskFilter(blurRadius(sigma), BlurMaskFilter.Blur.NORMAL)
+                    }
+                    canvas.nativeCanvas.drawPath(path.asAndroidPath(), paint)
+                }
+            }
+            return@clipPath
+        }
         ShadowLayers.forEach { (grow, weight) ->
             val e = spread + sigma * grow
             val outline = shape.createOutline(Size(size.width + e * 2, size.height + e * 2), layoutDirection, this)
@@ -180,6 +201,12 @@ fun DrawScope.outerShadow(shape: Shape, shadow: PiyoShadow) {
         }
     }
 }
+
+// これより大きなぼかしは、本物のぼかしで描く
+private val SMOOTH_BLUR_FROM = 8.dp
+
+// ぼかしの標準偏差を、BlurMaskFilter の半径にする(Skia の換算 σ = 0.57735r + 0.5 の逆)
+private fun blurRadius(sigma: Float): Float = ((sigma - 0.5f) / 0.57735f).coerceAtLeast(0.5f)
 
 // 近似のぼかしの影の重ね方(標準偏差に対する広げ幅、濃さ)
 private val ShadowLayers = listOf(1.5f to 0.25f, 0.75f to 0.25f, 0f to 0.3f)

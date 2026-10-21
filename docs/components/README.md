@@ -8,6 +8,7 @@
 | `PiyoChip`、`PiyoChipGroup`、`PiyoMultiChipGroup` | [chip.md](chip.md) | `Chip` |
 | `PiyoTabs` | [tabs.md](tabs.md) | `TabTrack`、`TabThumb` |
 | `PiyoCard` | [card.md](card.md) | `Card` |
+| `PiyoMenu`、`PiyoMenuGroup`、`PiyoMenuItem`、`PiyoMenuDivider` | [menu.md](menu.md) | `Menu`、`MenuItem`、`Divider` |
 | `GourdTabRail`、`GourdRailPanel`、`GenieVisibility` | [../effects/README.md](../effects/README.md) | スタイルから独立 |
 
 ## 全部品に共通

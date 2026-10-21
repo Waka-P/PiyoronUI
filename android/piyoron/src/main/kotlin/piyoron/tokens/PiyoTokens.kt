@@ -79,6 +79,39 @@ object PiyoTokens {
         val PaddingY = 20.8.dp
     }
 
+    object Menu {
+        val MinWidth = 140.dp
+        val Padding = 5.dp
+        val Radius = 14.dp
+        // ボタンとメニューの間
+        val Gap = 4.dp
+        // 画面の端から空ける幅
+        val Margin = 8.dp
+        val ItemPaddingX = 12.dp
+        val ItemPaddingY = 8.dp
+        val ItemRadius = 9.dp
+        // 項目の中のアイコン、文字、補足の間
+        val ItemGap = 8.dp
+        // 文字と右寄せの補足の間
+        val DetailGap = 12.dp
+        val IconSize = 18.dp
+        val TextSize = 13.5.sp
+        val DetailSize = 11.5.sp
+        // 区切り線の上下の空き(参照実装の margin-top 9px と線の位置 -5px)
+        val DividerSpace = 4.5.dp
+        val DividerInset = 8.dp
+        // 開き始めと閉じ終わりの大きさ
+        val OpenScale = 0.3f
+        val OpenDuration = 200
+        val FadeDuration = 160
+        val SlideDuration = 220
+        // 項目の背景と文字の色が変わる時間
+        val ItemDuration = 120
+        val Easing = CubicBezierEasing(0.2f, 0.8f, 0.2f, 1f)
+        // CSS の ease-out
+        val FadeEasing = CubicBezierEasing(0f, 0f, 0.58f, 1f)
+    }
+
     object Tabs {
         val TrackPadding = 3.dp
         val TrackBorder = 1.dp

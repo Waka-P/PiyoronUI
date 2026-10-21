@@ -87,6 +87,5 @@ fun PiyoTheme(
         LocalPiyoStyle provides style,
         LocalPiyoContentColor provides colors.contentDefault,
         LocalPiyoTextStyle provides TextStyle(fontSize = PiyoTokens.Text.Size, fontWeight = PiyoTokens.Text.Weight),
-        content = content,
-    )
+    ) { PiyoOverlayHost(content) }
 }

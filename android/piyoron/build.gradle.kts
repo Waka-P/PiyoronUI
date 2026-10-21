@@ -31,6 +31,7 @@ dependencies {
     api(libs.androidx.compose.ui.unit)
     api(libs.androidx.compose.foundation)
     api(libs.androidx.compose.animation.core)
+    implementation(libs.androidx.activity.compose)
 
     testImplementation(libs.junit)
 }

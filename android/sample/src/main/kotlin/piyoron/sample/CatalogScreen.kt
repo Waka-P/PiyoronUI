@@ -44,6 +44,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import piyoron.components.PiyoButton
 import piyoron.components.PiyoCard
+import piyoron.components.PiyoMenu
+import piyoron.components.PiyoMenuDivider
+import piyoron.components.PiyoMenuGroup
+import piyoron.components.PiyoMenuItem
 import piyoron.components.PiyoChip
 import piyoron.components.PiyoChipGroup
 import piyoron.components.PiyoIconButton
@@ -156,6 +160,31 @@ private fun CatalogContent(
             PiyoTabs(listOf("すべて", "未読", "既読", "保存"), kind, { kind = it }, Modifier.fillMaxWidth())
             PiyoTabs(listOf("カード", "一覧"), mode, { mode = it }, Modifier.fillMaxWidth())
             PiyoTabs(listOf("今日", "今週", "今月"), view, { view = it }, Modifier.fillMaxWidth(0.7f))
+        }
+
+        Section("メニュー") {
+            var last by rememberSaveable { mutableStateOf("まだ選んでいない") }
+            Caption("開いている間に、ほかのボタンへマウスを乗せる(スマホでは押す)と、滑って切り替わる")
+            PiyoMenuGroup {
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.End)) {
+                    PiyoMenu(SampleIcons.Copy, "コピー") {
+                        PiyoMenuItem("テキスト", { last = "テキストをコピー" }, detail = "本文と日付")
+                        PiyoMenuItem("テキスト", { last = "名前なしでコピー" }, detail = "名前なし")
+                        PiyoMenuItem("リンク", { last = "リンクをコピー" }, detail = "共有用")
+                    }
+                    PiyoMenu(SampleIcons.Download, "ダウンロード") {
+                        PiyoMenuItem("PDF", { last = "PDF" }, detail = "印刷と同じ紙面")
+                        PiyoMenuItem("JSON", { last = "JSON" }, detail = "元のデータ")
+                    }
+                    PiyoMenu(SampleIcons.More, "その他") {
+                        PiyoMenuItem("名前を変える", { last = "名前を変える" }, icon = SampleIcons.Star)
+                        PiyoMenuItem("複製", { last = "複製" }, icon = SampleIcons.Copy)
+                        PiyoMenuDivider()
+                        PiyoMenuItem("削除", { last = "削除" }, icon = SampleIcons.Trash, tone = PiyoTone.Danger)
+                    }
+                }
+            }
+            Caption("選んだもの: $last")
         }
 
         Section("カード") {

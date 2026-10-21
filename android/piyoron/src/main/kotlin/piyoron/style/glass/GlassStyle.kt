@@ -54,6 +54,9 @@ internal object GlassStyle : PiyoStyle {
             SurfaceRole.TabTrack -> trackLook(roles, glass)
             SurfaceRole.TabThumb -> thumbLook(roles, glass)
             SurfaceRole.Card -> cardLook(roles, glass)
+            SurfaceRole.Menu -> menuLook(glass)
+            SurfaceRole.MenuItem -> menuItemLook(glass, state, tone)
+            SurfaceRole.Divider -> GlassLook(fill = solidFill(glass.menuDivider), shadows = emptyList(), ring = null, edge = null)
         }
         return glassLayers(shape, look)
     }
@@ -70,10 +73,16 @@ internal object GlassStyle : PiyoStyle {
                 else -> roles.contentMuted
             }
             SurfaceRole.TabTrack, SurfaceRole.TabThumb -> if (state.selected) roles.contentSelected else roles.contentMuted
-            SurfaceRole.Card -> roles.contentDefault
+            SurfaceRole.Card, SurfaceRole.Menu, SurfaceRole.Divider -> roles.contentDefault
+            SurfaceRole.MenuItem -> when {
+                tone == PiyoTone.Danger -> roles.danger
+                state.hovered || state.focused || state.pressed -> roles.primaryStrong
+                else -> roles.contentDefault
+            }
         }
         val duration = when {
             Piyo.reduceMotion -> 0
+            role == SurfaceRole.MenuItem -> PiyoTokens.Menu.ItemDuration
             role == SurfaceRole.TabTrack || role == SurfaceRole.TabThumb -> PiyoTokens.Duration.Segmented
             else -> PiyoTokens.Duration.Toggle
         }
@@ -232,6 +241,24 @@ private fun thumbLook(roles: PiyoColorRoles, glass: GlassColors) = GlassLook(
     edge = sweepEdge(blendStops(roles.edgeStops, glass.toneEdgePrimary, GlassTokens.Tabs.ThumbEdgeBlend)),
     ringOnTop = true,
 )
+
+// メニューの面(半透明の面、主な色の薄い1本の枠、2段の外の影)
+private fun menuLook(glass: GlassColors) = GlassLook(
+    fill = solidFill(glass.menuFill),
+    shadows = glass.menuShadow,
+    ring = null,
+    edge = { shape -> strokeInside(shape, GlassTokens.Edge.Width.toPx(), SolidColor(glass.menuEdge)) },
+)
+
+// メニューの項目(マウスを乗せる、フォーカス、押したときだけ淡い背景)
+@Composable
+private fun menuItemLook(glass: GlassColors, state: PiyoState, tone: PiyoTone): GlassLook {
+    val active = state.enabled && (state.hovered || state.focused || state.pressed)
+    val hover = if (tone == PiyoTone.Danger) glass.menuItemDangerHover else glass.menuItemHover
+    val spec = tween<Color>(if (Piyo.reduceMotion) 0 else PiyoTokens.Menu.ItemDuration)
+    val color by animateColorAsState(if (active) hover else hover.copy(alpha = 0f), spec, label = "item")
+    return GlassLook(fill = { shape -> fillShape(shape, SolidColor(color)) }, shadows = emptyList(), ring = null, edge = null)
+}
 
 // カード(斜めのグラデーション、薄い枠)
 private fun cardLook(roles: PiyoColorRoles, glass: GlassColors) = GlassLook(

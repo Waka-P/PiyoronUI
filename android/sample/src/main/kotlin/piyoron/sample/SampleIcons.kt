@@ -17,6 +17,9 @@ object SampleIcons {
     val Home = lineIcon("home", "M4 10.5L12 4l8 6.5V20h-5v-6H9v6H4z")
     val Search = lineIcon("search", "M17 10.5a6.5 6.5 0 1 1-13 0 6.5 6.5 0 0 1 13 0zM15.2 15.2L20 20")
     val Gear = lineIcon("gear", "M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0zM12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1")
+    val Copy = lineIcon("copy", "M8 8h12v12H8zM16 8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3")
+    val Download = lineIcon("download", "M12 3v12M7 10l5 5 5-5M4 15v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4")
+    val More = lineIcon("more", "M12 5.5v.01M12 12v.01M12 18.5v.01")
     val Sparkle = lineIcon("sparkle", "M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z")
 }
 
