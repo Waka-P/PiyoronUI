@@ -48,6 +48,7 @@ import piyoron.components.PiyoMenu
 import piyoron.components.PiyoMenuDivider
 import piyoron.components.PiyoMenuGroup
 import piyoron.components.PiyoMenuItem
+import piyoron.components.PiyoMenuTransition
 import piyoron.components.PiyoChip
 import piyoron.components.PiyoChipGroup
 import piyoron.components.PiyoIconButton
@@ -164,8 +165,12 @@ private fun CatalogContent(
 
         Section("メニュー") {
             var last by rememberSaveable { mutableStateOf("まだ選んでいない") }
+            var transition by rememberSaveable { mutableStateOf(PiyoMenuTransition.Fade) }
+            var density by rememberSaveable { mutableStateOf("ふつう") }
             Caption("開いている間に、ほかのボタンへマウスを乗せる(スマホでは押す)と、滑って切り替わる")
-            PiyoMenuGroup {
+            Caption("開閉の動き")
+            PiyoChipGroup(PiyoMenuTransition.entries, transition, { transition = it }, label = { MenuTransitionNames.getValue(it) })
+            PiyoMenuGroup(transition = transition) {
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.End)) {
                     PiyoMenu(SampleIcons.Copy, "コピー") {
                         PiyoMenuItem("テキスト", { last = "テキストをコピー" }, detail = "本文と日付")
@@ -176,6 +181,14 @@ private fun CatalogContent(
                         PiyoMenuItem("PDF", { last = "PDF" }, detail = "印刷と同じ紙面")
                         PiyoMenuItem("JSON", { last = "JSON" }, detail = "元のデータ")
                     }
+                    PiyoMenu(SampleIcons.Gear, "表示", minWidth = 220.dp) {
+                        // 中身を自由に作る例(PiyoMenuItem を使わない)
+                        Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                            PiyoText("行の間隔", style = LocalPiyoTextStyle.current.copy(fontWeight = FontWeight.Bold))
+                            PiyoChipGroup(listOf("詰める", "ふつう", "広く"), density, { density = it })
+                            PiyoButton("閉じる", onClick = { close() })
+                        }
+                    }
                     PiyoMenu(SampleIcons.More, "その他") {
                         PiyoMenuItem("名前を変える", { last = "名前を変える" }, icon = SampleIcons.Star)
                         PiyoMenuItem("複製", { last = "複製" }, icon = SampleIcons.Copy)
@@ -184,7 +197,7 @@ private fun CatalogContent(
                     }
                 }
             }
-            Caption("選んだもの: $last")
+            Caption("選んだもの: $last、行の間隔: $density")
         }
 
         Section("カード") {
@@ -242,6 +255,14 @@ private fun Swatches() {
     }
     Caption("seed #%06X".format(c.seed.toArgb() and 0xFFFFFF))
 }
+
+// 開閉の動きの表示名
+private val MenuTransitionNames = mapOf(
+    PiyoMenuTransition.Fade to "フェード",
+    PiyoMenuTransition.Scale to "拡大",
+    PiyoMenuTransition.Genie to "ジニー",
+    PiyoMenuTransition.None to "なし",
+)
 
 // 色相を選ぶ帯
 @Composable

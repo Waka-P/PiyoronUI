@@ -1,6 +1,16 @@
 package piyoron.components
 
 import androidx.compose.animation.core.Animatable
+import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.graphics.ClipOp
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.drawscope.clipPath
+import piyoron.effects.genie.GenieSurfaceShape
+import piyoron.effects.genie.genie
+import piyoron.effects.genie.genieAlpha
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.clickable
@@ -9,7 +19,6 @@ import androidx.compose.foundation.interaction.collectIsHoveredAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -85,6 +94,43 @@ internal fun menuPosition(anchor: Rect, size: Size, area: Size, gap: Float, marg
     return Offset(left, top)
 }
 
+// メニューの開閉の動き
+enum class PiyoMenuTransition {
+    // 薄く現れて薄く消える(既定)
+    Fade,
+
+    // ボタンの中心から広がり、縮んで消える
+    Scale,
+
+    // ボタンに吸い込まれる(ジニー効果)
+    Genie,
+
+    // アニメーションなし(ほかのメニューへ滑る動きは残る)
+    None,
+}
+
+// メニューの既定値
+object PiyoMenuDefaults {
+    val ContentPadding = PaddingValues(PiyoTokens.Menu.Padding)
+    val MinWidth = PiyoTokens.Menu.MinWidth
+    val CornerRadius = PiyoTokens.Menu.Radius
+    val Transition = PiyoMenuTransition.Fade
+}
+
+// メニューの中身を置く場所。close() でメニューを閉じる(項目を自分で作るとき用)。中身は縦に並ぶ
+interface PiyoMenuScope {
+
+    // メニューを閉じる
+    fun close()
+}
+
+// 閉じる処理を持つ中身の置き場所
+private class MenuScopeImpl(private val onClose: () -> Unit) : PiyoMenuScope {
+
+    // メニューを閉じる
+    override fun close() = onClose()
+}
+
 // 1つのメニューの状態
 @Stable
 internal class MenuEntry {
@@ -93,8 +139,17 @@ internal class MenuEntry {
     var touch by mutableStateOf(Rect.Zero)
 
     // 中身と、呼んだ場所の CompositionLocal
-    var content: @Composable ColumnScope.() -> Unit by mutableStateOf({})
+    var content: @Composable PiyoMenuScope.() -> Unit by mutableStateOf({})
     var locals: CompositionLocalContext? by mutableStateOf(null)
+
+    // 面の見た目と開閉の動き(動きを指定しなければ組の既定)
+    var group: MenuGroup? = null
+    var ownTransition by mutableStateOf<PiyoMenuTransition?>(null)
+    val transition: PiyoMenuTransition get() = ownTransition ?: group?.transition ?: PiyoMenuDefaults.Transition
+    var surface by mutableStateOf<SurfaceRole?>(SurfaceRole.Menu)
+    var cornerRadius by mutableStateOf(PiyoTokens.Menu.Radius)
+    var contentPadding by mutableStateOf(PaddingValues(PiyoTokens.Menu.Padding))
+    var minWidth by mutableStateOf(PiyoTokens.Menu.MinWidth)
 
     // 層に出しているか、置いた位置と大きさ(層から見た位置)
     var shown by mutableStateOf(false)
@@ -113,6 +168,21 @@ internal class MenuEntry {
 
     // 押した位置が、メニューの面の上か
     fun hits(at: Offset): Boolean = shown && Rect(placed, size).contains(at)
+
+    // 開閉にかける時間(動きの種類ごと)
+    val duration: Int
+        get() = when (transition) {
+            PiyoMenuTransition.Fade -> PiyoTokens.Menu.FadeDuration
+            PiyoMenuTransition.Scale -> PiyoTokens.Menu.OpenDuration
+            PiyoMenuTransition.Genie -> PiyoTokens.Genie.Duration
+            PiyoMenuTransition.None -> 0
+        }
+
+    // ジニーの進み(0 で開いた形、1 で消えた形)
+    fun genieProgress(): Float {
+        val t = time.value
+        return PiyoTokens.Genie.Easing.transform(if (closing) t else 1f - t)
+    }
 }
 
 // まとめて扱うメニュー。開いているのは1つで、開いている間にほかへ移ると滑って切り替わる
@@ -122,6 +192,7 @@ internal class MenuGroup(private val scope: CoroutineScope, private val overlay:
     var current by mutableStateOf<MenuEntry?>(null)
         private set
     var reduceMotion = false
+    var transition by mutableStateOf(PiyoMenuTransition.Fade)
 
     // ボタンを押したとき(開いていれば閉じ、ほかが開いていれば滑って移る)
     fun toggle(entry: MenuEntry) = when (current) {
@@ -135,29 +206,29 @@ internal class MenuGroup(private val scope: CoroutineScope, private val overlay:
         if (current != null && current != entry) switchTo(entry)
     }
 
-    // 開く(ボタンの中心から広がる)
+    // 開く(動きはメニューごとの種類で)
     fun open(entry: MenuEntry) {
         current = entry
         entry.slideIn = null
         entry.closing = false
         entry.shown = true
         scope.launch {
-            if (reduceMotion) entry.time.snapTo(1f) else {
+            if (reduceMotion || entry.duration == 0) entry.time.snapTo(1f) else {
                 entry.time.snapTo(0f)
-                entry.time.animateTo(1f, tween(PiyoTokens.Menu.OpenDuration, easing = LinearEasing))
+                entry.time.animateTo(1f, tween(entry.duration, easing = LinearEasing))
             }
         }
     }
 
-    // 閉じる(ボタンの中心へ縮む)
+    // 閉じる(動きはメニューごとの種類で)
     fun close(entry: MenuEntry) {
         if (current == entry) current = null
         if (!entry.shown) return
         entry.closing = true
         scope.launch {
-            if (!reduceMotion) {
+            if (!reduceMotion && entry.duration > 0) {
                 entry.time.snapTo(0f)
-                entry.time.animateTo(1f, tween(PiyoTokens.Menu.OpenDuration, easing = LinearEasing))
+                entry.time.animateTo(1f, tween(entry.duration, easing = LinearEasing))
             }
             if (entry.closing) entry.shown = false
         }
@@ -213,11 +284,12 @@ private val LocalPiyoMenuClose = staticCompositionLocalOf<() -> Unit> { {} }
 
 // メニューの組を作り、最前面の層に描く場所を用意する
 @Composable
-private fun rememberMenuGroup(): MenuGroup {
+private fun rememberMenuGroup(transition: PiyoMenuTransition): MenuGroup {
     val overlay = LocalPiyoOverlay.current ?: error("PiyoMenu は PiyoTheme の中で使う")
     val scope = rememberCoroutineScope()
     val group = remember(overlay) { MenuGroup(scope, overlay) }
     group.reduceMotion = LocalPiyoReduceMotion.current
+    group.transition = transition
     DisposableEffect(group) {
         val entry = OverlayEntry(
             content = { MenuLayer(group, overlay) },
@@ -232,27 +304,40 @@ private fun rememberMenuGroup(): MenuGroup {
 }
 
 // 中のメニューを、開いている間に滑って切り替わる組にする。並べ方は中で決める(Row など)
+// transition は中のメニューの開閉の動きの既定
 @Composable
-fun PiyoMenuGroup(content: @Composable () -> Unit) {
-    CompositionLocalProvider(LocalPiyoMenuGroup provides rememberMenuGroup(), content = content)
+fun PiyoMenuGroup(transition: PiyoMenuTransition = PiyoMenuDefaults.Transition, content: @Composable () -> Unit) {
+    CompositionLocalProvider(LocalPiyoMenuGroup provides rememberMenuGroup(transition), content = content)
 }
 
 // アイコンのボタンと、押すと開くメニュー。PiyoMenuGroup の中に並べると、開いている間にほかのボタンへ滑って移る
+// 中身は自由に置ける(PiyoMenuItem を使わなくてもよい。閉じるときは close())。surface を null にすると面も描かない
 @Composable
 fun PiyoMenu(
     icon: ImageVector,
     contentDescription: String,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    content: @Composable ColumnScope.() -> Unit,
+    transition: PiyoMenuTransition? = null,
+    surface: SurfaceRole? = SurfaceRole.Menu,
+    cornerRadius: Dp = PiyoMenuDefaults.CornerRadius,
+    contentPadding: PaddingValues = PiyoMenuDefaults.ContentPadding,
+    minWidth: Dp = PiyoMenuDefaults.MinWidth,
+    content: @Composable PiyoMenuScope.() -> Unit,
 ) {
-    val group = LocalPiyoMenuGroup.current ?: rememberMenuGroup()
+    val group = LocalPiyoMenuGroup.current ?: rememberMenuGroup(transition ?: PiyoMenuDefaults.Transition)
     val entry = remember { MenuEntry() }
     val locals = currentCompositionLocalContext
     val latest by rememberUpdatedState(content)
     SideEffect {
         entry.content = { latest(this) }
         entry.locals = locals
+        entry.group = group
+        entry.ownTransition = transition
+        entry.surface = surface
+        entry.cornerRadius = cornerRadius
+        entry.contentPadding = contentPadding
+        entry.minWidth = minWidth
     }
     DisposableEffect(group, entry) {
         group.entries += entry
@@ -302,12 +387,15 @@ private fun MenuLayer(group: MenuGroup, overlay: PiyoOverlay) {
     }
 }
 
-// メニューの面(置き場所を決め、開閉と滑りの動きをかける)
+// メニュー(置き場所を決め、開閉と滑りの動きをかけ、面と中身を描く)
 @Composable
 private fun MenuPanel(entry: MenuEntry, group: MenuGroup, overlay: PiyoOverlay) {
     val close = remember(entry, group) { { group.close(entry) } }
+    val genie = entry.transition == PiyoMenuTransition.Genie
+    // 層から見た、パネルの左上からボタンの中心まで(ジニーの行き先)
+    val target = { overlay.toLocal(entry.anchor.center) - entry.placed }
     CompositionLocalProvider(LocalPiyoMenuClose provides close) {
-        Column(
+        Box(
             modifier = Modifier
                 .layout { measurable, constraints ->
                     val placeable = measurable.measure(Constraints(maxWidth = constraints.maxWidth, maxHeight = constraints.maxHeight))
@@ -320,18 +408,30 @@ private fun MenuPanel(entry: MenuEntry, group: MenuGroup, overlay: PiyoOverlay) 
                     layout(0, 0) { placeable.place(pos.x.roundToInt(), pos.y.roundToInt()) }
                 }
                 .graphicsLayer {
-                    val w = entry.size.width.coerceAtLeast(1f)
-                    val h = entry.size.height.coerceAtLeast(1f)
-                    val center = overlay.toLocal(entry.anchor.center) - entry.placed
-                    transformOrigin = TransformOrigin(center.x / w, center.y / h)
-                    val t = entry.time.value
-                    val moved = PiyoTokens.Menu.Easing.transform(t)
-                    val faded = PiyoTokens.Menu.FadeEasing.transform((t * PiyoTokens.Menu.OpenDuration / PiyoTokens.Menu.FadeDuration).coerceAtMost(1f))
-                    val small = PiyoTokens.Menu.OpenScale
-                    val scale = if (entry.closing) lerp(1f, small, moved) else lerp(small, 1f, moved)
-                    scaleX = scale
-                    scaleY = scale
-                    var a = if (entry.closing) 1f - faded else faded
+                    var a = 1f
+                    if (!genie) {
+                        val t = entry.time.value
+                        when (entry.transition) {
+                            PiyoMenuTransition.Scale -> {
+                                val w = entry.size.width.coerceAtLeast(1f)
+                                val h = entry.size.height.coerceAtLeast(1f)
+                                val center = target()
+                                transformOrigin = TransformOrigin(center.x / w, center.y / h)
+                                val moved = PiyoTokens.Menu.Easing.transform(t)
+                                val faded = PiyoTokens.Menu.FadeEasing.transform((t * PiyoTokens.Menu.OpenDuration / PiyoTokens.Menu.FadeDuration).coerceAtMost(1f))
+                                val small = PiyoTokens.Menu.OpenScale
+                                val scale = if (entry.closing) lerp(1f, small, moved) else lerp(small, 1f, moved)
+                                scaleX = scale
+                                scaleY = scale
+                                a = if (entry.closing) 1f - faded else faded
+                            }
+                            PiyoMenuTransition.Fade -> {
+                                val faded = PiyoTokens.Menu.FadeEasing.transform(t)
+                                a = if (entry.closing) 1f - faded else faded
+                            }
+                            else -> Unit
+                        }
+                    }
                     val s = PiyoTokens.Menu.Easing.transform(entry.slide.value)
                     when (entry.slideIn) {
                         true -> {
@@ -352,12 +452,56 @@ private fun MenuPanel(entry: MenuEntry, group: MenuGroup, overlay: PiyoOverlay) 
                     // 薄くするとき、面の大きさの画像を経由しない(外側に描く影が切れないように)
                     compositingStrategy = CompositingStrategy.ModulateAlpha
                 }
-                .piyoSurface(RoundedCornerShape(PiyoTokens.Menu.Radius), SurfaceRole.Menu)
-                .width(IntrinsicSize.Max)
-                .widthIn(min = PiyoTokens.Menu.MinWidth)
-                .padding(PiyoTokens.Menu.Padding),
-        ) { entry.content(this) }
+                .then(if (genie) Modifier.withoutAnchor(entry, overlay) else Modifier),
+        ) {
+            entry.surface?.let { role -> MenuSurface(entry, role, genie, target) }
+            Column(
+                modifier = Modifier
+                    .then(if (genie) Modifier.genie({ entry.genieProgress() }, target, entry.cornerRadius) else Modifier)
+                    .width(IntrinsicSize.Max)
+                    .widthIn(min = entry.minWidth)
+                    .padding(entry.contentPadding),
+            ) {
+                val scope = remember(close) { MenuScopeImpl(close) }
+                entry.content(scope)
+            }
+        }
     }
+}
+
+// メニューの面。ジニーのときは変形に沿った形で描く(内側の影も形に合わせるため、進み具合が変わるたびに作り直す)
+@Composable
+private fun BoxScope.MenuSurface(entry: MenuEntry, role: SurfaceRole, genie: Boolean, target: () -> Offset) {
+    val shape = if (genie) {
+        val p = entry.genieProgress()
+        GenieSurfaceShape(p, if (p > 0f) target() else Offset.Zero, entry.cornerRadius)
+    } else {
+        RoundedCornerShape(entry.cornerRadius)
+    }
+    Box(
+        Modifier
+            .matchParentSize()
+            .then(
+                if (genie) {
+                    Modifier.graphicsLayer {
+                        alpha = genieAlpha(entry.genieProgress())
+                        compositingStrategy = CompositingStrategy.ModulateAlpha
+                    }
+                } else {
+                    Modifier
+                },
+            )
+            .piyoSurface(shape, role),
+    )
+}
+
+// ジニーで吸い込まれる間、ボタンの上には描かない
+private fun Modifier.withoutAnchor(entry: MenuEntry, overlay: PiyoOverlay): Modifier = drawWithContent {
+    val button = entry.anchor
+    val hole = Path().apply {
+        addOval(Rect(overlay.toLocal(button.topLeft) - entry.placed, button.size))
+    }
+    clipPath(hole, ClipOp.Difference) { this@drawWithContent.drawContent() }
 }
 
 // メニューの項目。押すとメニューを閉じてから onClick を呼ぶ。detail は右寄せの補足
