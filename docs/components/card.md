@@ -15,8 +15,8 @@ PiyoCard(contentPadding = PaddingValues(12.dp), shape = Piyo.shapes.medium) { ..
 | 層 | 内容 | トークン |
 |---|---|---|
 | 塗り | 160deg の斜めグラデーション(面 .96 → シード色を 5% 混ぜた面 .9) | `glass.card.fill` |
-| 枠 | スイープを不透明度 .7 | `glass.card.edgeOpacity` |
-| 線状の影 | .5px を (2, 2) ずらし、1px ぼかす | `glass.card.ring*` |
+| 枠 | スイープを不透明度 .5(参照実装は .7) | `glass.card.edgeOpacity` |
+| 線状の影 | .5px を (1.5, 1.5) ずらし、1px ぼかす(参照実装は (2, 2)) | `glass.card.ring*` |
 | 文字 | `contentDefault` | |
 
 ボタンと違い外の影と内側の影は持たない。面を大きく取るので、影を重ねると重く見えるため(参照実装どおり)。

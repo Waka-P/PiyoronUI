@@ -400,11 +400,11 @@
   --piyo-glass-tabs-ring-offset-x: 1px;
   --piyo-glass-tabs-ring-offset-y: 1.5px;
   --piyo-glass-card-fill: linear-gradient(160deg, color-mix(in srgb, var(--piyo-color-surface) 96%, transparent) 0%, color-mix(in srgb, color-mix(in srgb, var(--piyo-color-primary) 5%, var(--piyo-color-surface)) 90%, transparent) 100%);
-  --piyo-glass-card-edge-opacity: 0.7;
+  --piyo-glass-card-edge-opacity: 0.5;
   --piyo-glass-card-ring-width: 0.5px;
   --piyo-glass-card-ring-blur: 1px;
-  --piyo-glass-card-ring-offset-x: 2px;
-  --piyo-glass-card-ring-offset-y: 2px;
+  --piyo-glass-card-ring-offset-x: 1.5px;
+  --piyo-glass-card-ring-offset-y: 1.5px;
   --piyo-glass-card-backdrop-blur: 14px;
   --piyo-glass-card-backdrop-saturate: 1.5;
   --piyo-glass-edge: conic-gradient(from 0deg, var(--piyo-color-edge-0) 0deg, var(--piyo-color-edge-1) 35deg, var(--piyo-color-edge-2) 70deg, var(--piyo-color-edge-3) 100deg, var(--piyo-color-edge-4) 125deg, var(--piyo-color-edge-5) 150deg, var(--piyo-color-edge-6) 175deg, var(--piyo-color-edge-7) 200deg, var(--piyo-color-edge-8) 230deg, var(--piyo-color-edge-9) 260deg, var(--piyo-color-edge-10) 290deg, var(--piyo-color-edge-11) 315deg, var(--piyo-color-edge-12) 340deg, var(--piyo-color-edge-0) 360deg);

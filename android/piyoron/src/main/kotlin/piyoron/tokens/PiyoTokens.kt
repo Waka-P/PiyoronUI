@@ -195,11 +195,11 @@ object GlassTokens {
     }
 
     object Card {
-        val EdgeOpacity = 0.7f
+        val EdgeOpacity = 0.5f
         val RingWidth = 0.5.dp
         val RingBlur = 1.dp
-        val RingOffsetX = 2.dp
-        val RingOffsetY = 2.dp
+        val RingOffsetX = 1.5.dp
+        val RingOffsetY = 1.5.dp
         val BackdropBlur = 14.dp
         val BackdropSaturate = 1.5f
     }
