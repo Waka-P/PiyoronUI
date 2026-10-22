@@ -25,25 +25,27 @@ function useControllable(value, defaultValue, onChange) {
 // テーマの要素(メニューなど、外に出す部品の置き場所)
 export const ThemeContext = createContext(null);
 
-// テーマ(中の部品にスタイルと色を渡す)。preset はプリセットの名前、seed はシード色
-export function PiyoTheme({ style = 'glass', preset, seed, className, children, ...props }) {
+// テーマ(中の部品にスタイルと色を渡す)。preset はプリセットの名前、seed はシード色、reduceMotion で動きを減らす
+export function PiyoTheme({ style = 'glass', preset, seed, reduceMotion, className, children, ...props }) {
   const [element, setElement] = useState(null);
   useLayoutEffect(() => {
     if (element && seed) setPiyoSeed(seed, { element });
     else if (element) setPiyoPreset(preset ?? 'ocean', { element });
   }, [element, seed, preset]);
   return (
-    <div ref={setElement} data-piyoron-style={style} className={className} {...props}>
+    <div ref={setElement} data-piyoron-style={style} data-piyoron-reduce-motion={reduceMotion ? 'true' : undefined} className={className} {...props}>
       <ThemeContext.Provider value={element}>{children}</ThemeContext.Provider>
     </div>
   );
 }
 
 // ボタン。tone は default、primary、danger。文字がなくアイコンだけなら円になる(aria-label を付ける)
-export function PiyoButton({ tone = 'default', icon, className, children, type = 'button', ...props }) {
+// 円のときは size と iconSize(px)で大きさを変えられる
+export function PiyoButton({ tone = 'default', icon, size, iconSize, className, style, children, type = 'button', ...props }) {
   const iconOnly = icon && (children === undefined || children === null);
+  const sized = { ...(size && { '--piyo-btn-size': `${size}px` }), ...(iconSize && { '--piyo-btn-icon-size': `${iconSize}px` }), ...style };
   return (
-    <button type={type} className={cx('piyo-btn', iconOnly && 'piyo-icon-btn', tone !== 'default' && `piyo-${tone}`, className)} {...props}>
+    <button type={type} className={cx('piyo-btn', iconOnly && 'piyo-icon-btn', tone !== 'default' && `piyo-${tone}`, className)} style={sized} {...props}>
       {icon}
       {children}
     </button>
@@ -103,14 +105,14 @@ function toItem(item) {
   return typeof item === 'object' ? item : { value: String(item), label: item };
 }
 
-// タブ。items は項目の並び。つまみは選んだ項目へ滑る。中身は PiyoTabPanel で置く
-export function PiyoTabs({ items, value, defaultValue, onValueChange, className, children, ...props }) {
+// タブ。items は項目の並び。つまみは選んだ項目へ滑る。中身は PiyoTabPanel で置く。className と style はタブの帯に付く
+export function PiyoTabs({ items, value, defaultValue, onValueChange, className, style, children, ...props }) {
   const list = items.map(toItem);
   const [current, setCurrent] = useControllable(value, defaultValue ?? list[0]?.value, onValueChange);
   const index = Math.max(0, list.findIndex((i) => i.value === current));
   return (
-    <Tabs.Root value={current} onValueChange={setCurrent} {...props}>
-      <Tabs.List className={cx('piyo-tabs', className)} style={{ '--piyo-tabs-n': list.length, '--piyo-tabs-i': index }}>
+    <Tabs.Root value={current} onValueChange={setCurrent} style={{ display: 'contents' }} {...props}>
+      <Tabs.List className={cx('piyo-tabs', className)} style={{ '--piyo-tabs-n': list.length, '--piyo-tabs-i': index, ...style }}>
         <span className="piyo-tabs-thumb" aria-hidden="true" />
         {list.map((item) => (
           <Tabs.Trigger key={item.value} value={item.value} className="piyo-tab" disabled={item.disabled}>

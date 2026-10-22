@@ -90,7 +90,7 @@ GenieVisibility(visible, anchor) { /* カードの中身 */ }
 ```
 
 - CSS だけの部品: `.piyo-btn`、`.piyo-chip`、`.piyo-tabs`、`.piyo-card`
-- JS の部品: メニュー、ひょうたん、ひょうたんとパネル(`import { PiyoMenu } from 'piyoron'`)
+- JS の部品: メニュー、ひょうたん、ひょうたんとパネル、ジニー(`import { PiyoMenu } from 'piyoron'`)
 - React 版: `import { PiyoButton, PiyoMenu } from 'piyoron/react'`
 
 詳しくは `docs/web.md`。
@@ -104,7 +104,7 @@ GenieVisibility(visible, anchor) { /* カードの中身 */ }
 | `web/tokens.css` | 生成した CSS 変数 |
 | `web/piyoron.css` | 部品の CSS |
 | `web/src` | JS(色、メニュー、ひょうたん)と React 版(`web/src/react`) |
-| `web/demo` | Web のカタログ(素の HTML と React) |
+| `web/demo` | Web のカタログ(素の HTML と React。Android のサンプルと同じ構成) |
 | `android/piyoron` | Compose ライブラリ(`core`、`components`、`style.glass`、`effects`、`tokens` のパッケージ) |
 | `android/sample` | カタログアプリ(全部品、エフェクト、色の切り替え) |
 | `docs/` | 分解メモ(スタイル、部品、エフェクト) |

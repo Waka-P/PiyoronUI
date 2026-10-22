@@ -20,11 +20,13 @@
   gap: var(--piyo-control-gap);
   box-sizing: border-box;
   height: var(--piyo-control-height);
+  margin-block: max(0px, (var(--piyo-touch-min-size) - var(--piyo-control-height)) / 2);
   padding: 0 var(--piyo-control-padding-x);
   border: 0;
   border-radius: var(--piyo-radius-pill);
   background: transparent;
   color: var(--piyo-color-content-selected);
+  line-height: 1;
   font: inherit;
   white-space: nowrap;
   cursor: pointer;
@@ -38,11 +40,20 @@
   flex: none;
 }
 
-/* 円のアイコンボタン */
+/* 円のアイコンボタン(大きさは --piyo-btn-size、アイコンは --piyo-btn-icon-size で変えられる) */
 :where(.piyo-btn.piyo-icon-btn) {
-  width: var(--piyo-control-height);
+  --piyo-btn-size: var(--piyo-control-height);
+  width: var(--piyo-btn-size);
+  height: var(--piyo-btn-size);
+  margin: max(0px, (var(--piyo-touch-min-size) - var(--piyo-btn-size)) / 2);
   padding: 0;
   border-radius: 50%;
+}
+
+/* 円のアイコンボタンのアイコン */
+:where(.piyo-btn.piyo-icon-btn) :where(svg, .piyo-icon) {
+  width: var(--piyo-btn-icon-size, var(--piyo-control-icon-size));
+  height: var(--piyo-btn-icon-size, var(--piyo-control-icon-size));
 }
 
 /* 主な操作と取り消せない操作の文字 */
@@ -59,22 +70,33 @@
   justify-content: center;
   gap: var(--piyo-control-gap);
   box-sizing: border-box;
+  margin-block: max(0px, (var(--piyo-touch-min-size) - var(--piyo-chip-padding-y) * 2 - var(--piyo-text-size-small)) / 2);
   padding: var(--piyo-chip-padding-y) var(--piyo-chip-padding-x);
   border: 0;
   border-radius: var(--piyo-radius-pill);
   background: transparent;
   color: var(--piyo-color-content-muted);
   font: inherit;
+  font-size: var(--piyo-text-size-small);
+  line-height: 1;
   white-space: nowrap;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
 }
 
-/* 選ぶボタンの並び(幅に合わせて折り返す) */
+/* 選ぶボタンのアイコン */
+:where(.piyo-chip) :where(svg, .piyo-icon) {
+  width: var(--piyo-control-icon-size);
+  height: var(--piyo-control-icon-size);
+  flex: none;
+}
+
+/* 選ぶボタンの並び(幅に合わせて折り返す。段の間は押せる範囲の余白だけ) */
 :where(.piyo-chip-group) {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--piyo-chip-gap);
+  align-items: center;
+  column-gap: var(--piyo-chip-gap);
 }
 
 /* 選んだ選ぶボタン */
@@ -241,6 +263,7 @@
   gap: var(--piyo-menu-item-gap);
   box-sizing: border-box;
   width: 100%;
+  min-height: var(--piyo-touch-min-size);
   padding: var(--piyo-menu-item-padding-y) var(--piyo-menu-item-padding-x);
   border: 0;
   border-radius: var(--piyo-menu-item-radius);
@@ -253,13 +276,6 @@
   cursor: pointer;
   transition: background-color var(--piyo-menu-item-duration), color var(--piyo-menu-item-duration);
   -webkit-tap-highlight-color: transparent;
-}
-
-/* 指で操作する画面では、項目を押しやすい高さにする */
-@media (pointer: coarse) {
-  :where(.piyo-menu-item) {
-    min-height: var(--piyo-touch-min-size);
-  }
 }
 
 /* 項目のアイコン */
@@ -291,6 +307,16 @@
 }
 
 /* ---------- 動きを減らす設定 ---------- */
+
+/* 動きを減らす設定(属性で指定したとき) */
+:where([data-piyoron-reduce-motion="true"]) :where(.piyo-btn, .piyo-chip, .piyo-pressable, .piyo-tabs-thumb, .piyo-tab, .piyo-menu-item) {
+  transition: none !important;
+}
+
+/* 動きを減らす設定では、押したときの大きさを変えない(属性で指定したとき) */
+:where([data-piyoron-reduce-motion="true"]) :where(.piyo-btn, .piyo-chip, .piyo-pressable):is(:hover, :active) {
+  transform: none !important;
+}
 
 /* 端末の設定で動きを止める */
 @media (prefers-reduced-motion: reduce) {
@@ -665,4 +691,41 @@
 :where(.piyo-gourd-panel > .piyo-gourd) {
   --piyo-s-fill: transparent;
   --piyo-s-edge-opacity: 0;
+}
+
+/* ---------- ジニー(形と動きは JS) ---------- */
+
+/* ジニーで出し入れする面の置き場所 */
+:where(.piyo-genie) {
+  position: relative;
+  isolation: isolate;
+}
+
+/* ジニーの面(変形に沿って JS が描く) */
+:where(.piyo-genie-surface) {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* ジニーの中身 */
+:where(.piyo-genie-content) {
+  position: relative;
+  z-index: 1;
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+}
+
+/* Glass: ジニーの面(カードと同じ) */
+:where([data-piyoron-style="glass"]) :where(.piyo-genie-surface) {
+  --piyo-s-fill: var(--piyo-glass-card-fill);
+  --piyo-s-edge: var(--piyo-glass-edge);
+  --piyo-s-edge-opacity: var(--piyo-glass-card-edge-opacity);
+  --piyo-s-ring-color: var(--piyo-color-ring-shadow);
+  --piyo-s-ring-width: var(--piyo-glass-card-ring-width);
+  --piyo-s-ring-blur: var(--piyo-glass-card-ring-blur);
+  --piyo-s-ring-x: var(--piyo-glass-card-ring-offset-x);
+  --piyo-s-ring-y: var(--piyo-glass-card-ring-offset-y);
 }

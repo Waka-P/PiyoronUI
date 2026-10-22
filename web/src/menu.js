@@ -271,7 +271,14 @@ export class PiyoMenu {
     }, { signal });
     this.observer = new ResizeObserver(() => this.resize());
     this.observer.observe(this.body);
-    this.onViewport = () => this.shown && this.render();
+    this.onViewport = () => {
+      if (!this.shown) return;
+      // 開いている間にボタンが動いた(スクロール、画面の大きさの変化)ら閉じる
+      const a = this.anchorRect();
+      const last = this.lastAnchor;
+      if (this.isOpen && last && (Math.abs(a.left - last.left) > 1 || Math.abs(a.top - last.top) > 1)) this.close();
+      else this.render();
+    };
     window.addEventListener('resize', this.onViewport, { signal });
     window.addEventListener('scroll', this.onViewport, { signal, capture: true });
   }
@@ -320,6 +327,7 @@ export class PiyoMenu {
     this.element.hidden = false;
     this.anchor.setAttribute('aria-expanded', 'true');
     this.box = this.measure();
+    this.lastAnchor = null;
     this.place();
     this.onOpenChange?.(true);
     if (slide && !reduceMotion(this.element)) {
@@ -392,6 +400,7 @@ export class PiyoMenu {
     this.place();
     const { width: w, height: h } = this.box;
     const a = this.anchorRect();
+    if (this.isOpen) this.lastAnchor = { left: a.left, top: a.top };
     const target = [(a.left + a.right) / 2 - this.pos.x, (a.top + a.bottom) / 2 - this.pos.y];
     const g = k.notchGap;
     const notch = ovalShape(a.left - this.pos.x - g, a.top - this.pos.y - g, a.right - this.pos.x + g, a.bottom - this.pos.y + g);

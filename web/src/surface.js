@@ -1,11 +1,12 @@
-// 変わる形の面を描く(塗り、線状の影、枠)
+// 変わる形の面を描く(外の影、塗り、線状の影、枠)
 // 色は部品のスタイルの CSS 変数(--piyo-s-fill、--piyo-s-edge、--piyo-s-ring-* など)を使う
-// 形は SVG のマスクで切り抜く。いくつかの形を渡すと、合わせた形の外周に線を描く
+// 形は SVG のマスクで切り抜く。いくつかの形を渡すと合わせた形として描き、重なった所の継ぎ目には線を出さない
+// 線の位置は Android 版と同じ(枠は形の内側、線状の影は輪郭の真ん中)
 
 import { shapeToPath } from './geometry.js';
 
 // 層を部品より外に広げる幅(線状の影や枠が外へ出ても切れないように)
-const MARGIN = 24;
+const MARGIN = 8;
 
 // SVG を CSS のマスクに使える文字列にする
 function svgUrl(svg) {
@@ -36,10 +37,27 @@ function masked(width, height, keep, body) {
   );
 }
 
-// 線のマスク。inside なら形の内側の帯、そうでなければ合わせた形の外側の帯(穴の縁にも線を引く)
+// 線を引くパス
+function stroke(d, width) {
+  return `<path d="${d}" fill="none" stroke="#fff" stroke-width="${width}"/>`;
+}
+
+// 形ごとの線を、ほかの形の内側では消して描く SVG(合わせた形の継ぎ目に線を出さない)
+// inside なら形の内側の帯(太さ line)、そうでなければ輪郭の真ん中の帯。穴の縁にも引く
 function lineMask(paths, holes, width, height, line, inside) {
-  const strokes = [...paths, ...holes].map((d) => `<path d="${d}" fill="none" stroke="#fff" stroke-width="${line * 2}"/>`).join('');
-  return masked(width, height, inside ? inner(paths, holes) : outer(paths, holes), strokes);
+  const defs = [];
+  const body = [];
+  paths.forEach((d, i) => {
+    const others = fills(paths.filter((_, j) => j !== i), '#000');
+    const keep = inside ? `${fills(paths, '#fff')}${fills(holes, '#000')}${others}` : `<rect width="100%" height="100%" fill="#fff"/>${others}`;
+    defs.push(`<mask id="m${i}" maskUnits="userSpaceOnUse" x="0" y="0" width="${width}" height="${height}">${keep}</mask>`);
+    body.push(`<g mask="url(#m${i})">${stroke(d, inside ? line * 2 : line)}</g>`);
+  });
+  if (holes.length) {
+    defs.push(`<mask id="mh" maskUnits="userSpaceOnUse" x="0" y="0" width="${width}" height="${height}">${inner(paths, holes)}</mask>`);
+    body.push(`<g mask="url(#mh)">${holes.map((d) => stroke(d, inside ? line * 2 : line)).join('')}</g>`);
+  }
+  return svgUrl(`<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}"><defs>${defs.join('')}</defs>${body.join('')}</svg>`);
 }
 
 // 全面の白(SVG のマスクを通して、白黒を透明度に変える)
@@ -53,6 +71,12 @@ function fillMask(paths, holes, width, height) {
 // 外側だけのマスク(影を形の外にだけ出す)
 function outsideMask(paths, holes, width, height) {
   return masked(width, height, outer(paths, holes), WHOLE);
+}
+
+// 影のもとの形のマスク(輪郭の上の画素から黒が漏れないよう、縁を少し削る)
+function shadowSourceMask(paths, holes, width, height) {
+  const trim = paths.map((d) => `<path d="${d}" fill="none" stroke="#000" stroke-width="3"/>`).join('');
+  return masked(width, height, inner(paths, holes) + trim, WHOLE);
 }
 
 // 層にマスクをかける
@@ -75,13 +99,12 @@ function px(element, name, fallback) {
   return Number.isNaN(v) ? fallback : v;
 }
 
-// 部品の面を、渡した形で描く。inside なら枠を形の内側に描く(形が1つのとき)。ringOnTop なら線状の影を枠の上に重ねる
+// 部品の面を、渡した形で描く。ringOnTop なら線状の影を枠の上に重ねる
 // 外の影(--piyo-s-shadow-filter)と後ろのぼかし(--piyo-s-backdrop)は、変数があるときだけ効く
 export class PaintedSurface {
   // 部品の要素の下に層を用意する
-  constructor(host, { inside = true, ringOnTop = false, margin = MARGIN } = {}) {
+  constructor(host, { ringOnTop = false, margin = MARGIN } = {}) {
     this.host = host;
-    this.inside = inside;
     this.margin = margin;
     host.classList.add('piyo-painted');
     this.root = document.createElement('div');
@@ -96,12 +119,11 @@ export class PaintedSurface {
       webkitBackdropFilter: 'var(--piyo-s-backdrop, none)',
     });
     this.inset = layer(this.drop, { background: 'var(--piyo-s-inset, none)' });
-    // 線状の影の層を作る
-    const ring = () => layer(this.root, {
-      background: 'var(--piyo-s-ring-color)',
+    // 線状の影の層を作る(マスクで切った線を、外の層でずらしてぼかす)
+    const ring = () => layer(layer(this.root, {
       filter: 'blur(var(--piyo-s-ring-blur))',
       transform: 'translate(var(--piyo-s-ring-x), var(--piyo-s-ring-y))',
-    });
+    }), { background: 'var(--piyo-s-ring-color)' });
     if (!ringOnTop) this.ring = ring();
     this.edge = layer(this.root, { background: 'var(--piyo-s-edge)', opacity: 'var(--piyo-s-edge-opacity, 1)' });
     if (ringOnTop) this.ring = ring();
@@ -125,9 +147,9 @@ export class PaintedSurface {
     const fill = fillMask(paths, holePaths, w, h);
     setMask(this.fill, fill);
     setMask(this.inset, fill);
-    setMask(this.shadowShape, fill);
+    setMask(this.shadowShape, shadowSourceMask(paths, holePaths, w, h));
     setMask(this.shadow, outsideMask(paths, holePaths, w, h));
-    setMask(this.edge, lineMask(paths, holePaths, w, h, edgeWidth, this.inside));
+    setMask(this.edge, lineMask(paths, holePaths, w, h, edgeWidth, true));
     setMask(this.ring, lineMask(paths, holePaths, w, h, ringWidth, false));
   }
 

@@ -4,7 +4,8 @@ import { createContext, useContext, useEffect, useLayoutEffect, useMemo, useRef,
 import { createPortal } from 'react-dom';
 import { PiyoMenu as MenuCore, PiyoMenuGroup as MenuGroupCore } from '../menu.js';
 import { GourdRailPanel, GourdTabRail } from '../gourd.js';
-import { ThemeContext, cx } from './basic.jsx';
+import { PiyoGenie as GenieCore } from '../genie.js';
+import { PiyoButton, ThemeContext, cx } from './basic.jsx';
 
 // ---------- メニュー ----------
 
@@ -28,9 +29,9 @@ export function usePiyoMenu() {
   return useContext(MenuContext);
 }
 
-// メニュー。trigger は開くボタン、children は中身(自由に置ける)
-// 組の中では transition、side、align を省くと組の既定になる
-export function PiyoMenu({ trigger, transition, side, align, onOpenChange, className, style, children }) {
+// メニュー。trigger は開くボタン(icon と label を渡すと、円のアイコンボタンを作る)。children は中身(自由に置ける)
+// 組の中では transition、side、align を省くと組の既定になる。minWidth は中身の最小の幅(px)
+export function PiyoMenu({ trigger, icon, label, transition, side, align, minWidth, onOpenChange, className, style, children }) {
   const group = useContext(GroupContext);
   const theme = useContext(ThemeContext);
   const anchorRef = useRef(null);
@@ -54,9 +55,9 @@ export function PiyoMenu({ trigger, transition, side, align, onOpenChange, class
   const api = useMemo(() => ({ close: () => core?.close(), open: () => core?.open() }), [core]);
   return (
     <>
-      <span ref={anchorRef} style={{ display: 'contents' }}>{trigger}</span>
+      <span ref={anchorRef} style={{ display: 'contents' }}>{trigger ?? <PiyoButton icon={icon} aria-label={label} />}</span>
       {createPortal(
-        <div ref={menuRef} className={cx('piyo-menu', className)} style={style} hidden>
+        <div ref={menuRef} className={cx('piyo-menu', className)} style={minWidth ? { '--piyo-menu-min-width': `${minWidth}px`, ...style } : style} hidden>
           <div className="piyo-menu-content">
             <div className="piyo-menu-body">
               <MenuContext.Provider value={api}>{children}</MenuContext.Provider>
@@ -173,6 +174,30 @@ export function PiyoGourdPanel({ items, value, onValueChange, open, onOpenChange
       <div className="piyo-gourd-panel-body">
         <div className="piyo-gourd-panel-content">{children}</div>
       </div>
+    </div>
+  );
+}
+
+// ---------- ジニー ----------
+
+// ジニー効果で出し入れする面。open が false になると anchor(要素か ref)に吸い込まれ、true で出てくる
+// surface が true なら面(カード)を変形に沿わせて描く。radius は角の丸み(px)。大きさは style や className で決める
+export function PiyoGenie({ open = true, anchor, surface = true, radius, className, style, children }) {
+  const ref = useRef(null);
+  const core = useRef(null);
+  useLayoutEffect(() => {
+    const target = anchor && 'current' in anchor ? anchor.current : anchor;
+    core.current = new GenieCore(ref.current, target, { open, surface, radius });
+    return () => core.current.destroy();
+    // 面の有無と丸みが変わったときだけ作り直す
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [surface, radius]);
+  useEffect(() => {
+    core.current?.setOpen(open);
+  }, [open]);
+  return (
+    <div ref={ref} className={className} style={style}>
+      <div className="piyo-genie-content">{children}</div>
     </div>
   );
 }

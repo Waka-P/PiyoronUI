@@ -336,7 +336,7 @@ export class GourdRailPanel {
       this.surfaceElement.className = 'piyo-gourd-panel-surface';
       element.prepend(this.surfaceElement);
     }
-    this.surface = new PaintedSurface(this.surfaceElement, { inside: false });
+    this.surface = new PaintedSurface(this.surfaceElement);
     this.k = gourdTokens(element);
     this.time = open ? 0 : 1;
     this.closing = !open;

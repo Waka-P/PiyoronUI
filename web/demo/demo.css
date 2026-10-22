@@ -1,22 +1,83 @@
-/* カタログの並べ方 */
-body { margin: 0; background: var(--piyo-color-background); }
+/* カタログの並べ方(Android のサンプルと同じ寸法) */
+body { margin: 0; background: var(--piyo-color-background); line-height: 1.15; }
+
+/* React 版のテーマの要素(ページ全体に色を当てる) */
+.theme-page { min-height: 100vh; background: var(--piyo-color-background); }
 
 /* 全体の幅と間 */
-main { max-width: 560px; margin: 0 auto; padding: 24px 16px 64px; display: flex; flex-direction: column; gap: 20px; }
+main { max-width: 560px; margin: 0 auto; padding: 16px 20px; display: flex; flex-direction: column; gap: 14px; }
 
-/* 見出し */
-h1 { margin: 0; font-size: 20px; font-weight: 700; }
-h2 { margin: 0 0 12px; font-size: 15px; font-weight: 700; color: var(--piyo-color-content-muted); }
+/* 題名 */
+.title { margin: 0; font-size: 20px; font-weight: 700; }
 
-/* 部品のまとまり */
-section { padding: 20px; border-radius: 20px; background: var(--piyo-color-surface); }
+/* 見出しつきのまとまり */
+.section { display: flex; flex-direction: column; gap: 10px; }
 
-/* 横並びと縦並び */
-.row { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
-.stack { display: flex; flex-direction: column; gap: 12px; }
+/* まとまりの見出し */
+.section-title { margin: 0; font-size: 15px; font-weight: 700; color: var(--piyo-color-content-muted); }
 
-/* 補足の文字 */
-.caption { margin: 4px 0; font-size: 13px; color: var(--piyo-color-content-muted); }
+/* まとまりの中身(中の部品は中身の幅。幅いっぱいにするものは下で指定) */
+.section-body { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; padding: 16px; border-radius: 20px; background: var(--piyo-color-surface); }
 
-/* アイコン */
-.icon { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+/* 幅いっぱいに置くもの */
+.section-body > :is(.piyo-card, .piyo-tabs, .rail-stage, .full) { align-self: stretch; }
+
+/* ページの中身(まとまりを縦に並べる) */
+.page { display: flex; flex-direction: column; gap: 14px; }
+
+/* 横並び */
+.row { display: flex; align-items: center; }
+
+/* 折り返す横並び */
+.flow { display: flex; flex-wrap: wrap; align-items: center; }
+
+/* 縦並び */
+.column { display: flex; flex-direction: column; }
+
+/* 小さな説明の文字 */
+.caption { margin: 0; font-size: 12px; color: var(--piyo-color-content-muted); }
+
+/* 太字 */
+.bold { font-weight: 700; }
+
+/* 線のアイコン(大きさは部品が決める) */
+.icon { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+/* 隠したもの */
+[hidden] { display: none !important; }
+
+/* 色見本の並び(入りきらない分は切る) */
+.swatches { display: flex; align-items: center; gap: 4px; align-self: stretch; overflow: hidden; }
+
+/* 色見本の1つ */
+.swatch { flex: none; width: 22px; height: 22px; border-radius: 6px; }
+
+/* 枠の色の帯(前の間は 4 + 12 + 4) */
+.edge-strip { display: flex; margin-left: 16px; }
+
+/* 枠の色の1本 */
+.edge-strip > span { flex: none; width: 8px; height: 22px; }
+
+/* 色相の帯と値を選ぶ帯(左右につまみのはみ出す分を足す) */
+.bar { display: block; width: calc(100% + 32px); height: 32px; margin: 0 -16px; touch-action: none; cursor: pointer; }
+
+/* ひょうたんとパネルの置き場所(後ろに格子と丸) */
+.rail-stage { position: relative; height: 440px; border-radius: 16px; overflow: hidden; }
+
+/* 後ろの格子と丸 */
+.rail-stage > canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+
+/* ひょうたんとパネル */
+.rail-stage > .piyo-gourd-panel { position: absolute; inset: 14px; }
+
+/* パネルの中身 */
+.panel-content { display: flex; flex-direction: column; gap: 12px; box-sizing: border-box; height: 100%; padding: 20px; }
+
+/* パネルの題名 */
+.panel-title { margin: 0; font-size: 18px; font-weight: 700; }
+
+/* ジニーのカード */
+.genie-card { width: 240px; height: 150px; }
+
+/* ジニーのカードの中身 */
+.genie-body { display: flex; flex-direction: column; gap: 8px; box-sizing: border-box; height: 100%; padding: 16px; }
