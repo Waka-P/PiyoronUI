@@ -47,10 +47,15 @@ function gradientToCss(g, prefix) {
 }
 
 // 色付きの枠を、tone ごとの conic-gradient にする
-function toneEdgeToCss(stops, tone, prefix) {
+function toneEdgeToCss(stops, tone, prefix, alpha = 1) {
   const t = `var(--${prefix}-color-${tone})`;
   const s = `var(--${prefix}-color-surface)`;
-  return `conic-gradient(from 0deg, ${stops.map((p) => `color-mix(in srgb, ${t} ${pct(p.amount)}, ${s}) ${num(p.angle)}deg`).join(', ')})`;
+  // 1色(alpha が 1 未満なら透かす)
+  const color = (p) => {
+    const c = `color-mix(in srgb, ${t} ${pct(p.amount)}, ${s})`;
+    return alpha < 1 ? `color-mix(in srgb, ${c} ${pct(alpha)}, transparent)` : c;
+  };
+  return `conic-gradient(from 0deg, ${stops.map((p) => `${color(p)} ${num(p.angle)}deg`).join(', ')})`;
 }
 
 // 色以外の値を CSS にする
@@ -97,6 +102,12 @@ function glassDecls(glass, semantic, prefix) {
   const stops = semantic.color.edgeStops.$value.stops;
   const edge = [...stops.map((s, i) => `var(--${prefix}-color-edge-${i}) ${num(s.angle)}deg`), `var(--${prefix}-color-edge-0) 360deg`];
   decls.push([varName(prefix, ['glass', 'edge']), `conic-gradient(from 0deg, ${edge.join(', ')})`]);
+  // タブのつまみの枠(選んだ色の枠を blend だけ透かして、通常の枠に重ねる)
+  const blend = glass.glass.tabs?.thumbEdgeBlend?.$value;
+  if (blend !== undefined) {
+    const tone = toneEdgeToCss(glass.glass.tone.edge.$value, 'primary', prefix, blend);
+    decls.push([varName(prefix, ['glass', 'tabs', 'thumbEdge']), `${tone}, var(--${prefix}-glass-edge)`]);
+  }
   return decls;
 }
 
@@ -113,7 +124,10 @@ export function buildCss(t) {
     ...rest.map(([name, p]) => block(`色: ${name}`, `[data-${attr}-palette="${name}"]`, paletteDecls(t.semantic, p, prefix))),
     block('Glass', `:root, [data-${attr}-style="glass"], [data-${attr}-palette]`, glassDecls(t.styles.glass, t.semantic, prefix)),
     ...Object.entries(t.presets).filter(([, p]) => p.toneUsesEdge).map(([name]) =>
-      block(`${name}: 色付きの枠も枠の色の並びにする`, `[data-${attr}-palette="${name}"]`, [[`--${prefix}-glass-tone-edge-primary`, `var(--${prefix}-glass-edge)`]])),
+      block(`${name}: 色付きの枠も枠の色の並びにする`, `[data-${attr}-palette="${name}"]`, [
+        [`--${prefix}-glass-tone-edge-primary`, `var(--${prefix}-glass-edge)`],
+        [`--${prefix}-glass-tabs-thumb-edge`, `var(--${prefix}-glass-edge)`],
+      ])),
   ];
   return parts.join('\n');
 }

@@ -1,0 +1,668 @@
+/* Piyoron 部品の CSS(tokens.css のあとに読む) */
+
+/* ---------- 土台(スタイルに関係なく共通) ---------- */
+
+/* 文字と色の土台 */
+:where([data-piyoron-style]) {
+  font-family: var(--piyo-font-family);
+  font-size: var(--piyo-text-size);
+  font-weight: var(--piyo-text-weight);
+  color: var(--piyo-color-content-default);
+}
+
+/* ボタン */
+:where(.piyo-btn) {
+  position: relative;
+  isolation: isolate;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--piyo-control-gap);
+  box-sizing: border-box;
+  height: var(--piyo-control-height);
+  padding: 0 var(--piyo-control-padding-x);
+  border: 0;
+  border-radius: var(--piyo-radius-pill);
+  background: transparent;
+  color: var(--piyo-color-content-selected);
+  font: inherit;
+  white-space: nowrap;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ボタンの中のアイコン */
+:where(.piyo-btn) :where(svg, .piyo-icon) {
+  width: var(--piyo-control-icon-size);
+  height: var(--piyo-control-icon-size);
+  flex: none;
+}
+
+/* 円のアイコンボタン */
+:where(.piyo-btn.piyo-icon-btn) {
+  width: var(--piyo-control-height);
+  padding: 0;
+  border-radius: 50%;
+}
+
+/* 主な操作と取り消せない操作の文字 */
+:where(.piyo-btn:is(.piyo-primary, .piyo-danger)) {
+  color: var(--piyo-color-content-on-primary);
+}
+
+/* 選ぶボタン */
+:where(.piyo-chip) {
+  position: relative;
+  isolation: isolate;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--piyo-control-gap);
+  box-sizing: border-box;
+  padding: var(--piyo-chip-padding-y) var(--piyo-chip-padding-x);
+  border: 0;
+  border-radius: var(--piyo-radius-pill);
+  background: transparent;
+  color: var(--piyo-color-content-muted);
+  font: inherit;
+  white-space: nowrap;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* 選ぶボタンの並び(幅に合わせて折り返す) */
+:where(.piyo-chip-group) {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--piyo-chip-gap);
+}
+
+/* 選んだ選ぶボタン */
+:where(.piyo-chip:is([aria-pressed="true"], [aria-checked="true"], [data-selected="true"])) {
+  color: var(--piyo-color-content-selected);
+}
+
+/* タブの土台(つまみの数と位置は --piyo-tabs-n と --piyo-tabs-i) */
+:where(.piyo-tabs) {
+  --piyo-tabs-n: 2;
+  --piyo-tabs-i: 0;
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  box-sizing: border-box;
+  padding: var(--piyo-tabs-track-padding);
+  border: var(--piyo-tabs-track-border) solid transparent;
+  border-radius: var(--piyo-radius-pill);
+}
+
+/* タブのつまみ(選んだ項目へ滑る) */
+:where(.piyo-tabs-thumb) {
+  position: absolute;
+  z-index: 0;
+  top: var(--piyo-tabs-track-padding);
+  bottom: var(--piyo-tabs-track-padding);
+  left: var(--piyo-tabs-track-padding);
+  width: calc((100% - var(--piyo-tabs-track-padding) * 2) / var(--piyo-tabs-n));
+  border-radius: var(--piyo-radius-pill);
+  transform: translateX(calc(var(--piyo-tabs-i) * 100%));
+  transition: transform var(--piyo-duration-segmented) var(--piyo-easing-standard);
+  pointer-events: none;
+}
+
+/* タブの1項目 */
+:where(.piyo-tab) {
+  position: relative;
+  z-index: 1;
+  flex: 1 1 0;
+  min-width: 0;
+  min-height: calc(var(--piyo-touch-min-size) - (var(--piyo-tabs-track-padding) + var(--piyo-tabs-track-border)) * 2);
+  padding: var(--piyo-tabs-item-padding-y) var(--piyo-tabs-item-padding-x);
+  border: 0;
+  border-radius: var(--piyo-radius-pill);
+  background: transparent;
+  color: var(--piyo-color-content-muted);
+  font: inherit;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+  transition: color var(--piyo-duration-segmented);
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* 選んだタブ */
+:where(.piyo-tab[aria-selected="true"]) {
+  color: var(--piyo-color-content-selected);
+}
+
+/* カード */
+:where(.piyo-card) {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  padding: var(--piyo-card-padding-y) var(--piyo-card-padding-x);
+  border-radius: var(--piyo-radius-lg);
+  color: var(--piyo-color-content-default);
+}
+
+/* 押せるカード */
+:where(button.piyo-card, a.piyo-card, .piyo-card[role="button"]) {
+  border: 0;
+  font: inherit;
+  text-align: inherit;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* 押したときの動き(マウスでは hover で大きく、押すと縮む) */
+:where(.piyo-btn, .piyo-chip, .piyo-pressable):not(:disabled, [aria-disabled="true"]) {
+  transition:
+    background .15s, color .15s, box-shadow .15s,
+    transform var(--piyo-press-hover-duration) cubic-bezier(.3, .7, .4, 1);
+}
+
+/* マウスを乗せたとき */
+@media (hover: hover) {
+  :where(.piyo-btn, .piyo-chip, .piyo-pressable):hover:not(:disabled, [aria-disabled="true"]) {
+    transform: scale(var(--piyo-press-hover-scale));
+  }
+
+  /* マウスで押したとき */
+  :where(.piyo-btn, .piyo-chip, .piyo-pressable):active:not(:disabled, [aria-disabled="true"]) {
+    transform: scale(calc(var(--piyo-press-hover-scale) - var(--piyo-press-active-shrink)));
+    transition-duration: var(--piyo-press-active-duration);
+  }
+}
+
+/* 指で押したとき(hover がないので、元より小さくする) */
+@media (hover: none) {
+  :where(.piyo-btn, .piyo-chip, .piyo-pressable):active:not(:disabled, [aria-disabled="true"]) {
+    transform: scale(calc(1 - var(--piyo-press-touch-shrink)));
+    transition-duration: var(--piyo-press-active-duration);
+  }
+}
+
+/* キーボードで選んだとき */
+:where(.piyo-btn, .piyo-chip, .piyo-tab, .piyo-pressable, .piyo-menu-item):focus-visible {
+  outline: var(--piyo-control-focus-width) solid var(--piyo-color-primary);
+  outline-offset: var(--piyo-control-focus-offset);
+}
+
+/* 無効 */
+:where(.piyo-btn, .piyo-chip, .piyo-tab, .piyo-pressable, .piyo-menu-item):is(:disabled, [aria-disabled="true"]) {
+  opacity: var(--piyo-control-disabled-opacity);
+  cursor: default;
+}
+
+/* ---------- メニュー ---------- */
+
+/* メニューの置き場所(位置と大きさは JS が決める) */
+:where(.piyo-menu) {
+  position: fixed;
+  z-index: 1000;
+  top: 0;
+  left: 0;
+  isolation: isolate;
+  box-sizing: border-box;
+  border-radius: var(--piyo-menu-radius);
+  color: var(--piyo-color-content-default);
+}
+
+/* 閉じているメニュー */
+:where(.piyo-menu[hidden]) {
+  display: none;
+}
+
+/* メニューの中身の窓(大きさが変わる間ははみ出しを切る。くり抜きは JS が clip-path で渡す) */
+:where(.piyo-menu-content) {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: inherit;
+}
+
+/* メニューの中身(この大きさに合わせてメニューの大きさが動く) */
+:where(.piyo-menu-body) {
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  width: max-content;
+  min-width: var(--piyo-menu-min-width);
+  padding: var(--piyo-menu-padding);
+}
+
+/* メニューの項目 */
+:where(.piyo-menu-item) {
+  display: flex;
+  align-items: center;
+  gap: var(--piyo-menu-item-gap);
+  box-sizing: border-box;
+  width: 100%;
+  padding: var(--piyo-menu-item-padding-y) var(--piyo-menu-item-padding-x);
+  border: 0;
+  border-radius: var(--piyo-menu-item-radius);
+  background: transparent;
+  color: var(--piyo-color-content-default);
+  font: inherit;
+  font-size: var(--piyo-menu-text-size);
+  text-align: left;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color var(--piyo-menu-item-duration), color var(--piyo-menu-item-duration);
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* 指で操作する画面では、項目を押しやすい高さにする */
+@media (pointer: coarse) {
+  :where(.piyo-menu-item) {
+    min-height: var(--piyo-touch-min-size);
+  }
+}
+
+/* 項目のアイコン */
+:where(.piyo-menu-item) :where(svg, .piyo-icon) {
+  width: var(--piyo-menu-icon-size);
+  height: var(--piyo-menu-icon-size);
+  flex: none;
+}
+
+/* 項目の右寄せの補足 */
+:where(.piyo-menu-detail) {
+  margin-left: auto;
+  padding-left: calc(var(--piyo-menu-detail-gap) - var(--piyo-menu-item-gap));
+  font-size: var(--piyo-menu-detail-size);
+  font-weight: 400;
+  color: var(--piyo-color-content-muted);
+}
+
+/* 項目の区切り線 */
+:where(.piyo-menu-divider) {
+  height: 1px;
+  margin: var(--piyo-menu-divider-space) var(--piyo-menu-divider-inset);
+  border: 0;
+}
+
+/* 削除の項目 */
+:where(.piyo-menu-item.piyo-danger) {
+  color: var(--piyo-color-danger);
+}
+
+/* ---------- 動きを減らす設定 ---------- */
+
+/* 端末の設定で動きを止める */
+@media (prefers-reduced-motion: reduce) {
+  :where(.piyo-btn, .piyo-chip, .piyo-pressable, .piyo-tabs-thumb, .piyo-tab, .piyo-menu-item) {
+    transition: none !important;
+  }
+
+  /* 押したときの大きさを変えない */
+  :where(.piyo-btn, .piyo-chip, .piyo-pressable):is(:hover, :active) {
+    transform: none !important;
+  }
+}
+
+/* ---------- Glass ---------- */
+
+/* ガラスの面のレシピ(塗り + 枠 + 線状の影)。部品は --piyo-s-* を変えるだけ */
+:where([data-piyoron-style="glass"]) :where(.piyo-btn, .piyo-chip, .piyo-tabs, .piyo-tabs-thumb, .piyo-card) {
+  --piyo-s-fill: transparent;
+  --piyo-s-shadow: none;
+  --piyo-s-edge: var(--piyo-glass-edge);
+  --piyo-s-edge-opacity: 1;
+  --piyo-s-edge-inset: 0px;
+  --piyo-s-ring-color: transparent;
+  --piyo-s-ring-width: var(--piyo-glass-ring-width);
+  --piyo-s-ring-blur: var(--piyo-glass-ring-blur);
+  --piyo-s-ring-x: var(--piyo-glass-ring-offset-x);
+  --piyo-s-ring-y: var(--piyo-glass-ring-offset-y);
+  background: var(--piyo-s-fill);
+  box-shadow: var(--piyo-s-shadow);
+}
+
+/* 枠(スイープの線を、マスクで縁だけにくり抜く) */
+:where([data-piyoron-style="glass"]) :where(.piyo-btn, .piyo-chip, .piyo-tabs, .piyo-tabs-thumb, .piyo-card)::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: var(--piyo-s-edge-inset);
+  padding: var(--piyo-glass-edge-width);
+  border-radius: inherit;
+  background: var(--piyo-s-edge);
+  opacity: var(--piyo-s-edge-opacity);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* 線状の影(枠と同じ形の線を、ずらしてぼかす) */
+:where([data-piyoron-style="glass"]) :where(.piyo-btn, .piyo-chip, .piyo-tabs, .piyo-tabs-thumb, .piyo-card)::after {
+  content: "";
+  position: absolute;
+  z-index: -2;
+  inset: var(--piyo-s-edge-inset);
+  border: var(--piyo-s-ring-width) solid var(--piyo-s-ring-color);
+  border-radius: inherit;
+  filter: blur(var(--piyo-s-ring-blur));
+  transform: translate(var(--piyo-s-ring-x), var(--piyo-s-ring-y));
+  pointer-events: none;
+}
+
+/* ボタン */
+:where([data-piyoron-style="glass"]) :where(.piyo-btn) {
+  --piyo-s-fill: linear-gradient(180deg, var(--piyo-color-fill-top), var(--piyo-color-fill-bottom));
+  --piyo-s-shadow: var(--piyo-glass-shadow-idle);
+  --piyo-s-ring-color: var(--piyo-color-ring-shadow);
+}
+
+/* マウスを乗せたボタン */
+@media (hover: hover) {
+  :where([data-piyoron-style="glass"]) :where(.piyo-btn):hover:not(:disabled, [aria-disabled="true"]) {
+    --piyo-s-fill: linear-gradient(180deg, var(--piyo-glass-fill-hover-top), var(--piyo-glass-fill-hover-bottom));
+    --piyo-s-shadow: var(--piyo-glass-shadow-hover);
+  }
+}
+
+/* 主な操作 */
+:where([data-piyoron-style="glass"]) :where(.piyo-btn.piyo-primary) {
+  --piyo-s-fill: var(--piyo-glass-tone-primary-fill);
+  --piyo-s-edge: var(--piyo-glass-tone-edge-primary);
+}
+
+/* 取り消せない操作 */
+:where([data-piyoron-style="glass"]) :where(.piyo-btn.piyo-danger) {
+  --piyo-s-fill: var(--piyo-glass-tone-danger-fill);
+  --piyo-s-edge: var(--piyo-glass-tone-edge-danger);
+}
+
+/* マウスを乗せた主な操作と取り消せない操作 */
+@media (hover: hover) {
+  :where([data-piyoron-style="glass"]) :where(.piyo-btn.piyo-primary):hover:not(:disabled, [aria-disabled="true"]) {
+    --piyo-s-fill: var(--piyo-glass-tone-primary-fill-hover);
+  }
+
+  /* 取り消せない操作 */
+  :where([data-piyoron-style="glass"]) :where(.piyo-btn.piyo-danger):hover:not(:disabled, [aria-disabled="true"]) {
+    --piyo-s-fill: var(--piyo-glass-tone-danger-fill-hover);
+  }
+}
+
+/* 選ぶボタンの段階値(色の濃さを動かすため) */
+@property --piyo-chip-tint {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+
+/* 選ぶボタンの枠の濃さ */
+@property --piyo-chip-edge {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+
+/* 選ぶボタン(未選択は淡く、選ぶと塗りが濃くなり線状の影が出る) */
+:where([data-piyoron-style="glass"]) :where(.piyo-chip) {
+  --piyo-chip-tint: var(--piyo-glass-chip-tint-rest);
+  --piyo-chip-edge: var(--piyo-glass-chip-edge-rest);
+  --piyo-s-fill:
+    linear-gradient(180deg, var(--piyo-glass-chip-gloss-top), var(--piyo-glass-chip-gloss-bottom)),
+    color-mix(in srgb, var(--piyo-color-primary) calc(var(--piyo-chip-tint) * 100%), transparent);
+  --piyo-s-shadow: var(--piyo-glass-chip-shadow-rest);
+  --piyo-s-edge: linear-gradient(calc(var(--piyo-glass-chip-edge-angle) * 1deg),
+    color-mix(in srgb, var(--piyo-color-primary) calc(var(--piyo-chip-edge) * var(--piyo-glass-chip-edge-side-ratio) * 100%), var(--piyo-color-surface)),
+    color-mix(in srgb, var(--piyo-color-primary) calc(var(--piyo-chip-edge) * 100%), var(--piyo-color-surface)) 50%,
+    color-mix(in srgb, var(--piyo-color-primary) calc(var(--piyo-chip-edge) * var(--piyo-glass-chip-edge-side-ratio) * 100%), var(--piyo-color-surface)));
+  transition:
+    --piyo-chip-tint var(--piyo-duration-toggle), --piyo-chip-edge var(--piyo-duration-toggle),
+    box-shadow var(--piyo-duration-toggle), color var(--piyo-duration-toggle),
+    transform var(--piyo-press-hover-duration) cubic-bezier(.3, .7, .4, 1);
+}
+
+/* マウスを乗せた選ぶボタン */
+@media (hover: hover) {
+  :where([data-piyoron-style="glass"]) :where(.piyo-chip):not([aria-pressed="true"], [aria-checked="true"], [data-selected="true"], :disabled):hover {
+    --piyo-chip-tint: var(--piyo-glass-chip-tint-hover);
+    --piyo-chip-edge: var(--piyo-glass-chip-edge-hover);
+    --piyo-s-shadow: var(--piyo-glass-chip-shadow-hover);
+    color: var(--piyo-color-primary);
+  }
+}
+
+/* 選んだ選ぶボタン */
+:where([data-piyoron-style="glass"]) :where(.piyo-chip:is([aria-pressed="true"], [aria-checked="true"], [data-selected="true"])) {
+  --piyo-s-fill:
+    linear-gradient(180deg, var(--piyo-glass-chip-gloss-top), var(--piyo-glass-chip-gloss-bottom)),
+    var(--piyo-color-fill-selected-bottom);
+  --piyo-s-shadow: var(--piyo-glass-shadow-idle);
+  --piyo-s-edge: var(--piyo-glass-tone-edge-primary);
+  --piyo-s-ring-color: var(--piyo-color-ring-shadow);
+  --piyo-s-ring-width: var(--piyo-glass-chip-ring-width);
+  --piyo-s-ring-blur: var(--piyo-glass-chip-ring-blur);
+  --piyo-s-ring-x: var(--piyo-glass-chip-ring-offset-x);
+  --piyo-s-ring-y: var(--piyo-glass-chip-ring-offset-y);
+}
+
+/* タブの土台(極薄。枠はボタンと同じ並びを薄く) */
+:where([data-piyoron-style="glass"]) :where(.piyo-tabs) {
+  --piyo-s-fill: var(--piyo-glass-tabs-track-fill);
+  --piyo-s-edge-opacity: var(--piyo-glass-tabs-track-edge-opacity);
+  --piyo-s-edge-inset: calc(var(--piyo-tabs-track-border) * -1);
+}
+
+/* タブのつまみ(通常ボタンと選んだチップの中間。線状の影は枠の上) */
+:where([data-piyoron-style="glass"]) :where(.piyo-tabs-thumb) {
+  --piyo-s-fill: var(--piyo-glass-tabs-thumb-fill);
+  --piyo-s-shadow: var(--piyo-glass-tabs-thumb-shadow);
+  --piyo-s-edge: var(--piyo-glass-tabs-thumb-edge);
+  --piyo-s-ring-color: var(--piyo-glass-tabs-ring-color);
+  --piyo-s-ring-blur: var(--piyo-glass-tabs-ring-blur);
+  --piyo-s-ring-x: var(--piyo-glass-tabs-ring-offset-x);
+  --piyo-s-ring-y: var(--piyo-glass-tabs-ring-offset-y);
+}
+
+/* つまみの線状の影は枠の上に重ねる */
+:where([data-piyoron-style="glass"]) :where(.piyo-tabs-thumb)::after {
+  z-index: 0;
+}
+
+/* カード(斜めのグラデーション、薄い枠) */
+:where([data-piyoron-style="glass"]) :where(.piyo-card) {
+  --piyo-s-fill: var(--piyo-glass-card-fill);
+  --piyo-s-edge-opacity: var(--piyo-glass-card-edge-opacity);
+  --piyo-s-ring-color: var(--piyo-color-ring-shadow);
+  --piyo-s-ring-width: var(--piyo-glass-card-ring-width);
+  --piyo-s-ring-blur: var(--piyo-glass-card-ring-blur);
+  --piyo-s-ring-x: var(--piyo-glass-card-ring-offset-x);
+  --piyo-s-ring-y: var(--piyo-glass-card-ring-offset-y);
+}
+
+/* メニューの面(塗り、1本の枠、外の影、後ろのぼかし。形とくり抜きは JS が描く) */
+:where([data-piyoron-style="glass"]) :where(.piyo-menu) {
+  --piyo-s-fill: var(--piyo-menu-color, var(--piyo-glass-menu-fill));
+  --piyo-s-edge: var(--piyo-glass-menu-edge);
+  --piyo-s-ring-color: transparent;
+  --piyo-s-backdrop: blur(var(--piyo-menu-blur, var(--piyo-menu-backdrop-blur)));
+  --piyo-s-shadow-filter:
+    drop-shadow(0 1px 1px color-mix(in srgb, var(--piyo-color-content-default) 8%, transparent))
+    drop-shadow(0 12px 13px color-mix(in srgb, var(--piyo-color-primary-strong) 20%, transparent));
+}
+
+/* マウスを乗せた・フォーカスした項目 */
+:where([data-piyoron-style="glass"]) :where(.piyo-menu-item):is(:hover, :focus-visible):not(:disabled, [aria-disabled="true"]) {
+  background: var(--piyo-glass-menu-item-hover);
+  color: var(--piyo-color-primary-strong);
+}
+
+/* マウスを乗せた・フォーカスした削除の項目 */
+:where([data-piyoron-style="glass"]) :where(.piyo-menu-item.piyo-danger):is(:hover, :focus-visible):not(:disabled, [aria-disabled="true"]) {
+  background: var(--piyo-glass-menu-item-danger-hover);
+  color: var(--piyo-color-danger);
+}
+
+/* 区切り線 */
+:where([data-piyoron-style="glass"]) :where(.piyo-menu-divider) {
+  background: var(--piyo-glass-menu-divider);
+}
+
+/* ---------- 変わる形の面(JS が SVG のマスクで描く) ---------- */
+
+/* JS が描いている間は、CSS の塗り・枠・線状の影を止める */
+:where(.piyo-painted) {
+  background: none !important;
+  box-shadow: none !important;
+}
+
+/* 枠と線状の影の疑似要素も止める */
+:where(.piyo-painted)::before,
+:where(.piyo-painted)::after {
+  display: none !important;
+}
+
+/* つまみの外の影と内側の影の近似(形が変わる面用。上の縁から白く、下の縁から淡い主な色が薄れる) */
+:where([data-piyoron-style="glass"]) :where(.piyo-tabs-thumb, .piyo-gourd-indicator) {
+  --piyo-s-drop: drop-shadow(0 1px 1.5px color-mix(in srgb, var(--piyo-color-primary) 12%, transparent));
+  --piyo-s-inset:
+    linear-gradient(180deg, color-mix(in srgb, var(--piyo-color-surface) 57%, transparent) 0, transparent 5px),
+    linear-gradient(0deg, color-mix(in srgb, var(--piyo-color-primary) 4%, transparent) 0, transparent 5.75px);
+}
+
+/* ---------- ひょうたん(形と動きは JS) ---------- */
+
+/* ひょうたんの土台(丸ボタンを縦か横に並べる) */
+:where(.piyo-gourd) {
+  position: relative;
+  isolation: isolate;
+  display: inline-flex;
+  flex-direction: column;
+  gap: var(--piyo-gourd-gap);
+  box-sizing: border-box;
+  padding: var(--piyo-gourd-padding);
+}
+
+/* 横向きのひょうたん */
+:where(.piyo-gourd[data-orientation="horizontal"]) {
+  flex-direction: row;
+}
+
+/* ひょうたんの丸ボタン */
+:where(.piyo-gourd-button) {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--piyo-gourd-button-size);
+  height: var(--piyo-gourd-button-size);
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--piyo-color-content-muted);
+  cursor: pointer;
+  transition: color var(--piyo-duration-segmented);
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* 丸ボタンのアイコン */
+:where(.piyo-gourd-button) :where(svg, .piyo-icon) {
+  width: var(--piyo-gourd-icon-size);
+  height: var(--piyo-gourd-icon-size);
+}
+
+/* 印が着いた丸ボタン */
+:where(.piyo-gourd-button[data-arrived="true"]) {
+  color: var(--piyo-color-content-selected);
+}
+
+/* キーボードで選んだ丸ボタン */
+:where(.piyo-gourd-button):focus-visible {
+  outline: var(--piyo-control-focus-width) solid var(--piyo-color-primary);
+  outline-offset: var(--piyo-control-focus-offset);
+}
+
+/* 選んだ項目の印(位置と形は JS) */
+:where(.piyo-gourd-indicator) {
+  position: absolute;
+  z-index: 0;
+  top: 0;
+  left: 0;
+  isolation: isolate;
+  pointer-events: none;
+}
+
+/* ひょうたんとパネル(置き方と形は JS) */
+:where(.piyo-gourd-panel) {
+  position: relative;
+  isolation: isolate;
+}
+
+/* ひょうたんとパネルを合わせた面 */
+:where(.piyo-gourd-panel-surface) {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* パネルの中身の置き場所 */
+:where(.piyo-gourd-panel-body) {
+  position: absolute;
+  z-index: 1;
+  overflow: visible;
+}
+
+/* パネルの中身 */
+:where(.piyo-gourd-panel-content) {
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+}
+
+/* ひょうたんとパネルのひょうたん */
+:where(.piyo-gourd-panel > .piyo-gourd) {
+  position: absolute;
+  z-index: 2;
+}
+
+/* Glass: ひょうたんの土台(タブの土台と同じ) */
+:where([data-piyoron-style="glass"]) :where(.piyo-gourd) {
+  --piyo-s-fill: var(--piyo-glass-tabs-track-fill);
+  --piyo-s-edge: var(--piyo-glass-edge);
+  --piyo-s-edge-opacity: var(--piyo-glass-tabs-track-edge-opacity);
+  --piyo-s-ring-color: transparent;
+}
+
+/* Glass: ひょうたんの印(タブのつまみと同じ) */
+:where([data-piyoron-style="glass"]) :where(.piyo-gourd-indicator) {
+  --piyo-s-fill: var(--piyo-glass-tabs-thumb-fill);
+  --piyo-s-edge: var(--piyo-glass-tabs-thumb-edge);
+  --piyo-s-edge-opacity: 1;
+  --piyo-s-ring-color: var(--piyo-glass-tabs-ring-color);
+  --piyo-s-ring-width: var(--piyo-glass-ring-width);
+  --piyo-s-ring-blur: var(--piyo-glass-tabs-ring-blur);
+  --piyo-s-ring-x: var(--piyo-glass-tabs-ring-offset-x);
+  --piyo-s-ring-y: var(--piyo-glass-tabs-ring-offset-y);
+}
+
+/* Glass: ひょうたんとパネルを合わせた面(カードと同じ) */
+:where([data-piyoron-style="glass"]) :where(.piyo-gourd-panel-surface) {
+  --piyo-s-fill: var(--piyo-glass-card-fill);
+  --piyo-s-edge: var(--piyo-glass-edge);
+  --piyo-s-edge-opacity: var(--piyo-glass-card-edge-opacity);
+  --piyo-s-ring-color: var(--piyo-color-ring-shadow);
+  --piyo-s-ring-width: var(--piyo-glass-card-ring-width);
+  --piyo-s-ring-blur: var(--piyo-glass-card-ring-blur);
+  --piyo-s-ring-x: var(--piyo-glass-card-ring-offset-x);
+  --piyo-s-ring-y: var(--piyo-glass-card-ring-offset-y);
+}
+
+/* ひょうたんとパネルの中のひょうたんは、面を合わせた面で描く */
+:where(.piyo-gourd-panel > .piyo-gourd) {
+  --piyo-s-fill: transparent;
+  --piyo-s-edge-opacity: 0;
+}

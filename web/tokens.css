@@ -411,9 +411,11 @@
   --piyo-glass-card-backdrop-blur: 14px;
   --piyo-glass-card-backdrop-saturate: 1.5;
   --piyo-glass-edge: conic-gradient(from 0deg, var(--piyo-color-edge-0) 0deg, var(--piyo-color-edge-1) 35deg, var(--piyo-color-edge-2) 70deg, var(--piyo-color-edge-3) 100deg, var(--piyo-color-edge-4) 125deg, var(--piyo-color-edge-5) 150deg, var(--piyo-color-edge-6) 175deg, var(--piyo-color-edge-7) 200deg, var(--piyo-color-edge-8) 230deg, var(--piyo-color-edge-9) 260deg, var(--piyo-color-edge-10) 290deg, var(--piyo-color-edge-11) 315deg, var(--piyo-color-edge-12) 340deg, var(--piyo-color-edge-0) 360deg);
+  --piyo-glass-tabs-thumb-edge: conic-gradient(from 0deg, color-mix(in srgb, color-mix(in srgb, var(--piyo-color-primary) 55%, var(--piyo-color-surface)) 50%, transparent) 0deg, color-mix(in srgb, color-mix(in srgb, var(--piyo-color-primary) 85%, var(--piyo-color-surface)) 50%, transparent) 90deg, color-mix(in srgb, color-mix(in srgb, var(--piyo-color-primary) 100%, var(--piyo-color-surface)) 50%, transparent) 160deg, color-mix(in srgb, color-mix(in srgb, var(--piyo-color-primary) 60%, var(--piyo-color-surface)) 50%, transparent) 240deg, color-mix(in srgb, color-mix(in srgb, var(--piyo-color-primary) 30%, var(--piyo-color-surface)) 50%, transparent) 312deg, color-mix(in srgb, color-mix(in srgb, var(--piyo-color-primary) 55%, var(--piyo-color-surface)) 50%, transparent) 360deg), var(--piyo-glass-edge);
 }
 
 /* bubble: 色付きの枠も枠の色の並びにする */
 [data-piyoron-palette="bubble"] {
   --piyo-glass-tone-edge-primary: var(--piyo-glass-edge);
+  --piyo-glass-tabs-thumb-edge: var(--piyo-glass-edge);
 }

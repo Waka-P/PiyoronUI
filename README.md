@@ -1,6 +1,6 @@
 # Piyoron UI
 
-お気に入りのUIを元にした、自分用のデザインシステムとUIライブラリ。最初のスタイルは「ガラス風(Glass)」。Jetpack Compose 版が先で、Web 版はこのあと作る。
+お気に入りのUIを元にした、自分用のデザインシステムとUIライブラリ。最初のスタイルは「ガラス風(Glass)」。Jetpack Compose 版と Web 版(CSS、JS、React)がある。
 
 名前は仮(`piyoron.config.json`、`android/gradle.properties`、このファイルに集約)。
 
@@ -79,6 +79,22 @@ PiyoIconButton(icon, "お知らせ", { visible = !visible }, modifier = Modifier
 GenieVisibility(visible, anchor) { /* カードの中身 */ }
 ```
 
+## 使い方(Web)
+
+```html
+<html data-piyoron-style="glass">
+<link rel="stylesheet" href="piyoron/tokens.css">
+<link rel="stylesheet" href="piyoron/piyoron.css">
+
+<button class="piyo-btn piyo-primary">確定</button>
+```
+
+- CSS だけの部品: `.piyo-btn`、`.piyo-chip`、`.piyo-tabs`、`.piyo-card`
+- JS の部品: メニュー、ひょうたん、ひょうたんとパネル(`import { PiyoMenu } from 'piyoron'`)
+- React 版: `import { PiyoButton, PiyoMenu } from 'piyoron/react'`
+
+詳しくは `docs/web.md`。
+
 ## 構成
 
 | 場所 | 中身 |
@@ -86,6 +102,9 @@ GenieVisibility(visible, anchor) { /* カードの中身 */ }
 | `tokens/` | 見た目の元データ(JSON)。書き方は `tokens/schema.md` |
 | `tools/` | 色の生成、CSS / Kotlin の書き出し、テスト、確認用のプレビュー |
 | `web/tokens.css` | 生成した CSS 変数 |
+| `web/piyoron.css` | 部品の CSS |
+| `web/src` | JS(色、メニュー、ひょうたん)と React 版(`web/src/react`) |
+| `web/demo` | Web のカタログ(素の HTML と React) |
 | `android/piyoron` | Compose ライブラリ(`core`、`components`、`style.glass`、`effects`、`tokens` のパッケージ) |
 | `android/sample` | カタログアプリ(全部品、エフェクト、色の切り替え) |
 | `docs/` | 分解メモ(スタイル、部品、エフェクト) |
@@ -97,6 +116,7 @@ GenieVisibility(visible, anchor) { /* カードの中身 */ }
 | `docs/styles/glass.md` | Glass の分解メモ(どの値か、なぜこの見た目か、Android での描き方) |
 | `docs/components/` | 部品ごとのメモ |
 | `docs/effects/README.md` | ジニーとひょうたんの形と動き、重さへの対策 |
+| `docs/web.md` | Web 版の使い方、変わる形の描き方、Android 版との違い |
 | `tokens/schema.md` | トークンの書き方 |
 
 ## 開発
@@ -105,7 +125,9 @@ GenieVisibility(visible, anchor) { /* カードの中身 */ }
 |---|---|
 | `npm run tokens` | トークンから CSS と Kotlin を作り直す |
 | `npm run colors -- "#D6457C"` | シード色から全 role を JSON で出す(`--preset mint` も可) |
-| `npm test` | 色生成と生成物のテスト(JS) |
+| `npm test` | 色生成、生成物、Web の形と置き場所のテスト(JS) |
+| `cd web && npm install && npm run dev` | Web のカタログを開く(`/demo/index.html`、`/demo/react.html`) |
+| `cd web && npm run build` | Web のライブラリを `web/dist` に出す |
 | `cd android && ./gradlew :piyoron:testDebugUnitTest` | 色生成と形の計算のテスト(Kotlin。色は JS と同じ結果か) |
 | `cd android && ./gradlew :sample:installDebug` | サンプルを入れる |
 | `cd android && ./gradlew :piyoron:publishToMavenLocal` | ライブラリを手元の Maven に出す(JitPack も同じ処理。`jitpack.yml`) |
