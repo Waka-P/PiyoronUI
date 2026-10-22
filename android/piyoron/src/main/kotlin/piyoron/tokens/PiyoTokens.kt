@@ -39,9 +39,12 @@ object PiyoTokens {
     }
 
     object Press {
-        val HoverScale = 1.04f
-        val ActiveShrink = 0.03f
-        val TouchShrink = 0.04f
+        // マウスを乗せたときに大きくなる量(幅と高さ。部品の大きさによらず同じ量)
+        val HoverGrow = 1.5.dp
+        // マウスで押したときに、乗せたときの大きさから縮む量
+        val ActiveShrink = 1.1.dp
+        // 指で押したときに、元の大きさから縮む量
+        val TouchShrink = 1.5.dp
         val HoverDuration = 180
         val ActiveDuration = 70
     }

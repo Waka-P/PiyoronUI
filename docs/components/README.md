@@ -16,7 +16,7 @@
 | 項目 | 内容 | トークン |
 |---|---|---|
 | 触れる範囲 | 見た目が小さくても 48dp 以上(`Modifier.touchTarget`) | `touch.minSize` |
-| 押したときの動き | マウスで hover 1.04 倍、押すと .03 縮む。指で押すと元の .96 倍。速い一押しでも見えるよう、押した・離したの知らせから動かす(`Modifier.pressMotion`) | `press.*` |
+| 押したときの動き | マウスで hover すると幅と高さが 1.5 大きく、押すとそこから 1.1 縮む。指で押すと元より 1.5 小さくなる。倍率ではなく量で決めるので、部品の大きさによらず縁が同じだけ動く(大きいカードでも動きすぎない)。速い一押しでも見えるよう、押した・離したの知らせから動かす(`Modifier.pressMotion`) | `press.*` |
 | フォーカス | キーボードで選ぶと、形に沿った 2dp の輪郭を 2dp 外に出す | `control.focusWidth` / `focusOffset` |
 | 無効 | 不透明度 .45、押せない | `control.disabledOpacity` |
 | 文字・アイコンの色 | スタイルの `contentColor(role, state, tone)` で決め、`LocalPiyoContentColor` で中に配る | |

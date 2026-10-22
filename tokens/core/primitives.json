@@ -25,9 +25,9 @@
     "family": {"$type": "fontFamily", "$value": ["Zen Kaku Gothic New", "Hiragino Sans", "Meiryo", "sans-serif"]}
   },
   "press": {
-    "hoverScale": {"$type": "number", "$value": 1.04},
-    "activeShrink": {"$type": "number", "$value": 0.03},
-    "touchShrink": {"$type": "number", "$value": 0.04},
+    "hoverGrow": {"$type": "dimension", "$description": "マウスを乗せたときに大きくなる量(幅と高さ。部品の大きさによらず同じ量)", "$value": 1.5},
+    "activeShrink": {"$type": "dimension", "$description": "マウスで押したときに、乗せたときの大きさから縮む量", "$value": 1.1},
+    "touchShrink": {"$type": "dimension", "$description": "指で押したときに、元の大きさから縮む量", "$value": 1.5},
     "hoverDuration": {"$type": "duration", "$value": 180},
     "activeDuration": {"$type": "duration", "$value": 70}
   },

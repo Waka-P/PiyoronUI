@@ -1,6 +1,6 @@
 // ジニー効果で出し入れする(閉じるとボタンに吸い込まれ、開くとそこから出てくる)
 
-import { GenieFrame, genieAlpha, layoutRect, roundRectShape, shapeToPath } from './geometry.js';
+import { GenieFrame, genieAlpha, layoutRect, moveShape, roundRectShape, shapeToPath } from './geometry.js';
 import { animate, cssNumber, cssValue, easingFromCss, lerp, reduceMotion } from './motion.js';
 import { PaintedSurface } from './surface.js';
 
@@ -82,8 +82,16 @@ export class PiyoGenie {
     const frame = p > 0 ? new GenieFrame(p, w, h, target, this.neck, this.radius) : null;
     const alpha = String(genieAlpha(p));
     if (this.surface) {
-      this.surfaceElement.style.opacity = alpha;
-      this.surface.draw([frame ? frame.placedShape() : roundRectShape(0, 0, w, h, this.radius)], w, h);
+      // 動いている間は、面を描く範囲にカードと行き先のボタンの両方を含める(ボタンへ向かう形が途中で切れないように)
+      // 止まっているときはカードの範囲だけ(塗りのグラデーションの範囲を変えない)
+      const pad = frame ? 4 : 0;
+      const x0 = frame ? Math.min(0, a.left - box.left - pad) : 0;
+      const y0 = frame ? Math.min(0, a.top - box.top - pad) : 0;
+      const x1 = frame ? Math.max(w, a.right - box.left + pad) : w;
+      const y1 = frame ? Math.max(h, a.bottom - box.top + pad) : h;
+      Object.assign(this.surfaceElement.style, { inset: 'auto', left: `${x0}px`, top: `${y0}px`, width: `${x1 - x0}px`, height: `${y1 - y0}px`, opacity: alpha });
+      const shape = frame ? frame.placedShape() : roundRectShape(0, 0, w, h, this.radius);
+      this.surface.draw([moveShape(shape, -x0, -y0)], x1 - x0, y1 - y0);
     }
     const c = this.content.style;
     if (frame) {

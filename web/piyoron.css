@@ -2,6 +2,7 @@
 
 /* ---------- 土台(スタイルに関係なく共通) ---------- */
 
+
 /* 文字と色の土台 */
 :where([data-piyoron-style]) {
   font-family: var(--piyo-font-family);
@@ -181,22 +182,32 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-/* 押したときの動き(マウスでは hover で大きく、押すと縮む) */
+/* 押したときの動き(マウスでは乗せると大きく、押すと縮む)。文字も含めて部品全体を拡大・縮小する
+   大きさの変化は px の量(--piyo-grow)で、拡大率は「1 + 量 ÷ 幅」と「1 + 量 ÷ 高さ」。部品の大きさによらず縁が同じだけ動く
+   幅と高さ(--piyo-w、--piyo-h)は press.js が測って入れる(CSS では部品が自分の大きさを知れないため)。ないときは動かない
+   部品は描画の層に分けておく(will-change)。動きの途中で文字を描き直さず、描いたものをそのまま拡大するので、文字が跳ねない */
+:where(.piyo-btn, .piyo-chip, .piyo-pressable) {
+  --piyo-grow: 0px;
+  scale: calc(1 + var(--piyo-grow) / var(--piyo-w, 1e6px)) calc(1 + var(--piyo-grow) / var(--piyo-h, 1e6px));
+  will-change: scale;
+}
+
+/* 動きの速さ(拡大率そのものを動かし、描画の層だけで動かす) */
 :where(.piyo-btn, .piyo-chip, .piyo-pressable):not(:disabled, [aria-disabled="true"]) {
   transition:
     background .15s, color .15s, box-shadow .15s,
-    transform var(--piyo-press-hover-duration) cubic-bezier(.3, .7, .4, 1);
+    scale var(--piyo-press-hover-duration) cubic-bezier(.3, .7, .4, 1);
 }
 
 /* マウスを乗せたとき */
 @media (hover: hover) {
   :where(.piyo-btn, .piyo-chip, .piyo-pressable):hover:not(:disabled, [aria-disabled="true"]) {
-    transform: scale(var(--piyo-press-hover-scale));
+    --piyo-grow: var(--piyo-press-hover-grow);
   }
 
   /* マウスで押したとき */
   :where(.piyo-btn, .piyo-chip, .piyo-pressable):active:not(:disabled, [aria-disabled="true"]) {
-    transform: scale(calc(var(--piyo-press-hover-scale) - var(--piyo-press-active-shrink)));
+    --piyo-grow: calc(var(--piyo-press-hover-grow) - var(--piyo-press-active-shrink));
     transition-duration: var(--piyo-press-active-duration);
   }
 }
@@ -204,7 +215,7 @@
 /* 指で押したとき(hover がないので、元より小さくする) */
 @media (hover: none) {
   :where(.piyo-btn, .piyo-chip, .piyo-pressable):active:not(:disabled, [aria-disabled="true"]) {
-    transform: scale(calc(1 - var(--piyo-press-touch-shrink)));
+    --piyo-grow: calc(var(--piyo-press-touch-shrink) * -1);
     transition-duration: var(--piyo-press-active-duration);
   }
 }
@@ -317,7 +328,7 @@
 
 /* 動きを減らす設定では、押したときの大きさを変えない(属性で指定したとき) */
 :where([data-piyoron-reduce-motion="true"]) :where(.piyo-btn, .piyo-chip, .piyo-pressable):is(:hover, :active) {
-  transform: none !important;
+  --piyo-grow: 0px !important;
 }
 
 /* 端末の設定で動きを止める */
@@ -328,7 +339,7 @@
 
   /* 押したときの大きさを変えない */
   :where(.piyo-btn, .piyo-chip, .piyo-pressable):is(:hover, :active) {
-    transform: none !important;
+    --piyo-grow: 0px !important;
   }
 }
 
@@ -447,7 +458,7 @@
   transition:
     --piyo-chip-tint var(--piyo-duration-toggle), --piyo-chip-edge var(--piyo-duration-toggle),
     box-shadow var(--piyo-duration-toggle), color var(--piyo-duration-toggle),
-    transform var(--piyo-press-hover-duration) cubic-bezier(.3, .7, .4, 1);
+    scale var(--piyo-press-hover-duration) cubic-bezier(.3, .7, .4, 1);
 }
 
 /* マウスを乗せた選ぶボタン */

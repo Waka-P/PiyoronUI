@@ -26,6 +26,7 @@ import androidx.compose.ui.layout.layout
 import androidx.compose.ui.unit.constrainHeight
 import androidx.compose.ui.unit.constrainWidth
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import piyoron.tokens.PiyoTokens
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -42,12 +43,14 @@ fun rememberPiyoState(interactionSource: InteractionSource, selected: Boolean = 
 }
 
 // 押したときの動き。マウスでは乗せると少し大きく、押すと少し縮む。タッチでは押すと元より小さくなる(動きを減らす設定では動かさない)
+// 大きさの変化は dp の量で決め、部品の大きさによらず縁が同じだけ動く(大きいカードでも動きすぎない)
 @Composable
 fun Modifier.pressMotion(interactionSource: InteractionSource, state: PiyoState): Modifier {
-    val scale = remember { Animatable(1f) }
-    val rest by rememberUpdatedState(if (state.enabled && state.hovered) PiyoTokens.Press.HoverScale else 1f)
+    val grow = remember { Animatable(0f) }
+    val hoverGrow = PiyoTokens.Press.HoverGrow.value
+    val rest by rememberUpdatedState(if (state.enabled && state.hovered) hoverGrow else 0f)
     val pressed by rememberUpdatedState(
-        if (state.hovered) PiyoTokens.Press.HoverScale - PiyoTokens.Press.ActiveShrink else 1f - PiyoTokens.Press.TouchShrink,
+        if (state.hovered) hoverGrow - PiyoTokens.Press.ActiveShrink.value else -PiyoTokens.Press.TouchShrink.value,
     )
     val holding = remember { mutableStateOf(false) }
     if (LocalPiyoReduceMotion.current) return this
@@ -59,23 +62,24 @@ fun Modifier.pressMotion(interactionSource: InteractionSource, state: PiyoState)
                     holding.value = true
                     job?.cancel()
                     job = launch {
-                        scale.animateTo(pressed, tween(PiyoTokens.Press.ActiveDuration))
-                        if (!holding.value) scale.animateTo(rest, tween(PiyoTokens.Press.HoverDuration))
+                        grow.animateTo(pressed, tween(PiyoTokens.Press.ActiveDuration))
+                        if (!holding.value) grow.animateTo(rest, tween(PiyoTokens.Press.HoverDuration))
                     }
                 }
                 is PressInteraction.Release, is PressInteraction.Cancel -> {
                     holding.value = false
-                    if (job?.isActive != true) job = launch { scale.animateTo(rest, tween(PiyoTokens.Press.HoverDuration)) }
+                    if (job?.isActive != true) job = launch { grow.animateTo(rest, tween(PiyoTokens.Press.HoverDuration)) }
                 }
             }
         }
     }
     LaunchedEffect(rest) {
-        if (!holding.value) scale.animateTo(rest, tween(PiyoTokens.Press.HoverDuration))
+        if (!holding.value) grow.animateTo(rest, tween(PiyoTokens.Press.HoverDuration))
     }
     return graphicsLayer {
-        scaleX = scale.value
-        scaleY = scale.value
+        val amount = grow.value.dp.toPx()
+        if (size.width > 0f) scaleX = 1f + amount / size.width
+        if (size.height > 0f) scaleY = 1f + amount / size.height
     }
 }
 

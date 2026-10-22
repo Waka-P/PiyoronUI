@@ -4,6 +4,7 @@ import { piyoPresets, setPiyoPreset, setPiyoSeed, seedFromHue } from '../src/the
 import { PiyoMenu, PiyoMenuGroup, PiyoMenuAlignment } from '../src/menu.js';
 import { GourdRailPanel, GourdTabRail } from '../src/gourd.js';
 import { PiyoGenie } from '../src/genie.js';
+import '../src/press.js';
 import { ICONS, barFraction, cssColor, drawBackdrop, drawBiasSlider, drawHueBar } from './draw.js';
 
 // ---------- 小さな道具 ----------

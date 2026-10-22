@@ -44,20 +44,29 @@ function stroke(d, width) {
 
 // 形ごとの線を、ほかの形の内側では消して描く SVG(合わせた形の継ぎ目に線を出さない)
 // inside なら形の内側の帯(太さ line)、そうでなければ輪郭の真ん中の帯。穴の縁にも引く
+// 消すのは、ほかの形を縁から線の太さだけ縮めた範囲。辺がちょうど重なる所(合わせた形の外周)の線は残る
 function lineMask(paths, holes, width, height, line, inside) {
+  // マスクの定義
+  const mask = (id, content) => `<mask id="${id}" maskUnits="userSpaceOnUse" x="0" y="0" width="${width}" height="${height}">${content}</mask>`;
+  const whole = '<rect width="100%" height="100%" fill="#fff"/>';
+  const band = inside ? line * 2 : line;
   const defs = [];
   const body = [];
+  // 形ごとの「縁の近く」を除くマスク(縮めた内側だけを残す)
+  paths.forEach((d, j) => defs.push(mask(`n${j}`, `${whole}<path d="${d}" fill="none" stroke="#000" stroke-width="${line * 2}"/>`)));
+  if (inside) defs.push(mask('mu', inner(paths, holes)));
   paths.forEach((d, i) => {
-    const others = fills(paths.filter((_, j) => j !== i), '#000');
-    const keep = inside ? `${fills(paths, '#fff')}${fills(holes, '#000')}${others}` : `<rect width="100%" height="100%" fill="#fff"/>${others}`;
-    defs.push(`<mask id="m${i}" maskUnits="userSpaceOnUse" x="0" y="0" width="${width}" height="${height}">${keep}</mask>`);
-    body.push(`<g mask="url(#m${i})">${stroke(d, inside ? line * 2 : line)}</g>`);
+    const erase = paths.map((o, j) => (j === i ? '' : `<g mask="url(#n${j})"><path d="${o}" fill="#000"/></g>`)).join('');
+    defs.push(mask(`m${i}`, whole + erase));
+    body.push(`<g mask="url(#m${i})">${stroke(d, band)}</g>`);
   });
+  const lines = inside ? `<g mask="url(#mu)">${body.join('')}</g>` : body.join('');
+  let holeLines = '';
   if (holes.length) {
-    defs.push(`<mask id="mh" maskUnits="userSpaceOnUse" x="0" y="0" width="${width}" height="${height}">${inner(paths, holes)}</mask>`);
-    body.push(`<g mask="url(#mh)">${holes.map((d) => stroke(d, inside ? line * 2 : line)).join('')}</g>`);
+    defs.push(mask('mh', inner(paths, holes)));
+    holeLines = `<g mask="url(#mh)">${holes.map((d) => stroke(d, band)).join('')}</g>`;
   }
-  return svgUrl(`<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}"><defs>${defs.join('')}</defs>${body.join('')}</svg>`);
+  return svgUrl(`<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}"><defs>${defs.join('')}</defs>${lines}${holeLines}</svg>`);
 }
 
 // 全面の白(SVG のマスクを通して、白黒を透明度に変える)

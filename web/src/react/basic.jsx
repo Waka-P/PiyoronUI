@@ -4,6 +4,7 @@ import { createContext, useLayoutEffect, useState } from 'react';
 import * as Tabs from '@radix-ui/react-tabs';
 import * as ToggleGroup from '@radix-ui/react-toggle-group';
 import { setPiyoPreset, setPiyoSeed } from '../theme.js';
+import '../press.js';
 
 // クラス名をつなぐ(空は飛ばす)
 export function cx(...names) {

@@ -17,9 +17,9 @@
   --piyo-duration-segmented: 250ms;
   --piyo-easing-standard: cubic-bezier(0.4, 0, 0.2, 1);
   --piyo-font-family: "Zen Kaku Gothic New", "Hiragino Sans", "Meiryo", sans-serif;
-  --piyo-press-hover-scale: 1.04;
-  --piyo-press-active-shrink: 0.03;
-  --piyo-press-touch-shrink: 0.04;
+  --piyo-press-hover-grow: 1.5px;
+  --piyo-press-active-shrink: 1.1px;
+  --piyo-press-touch-shrink: 1.5px;
   --piyo-press-hover-duration: 180ms;
   --piyo-press-active-duration: 70ms;
   --piyo-touch-min-size: 48px;

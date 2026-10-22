@@ -129,18 +129,25 @@ function pairs(seg) {
 }
 
 // フィレット(ひょうたんの下端 h とパネルの左端 pl の間をなめらかにつなぐ角。rf は横、ry は縦の大きさ)
-export function filletShape(h, pl, rf, ry) {
+// ov だけ、継ぎ目(上)とパネル(右)に食い込ませる(合わせた形の内側の境に線を出さないため。外形は変わらない)
+export function filletShape(h, pl, rf, ry, ov = 0) {
   return [shapeOf([
-    [[pl, h], ...pairs(straight([pl, h], [pl, h + ry]))],
+    [[pl - rf, h - ov], ...pairs(straight([pl - rf, h - ov], [pl + ov, h - ov]))],
+    [[pl + ov, h - ov], ...pairs(straight([pl + ov, h - ov], [pl + ov, h + ry]))],
+    [[pl + ov, h + ry], ...pairs(straight([pl + ov, h + ry], [pl, h + ry]))],
     [[pl, h + ry], [pl, h + ry - K * ry], [pl - rf + K * rf, h], [pl - rf, h]],
+    [[pl - rf, h], ...pairs(straight([pl - rf, h], [pl - rf, h - ov]))],
   ])];
 }
 
 // 上向きのフィレット(ひょうたんの上端 y とパネルの左端の間)
-export function filletShapeUp(y, pl, rf, ry) {
+export function filletShapeUp(y, pl, rf, ry, ov = 0) {
   return [shapeOf([
-    [[pl, y], ...pairs(straight([pl, y], [pl, y - ry]))],
+    [[pl - rf, y + ov], ...pairs(straight([pl - rf, y + ov], [pl + ov, y + ov]))],
+    [[pl + ov, y + ov], ...pairs(straight([pl + ov, y + ov], [pl + ov, y - ry]))],
+    [[pl + ov, y - ry], ...pairs(straight([pl + ov, y - ry], [pl, y - ry]))],
     [[pl, y - ry], [pl, y - ry + K * ry], [pl - rf + K * rf, y], [pl - rf, y]],
+    [[pl - rf, y], ...pairs(straight([pl - rf, y], [pl - rf, y + ov]))],
   ])];
 }
 

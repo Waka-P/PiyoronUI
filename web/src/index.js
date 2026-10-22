@@ -5,3 +5,4 @@ export { PiyoMenu, PiyoMenuGroup, PiyoMenuAlignment } from './menu.js';
 export { GourdTabRail, GourdRailPanel } from './gourd.js';
 export { PiyoGenie } from './genie.js';
 export { PaintedSurface } from './surface.js';
+export { startPiyoPress } from './press.js';

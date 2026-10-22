@@ -270,6 +270,12 @@ const EXTEND_UNTIL = 0.6;
 const STRAIGHT_FROM = 0.35;
 const STRAIGHT_UNTIL = 0.9;
 
+// 継ぎ目とフィレットを、隣の形に食い込ませる幅(線の太さの2倍より大きく)
+const JOIN_OVERLAP = 3;
+
+// これより小さい継ぎ目とフィレットは描かない(幅のない形の輪郭が線として残らないように)
+const MIN_PART = 0.5;
+
 // 開閉の時間 t(0〜1)での継ぎ目の状態(伸び 0〜1、角の丸み 0〜1)
 function seamAt(t, closing) {
   return closing
@@ -442,8 +448,10 @@ export class GourdRailPanel {
     const reach = frame ? pl + frame.placeX(0) + frame.r1 : null;
     const joinEnd = reach === null ? bridgeEnd : Math.max(bridgeEnd, reach);
     const joinRound = reach === null ? cx * seam.round : Math.min(cx * seam.round, joinEnd - reach);
+    // 継ぎ目はパネルに少し食い込ませる(継ぎ目とパネルの境の線を、パネルの内側として確実に消すため。外形は変わらない)
+    const overlap = reach === null ? 0 : JOIN_OVERLAP;
     const parts = [gourdShape(w, len, this.buttons.length)];
-    if (bridgeBottom > bridgeTop) parts.push(bridgeShape(w, bridgeBottom, joinEnd, joinRound, bridgeTop));
+    if (bridgeBottom - bridgeTop > MIN_PART && joinEnd - cx > MIN_PART) parts.push(bridgeShape(w, bridgeBottom, joinEnd + overlap, joinRound, bridgeTop));
     if (frame) {
       // フィレットは、今のパネルの行き先側の辺に付け、辺の残りと継ぎ目の重なりに合わせて縮める
       const edge = pl + frame.placeX(0);
@@ -451,17 +459,17 @@ export class GourdRailPanel {
       const rx = Math.max(0, Math.min(f, edge - cx)) * kf;
       const below = Math.max(0, Math.min(fBottom, frame.d - frame.r1dY - (top + len))) * kf;
       const above = Math.max(0, Math.min(fTop, top - (frame.a + frame.r1aY))) * kf;
-      if (rx > 0 && below > 0) parts.push(filletShape(len, edge, rx, below));
-      if (rx > 0 && above > 0) parts.push(filletShapeUp(0, edge, rx, above));
+      if (rx > MIN_PART && below > MIN_PART) parts.push(filletShape(len, edge, rx, below, JOIN_OVERLAP));
+      if (rx > MIN_PART && above > MIN_PART) parts.push(filletShapeUp(0, edge, rx, above, JOIN_OVERLAP));
     }
     const shapes = parts.map((s) => mapShape(moveShape(s, 0, top), m.map));
     if (frame) shapes.push(mapShape(moveShape(frame.placedShape(), pl, 0), m.map));
     this.surface.draw(shapes, width, height);
-    this.drawContent(frame, m, panel, rail);
+    this.drawContent(frame, m, panel, rail, rTop, rBottom);
   }
 
-  // パネルの中身を、ジニーの形で切り抜いて縮め、ひょうたんの上には描かない
-  drawContent(frame, m, panel, rail) {
+  // パネルの中身を、ジニーの形で切り抜いて縮め、ひょうたんの上には描かない(角の丸みは面と同じ rTop、rBottom)
+  drawContent(frame, m, panel, rail, rTop, rBottom) {
     const k = this.k;
     const pw = panel.right - panel.left;
     const ph = panel.bottom - panel.top;
@@ -475,7 +483,7 @@ export class GourdRailPanel {
       const center = m.map(railWidth(k) / 2, this.placement().top + buttonTop(k, this.selected) + k.button / 2);
       target[0] = center[0] - panel.left;
       target[1] = center[1] - panel.top;
-      const real = new GenieFrame(k.genieEasing(this.time), pw, ph, target, k.neck, k.radius);
+      const real = new GenieFrame(k.genieEasing(this.time), pw, ph, target, k.neck, k.radius, rTop, rBottom);
       const { transform, origin } = real.transform();
       Object.assign(style, {
         clipPath: `path("${shapeToPath(real.clipShape())}")`,
