@@ -274,7 +274,15 @@ private fun RailContent(
     modifier: Modifier = Modifier,
 ) {
     val duration = if (bouncy) PiyoTokens.Gourd.BounceDuration else PiyoTokens.Gourd.SwitchDuration
-    val motion = rememberIndicatorMotion(selectedIndex, duration, PiyoTokens.Gourd.SwitchEasing)
+    val density = LocalDensity.current
+    // 動いている途中で選び直したら、今描いている印の中心から動き直す(伸びた印が飛ばないように)
+    val motion = rememberIndicatorMotion(selectedIndex, duration, PiyoTokens.Gourd.SwitchEasing) { m ->
+        with(density) {
+            val blob = blobAt(m, m.progress.value, bouncy)
+            val step = (PiyoTokens.Gourd.ButtonSize + PiyoTokens.Gourd.Gap).toPx()
+            (blob.top + blob.length / 2 - PiyoTokens.Gourd.Padding.toPx() - PiyoTokens.Gourd.ButtonSize.toPx() / 2) / step
+        }
+    }
     val arrivedIndex by remember(motion) {
         derivedStateOf { if (!motion.moving || motion.progress.value >= PiyoTokens.Gourd.ArriveAt) motion.to else -1 }
     }

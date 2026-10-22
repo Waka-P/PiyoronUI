@@ -5,7 +5,7 @@ import { createPortal } from 'react-dom';
 import { PiyoMenu as MenuCore, PiyoMenuGroup as MenuGroupCore } from '../menu.js';
 import { GourdRailPanel, GourdTabRail } from '../gourd.js';
 import { PiyoGenie as GenieCore } from '../genie.js';
-import { PiyoButton, ThemeContext, cx } from './basic.jsx';
+import { PiyoButton, ThemeContext, cx, useControllable } from './basic.jsx';
 
 // ---------- メニュー ----------
 
@@ -110,23 +110,31 @@ function indexOf(items, value) {
   return Math.max(0, items.findIndex((i) => i.value === value));
 }
 
+// 項目の値をつないだ文字列(項目が入れ替わったら、丸ボタンを作り直したことに気づくため)
+function itemsKey(items) {
+  return JSON.stringify(items.map((i) => i.value));
+}
+
 // ひょうたん型のタブ。items は { value, icon, label } の並び。orientation は vertical か horizontal、bouncy で弾む動き
-export function PiyoGourdTabs({ items, value, onValueChange, orientation = 'vertical', bouncy = false, className, ...props }) {
+// value を渡さないときは中で持つ(最初は defaultValue か先頭の項目)
+export function PiyoGourdTabs({ items, value, defaultValue, onValueChange, orientation = 'vertical', bouncy = false, className, ...props }) {
   const ref = useRef(null);
   const rail = useRef(null);
-  const latest = useRef({ items, onValueChange });
-  latest.current = { items, onValueChange };
-  const index = indexOf(items, value);
+  const [current, setCurrent] = useControllable(value, defaultValue ?? items[0]?.value, onValueChange);
+  const latest = useRef({ items, setCurrent });
+  latest.current = { items, setCurrent };
+  const index = indexOf(items, current);
+  const key = itemsKey(items);
   useLayoutEffect(() => {
     rail.current = new GourdTabRail(ref.current, {
       selected: index,
       bouncy,
-      onSelect: (i) => latest.current.onValueChange?.(latest.current.items[i].value),
+      onSelect: (i) => latest.current.setCurrent(latest.current.items[i].value),
     });
     return () => rail.current.destroy();
-    // 部品の数、向き、動きが変わったときだけ作り直す
+    // 項目、向き、動きが変わったときだけ作り直す
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [items.length, orientation, bouncy]);
+  }, [key, orientation, bouncy]);
   useEffect(() => {
     rail.current?.select(index);
   }, [index]);
@@ -139,32 +147,36 @@ export function PiyoGourdTabs({ items, value, onValueChange, orientation = 'vert
 
 // ひょうたん型のタブとパネル。表示中のタブをもう一度押すとパネルが開閉する(ジニー効果)
 // side はひょうたんを置く側(left、right、top、bottom)、align は辺のどこに寄せるか(-1〜1)。大きさは style や className で決める
-export function PiyoGourdPanel({ items, value, onValueChange, open, onOpenChange, side = 'left', align = -1, bouncy = false, className, style, children }) {
+// value と open を渡さないときは中で持つ(最初は defaultValue か先頭の項目、defaultOpen)
+export function PiyoGourdPanel({ items, value, defaultValue, onValueChange, open, defaultOpen = true, onOpenChange, side = 'left', align = -1, bouncy = false, className, style, children }) {
   const ref = useRef(null);
   const panel = useRef(null);
-  const latest = useRef({ items, onValueChange, onOpenChange });
-  latest.current = { items, onValueChange, onOpenChange };
-  const index = indexOf(items, value);
+  const [current, setCurrent] = useControllable(value, defaultValue ?? items[0]?.value, onValueChange);
+  const [shown, setShown] = useControllable(open, defaultOpen, onOpenChange);
+  const latest = useRef({ items, setCurrent, setShown });
+  latest.current = { items, setCurrent, setShown };
+  const index = indexOf(items, current);
+  const key = itemsKey(items);
   useLayoutEffect(() => {
     panel.current = new GourdRailPanel(ref.current, {
       selected: index,
-      open: open ?? true,
+      open: shown,
       side,
       align,
       bouncy,
-      onSelect: (i) => latest.current.onValueChange?.(latest.current.items[i].value),
-      onOpenChange: (o) => latest.current.onOpenChange?.(o),
+      onSelect: (i) => latest.current.setCurrent(latest.current.items[i].value),
+      onOpenChange: (o) => latest.current.setShown(o),
     });
     return () => panel.current.destroy();
-    // 部品の数、置き方、動きが変わったときだけ作り直す
+    // 項目、置き方、動きが変わったときだけ作り直す
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [items.length, side, align, bouncy]);
+  }, [key, side, align, bouncy]);
   useEffect(() => {
     if (panel.current && panel.current.selected !== index) panel.current.select(index);
   }, [index]);
   useEffect(() => {
-    if (open !== undefined) panel.current?.setOpen(open);
-  }, [open]);
+    panel.current?.setOpen(shown);
+  }, [shown]);
   return (
     <div ref={ref} className={cx('piyo-gourd-panel', className)} style={style}>
       <div className="piyo-gourd-panel-surface" />

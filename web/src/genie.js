@@ -4,10 +4,9 @@ import { GenieFrame, genieAlpha, layoutRect, moveShape, roundRectShape, shapeToP
 import { animate, cssNumber, cssValue, easingFromCss, lerp, reduceMotion } from './motion.js';
 import { PaintedSurface } from './surface.js';
 
-// 吸い込まれる先の形(角の丸みは要素の border-radius。円のボタンなら円)
-function anchorShape(anchor, dx, dy) {
-  const r = layoutRect(anchor);
-  const radius = Math.min(parseFloat(getComputedStyle(anchor).borderTopLeftRadius) || 0, r.width / 2, r.height / 2);
+// 吸い込まれる先の形(r は先の四角、corner は角の丸み。dx、dy だけずらす)
+function anchorShape(r, corner, dx, dy) {
+  const radius = Math.min(corner, r.width / 2, r.height / 2);
   return roundRectShape(r.left - dx, r.top - dy, r.width, r.height, radius);
 }
 
@@ -68,16 +67,18 @@ export class PiyoGenie {
 
   // 今の時間の形と中身の変形を描く
   render() {
+    // 読むものは先にまとめて読む(書いたあとに読むと、毎コマ配置の計算が走る)
     const el = this.element;
     const box = el.getBoundingClientRect();
     const w = el.clientWidth;
     const h = el.clientHeight;
+    const a = layoutRect(this.anchor);
+    const corner = this.time > 0 && this.time < 1 ? parseFloat(getComputedStyle(this.anchor).borderTopLeftRadius) || 0 : 0;
     const hidden = this.time >= 1;
     el.style.visibility = hidden ? 'hidden' : '';
     el.setAttribute('aria-hidden', String(!this.open));
     if (hidden) return;
     const p = this.easing(this.time);
-    const a = layoutRect(this.anchor);
     const target = [(a.left + a.right) / 2 - box.left, (a.top + a.bottom) / 2 - box.top];
     const frame = p > 0 ? new GenieFrame(p, w, h, target, this.neck, this.radius) : null;
     const alpha = String(genieAlpha(p));
@@ -101,7 +102,7 @@ export class PiyoGenie {
       Object.assign(c, { clipPath: '', transform: '', transformOrigin: '', opacity: '' });
     }
     // 出し入れの間は、ボタンの形の上に描かない
-    const hole = p > 0 ? shapeToPath(anchorShape(this.anchor, box.left, box.top)) : '';
+    const hole = p > 0 ? shapeToPath(anchorShape(a, corner, box.left, box.top)) : '';
     el.style.clipPath = hole ? `path(evenodd, "M-9999 -9999H9999V9999H-9999Z${hole}")` : '';
   }
 

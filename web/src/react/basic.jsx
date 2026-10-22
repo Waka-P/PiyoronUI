@@ -12,7 +12,7 @@ export function cx(...names) {
 }
 
 // 制御されていてもいなくても使える値(value があればそれを、なければ内部の値を使う)
-function useControllable(value, defaultValue, onChange) {
+export function useControllable(value, defaultValue, onChange) {
   const [inner, setInner] = useState(defaultValue);
   const controlled = value !== undefined;
   // 値を変える

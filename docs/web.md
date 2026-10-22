@@ -89,7 +89,7 @@ genie.setOpen(false);              // ボタンに吸い込まれる
 |---|---|---|
 | `PiyoMenu` | ボタンと `.piyo-menu`(中身は自由) | `transition`(`fade` 既定、`scale`、`genie`、`none`)、`side`(`bottom`、`top`、`right`、`left`)、`align`(下の表か -1〜1 の数) |
 | `PiyoMenuGroup` | なし | 中のメニューの既定。開いている間にほかのボタンへ移ると滑って切り替わる |
-| `GourdTabRail` | `.piyo-gourd` と `.piyo-gourd-button` | `data-orientation="horizontal"` で横、`bouncy` で弾む動き |
+| `GourdTabRail` | `.piyo-gourd` と `.piyo-gourd-button` | `data-orientation="horizontal"` で横、`bouncy` で弾む動き。矢印キー、Home、End で項目を移れる(Tab で止まるのは選んだ丸ボタンだけ) |
 | `GourdRailPanel` | `.piyo-gourd-panel` の中に `.piyo-gourd` と `.piyo-gourd-panel-content` | `side`、`align`、`open`。表示中のタブをもう一度押すと閉じる |
 | `PiyoGenie` | 出し入れする要素と、吸い込まれる先のボタン | `open`、`surface`(カードの面を描くか)、`radius`。出し入れの間はボタンの上に描かない |
 
@@ -132,14 +132,20 @@ import { PiyoTheme, PiyoButton, PiyoChipGroup, PiyoChipItem, PiyoTabs, PiyoMenu,
 | `PiyoChipGroup` / `PiyoChipItem` | Radix の ToggleGroup(矢印キーで移れる) |
 | `PiyoTabs` / `PiyoTabPanel` | Radix の Tabs |
 | `PiyoMenu` / `PiyoMenuGroup` / `PiyoMenuItem` / `PiyoMenuDivider` / `usePiyoMenu` | JS 版のメニュー。ボタンは `trigger` か `icon` と `label`。中身から閉じるときは `usePiyoMenu().close()` |
-| `PiyoGourdTabs` / `PiyoGourdPanel` | JS 版のひょうたん |
+| `PiyoGourdTabs` / `PiyoGourdPanel` | JS 版のひょうたん。`value`(と `open`)を渡さなければ中で持つ(`defaultValue`、`defaultOpen`) |
 | `PiyoGenie` | JS 版のジニー。`anchor` は吸い込まれる先(要素か ref) |
 
 値は `value` と `onValueChange` で外から持つことも、`defaultValue` で中に任せることもできる。
 
+React 版を使うときは、`react`、`react-dom`、`@radix-ui/react-tabs`、`@radix-ui/react-toggle-group` を使う側で入れる(どれも「なくてもよい依存」にしてあるので、CSS と JS だけなら要らない)。
+
 ## 変わる形の描き方
 
 メニュー、ひょうたん、つまみ、パネル、ジニーは形が毎コマ変わる。CSS の角丸では描けないので、JS が形を SVG のパスにして、層ごとのマスクに使う(`web/src/surface.js`)。
+
+- マスクは、部品ごとにページの中に置いた小さな `<svg>` の `<mask>` に書き、層から `mask: url(#id)` で参照する。毎コマ書き換えるのはマスクの中身だけ。画像(data URL)を毎コマ作り直す方法より、ずっと軽い(ひょうたん単体の4本を動かしたとき、ブラウザの処理時間が約 4,000ms から約 720ms に減り、1秒に 60 コマを保つ)
+- 外の影の層は、外の影の変数(`--piyo-s-shadow-filter`、今はメニューだけ)があるときだけ作る
+- 線の太さは最初に1回だけ読む。パネルとジニーは、要素の大きさを書いた直後に読み直さない(毎コマ配置の計算が走らないように)
 
 | 層 | 中身 | マスク |
 |---|---|---|

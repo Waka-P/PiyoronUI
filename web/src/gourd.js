@@ -1,7 +1,7 @@
 // ひょうたん型のタブと、パネルとつないだ部品(Android 版の GourdTabRail.kt を移したもの)
 
 import {
-  GenieFrame, GourdProfile, bridgeShape, filletShape, filletShapeUp, gourdShape, gourdShapeOriented, mapShape, moveShape, shapeToPath,
+  GenieFrame, GourdProfile, genieAlpha, bridgeShape, filletShape, filletShapeUp, gourdShape, gourdShapeOriented, mapShape, moveShape, shapeToPath,
 } from './geometry.js';
 import { animate, cssNumber, cssValue, easingFromCss, lerp, part, reduceMotion, smooth, smoothKeyframes, smoothMin } from './motion.js';
 import { PaintedSurface } from './surface.js';
@@ -161,12 +161,17 @@ class RailIndicator {
     this.render();
   }
 
-  // 選んだ項目を変える(印が伸びて移る)
+  // 選んだ項目を変える(印が伸びて移る)。動いている途中なら、今の印の中心から動き直す
   select(index) {
     if (index === this.motion.to) return;
     const m = this.motion;
-    const fraction = m.moving ? this.k.easing(m.t) : 1;
-    m.from = lerp(m.from, m.to, fraction);
+    const k = this.k;
+    if (m.moving) {
+      const blob = blobAt(k, m, m.t, this.bouncy, this.lead);
+      m.from = (blob.top + blob.length / 2 - k.padding - k.button / 2) / (k.button + k.gap);
+    } else {
+      m.from = m.to;
+    }
     m.to = index;
     this.stop?.();
     if (reduceMotion(this.rail)) {
@@ -213,6 +218,31 @@ class RailIndicator {
   }
 }
 
+// パネルの中身に付ける id の通し番号
+let nextPanelId = 0;
+
+// ---------- キー操作 ----------
+
+// 丸ボタンを矢印キーで移れるようにする(選んだボタンだけ Tab で止まる。移った先を押したことにする)
+function bindRailKeys(buttons, signal) {
+  buttons.forEach((b, i) => b.addEventListener('keydown', (e) => {
+    const n = buttons.length;
+    const next = { ArrowDown: i + 1, ArrowRight: i + 1, ArrowUp: i - 1, ArrowLeft: i - 1, Home: 0, End: n - 1 }[e.key];
+    if (next === undefined) return;
+    e.preventDefault();
+    const target = buttons[(next + n) % n];
+    target.focus();
+    if (target !== b) target.click();
+  }, { signal }));
+}
+
+// 選んだ丸ボタンだけを Tab で止まる場所にする
+function markTabStop(buttons, index) {
+  buttons.forEach((b, i) => {
+    b.tabIndex = i === index ? 0 : -1;
+  });
+}
+
 // ---------- ひょうたん単体 ----------
 
 // ひょうたん型のタブ。element は .piyo-gourd(中に .piyo-gourd-button を並べる)。選ぶと onSelect(番号)を呼ぶ
@@ -233,6 +263,7 @@ export class GourdTabRail {
       b.setAttribute('role', 'tab');
       b.addEventListener('click', () => (this.onSelect ? this.onSelect(i) : this.select(i)), { signal: this.abort.signal });
     });
+    bindRailKeys(this.buttons, this.abort.signal);
     this.select(selected);
     this.draw();
   }
@@ -250,6 +281,7 @@ export class GourdTabRail {
   // 選んだ項目を変える
   select(index) {
     this.buttons.forEach((b, i) => b.setAttribute('aria-selected', String(i === index)));
+    markTabStop(this.buttons, index);
     this.indicator.select(index);
   }
 
@@ -353,7 +385,16 @@ export class GourdRailPanel {
       b.setAttribute('role', 'tab');
       b.addEventListener('click', () => this.press(i), { signal: this.abort.signal });
     });
-    this.observer = new ResizeObserver(() => this.layout());
+    bindRailKeys(this.buttons, this.abort.signal);
+    if (!this.content.id) this.content.id = `piyo-gourd-panel-${++nextPanelId}`;
+    this.content.setAttribute('role', 'tabpanel');
+    this.buttons.forEach((b) => b.setAttribute('aria-controls', this.content.id));
+    // 大きさは変わったときだけ覚える(毎コマ読むと配置の計算が走る)
+    this.size = { width: element.clientWidth, height: element.clientHeight };
+    this.observer = new ResizeObserver(() => {
+      this.size = { width: element.clientWidth, height: element.clientHeight };
+      this.layout();
+    });
     this.observer.observe(element);
     this.markButtons();
     this.layout();
@@ -406,13 +447,13 @@ export class GourdRailPanel {
       b.setAttribute('aria-selected', String(i === this.selected));
       b.setAttribute('aria-expanded', String(this.open && i === this.selected));
     });
+    markTabStop(this.buttons, this.selected);
   }
 
   // 配置を求める(実際の向きでの px)
   placement() {
     const k = this.k;
-    const width = this.element.clientWidth;
-    const height = this.element.clientHeight;
+    const { width, height } = this.size;
     const m = sideMap(this.side, width, height);
     const len = railLength(k, this.buttons.length);
     const top = Math.max(0, m.size.height - len) * (Math.min(1, Math.max(-1, this.align)) + 1) / 2;
@@ -465,31 +506,29 @@ export class GourdRailPanel {
     const shapes = parts.map((s) => mapShape(moveShape(s, 0, top), m.map));
     if (frame) shapes.push(mapShape(moveShape(frame.placedShape(), pl, 0), m.map));
     this.surface.draw(shapes, width, height);
-    this.drawContent(frame, m, panel, rail, rTop, rBottom);
+    this.drawContent(frame, m, panel, rail, top, rTop, rBottom);
   }
 
   // パネルの中身を、ジニーの形で切り抜いて縮め、ひょうたんの上には描かない(角の丸みは面と同じ rTop、rBottom)
-  drawContent(frame, m, panel, rail, rTop, rBottom) {
+  // top は基準の向きでのひょうたんの上端。大きさはここで読み直さない(書いた直後に読むと、毎コマ配置の計算が走る)
+  drawContent(frame, m, panel, rail, top, rTop, rBottom) {
     const k = this.k;
-    const pw = panel.right - panel.left;
-    const ph = panel.bottom - panel.top;
-    this.body.hidden = this.time >= 1;
     const style = this.content.style;
+    this.body.hidden = this.time >= 1;
     if (!frame || this.time <= 0) {
       Object.assign(style, { clipPath: '', transform: '', transformOrigin: '', opacity: '' });
     } else {
       // 実際の向きで、パネルから見たジニーの変形
-      const target = [rail.left + railWidth(k) / 2 - panel.left, 0];
-      const center = m.map(railWidth(k) / 2, this.placement().top + buttonTop(k, this.selected) + k.button / 2);
-      target[0] = center[0] - panel.left;
-      target[1] = center[1] - panel.top;
-      const real = new GenieFrame(k.genieEasing(this.time), pw, ph, target, k.neck, k.radius, rTop, rBottom);
+      const center = m.map(railWidth(k) / 2, top + buttonTop(k, this.selected) + k.button / 2);
+      const target = [center[0] - panel.left, center[1] - panel.top];
+      const p = k.genieEasing(this.time);
+      const real = new GenieFrame(p, panel.right - panel.left, panel.bottom - panel.top, target, k.neck, k.radius, rTop, rBottom);
       const { transform, origin } = real.transform();
       Object.assign(style, {
         clipPath: `path("${shapeToPath(real.clipShape())}")`,
         transform,
         transformOrigin: origin,
-        opacity: String(k.genieEasing(this.time) > 0.8 ? 1 - (k.genieEasing(this.time) - 0.8) / 0.2 : 1),
+        opacity: String(genieAlpha(p)),
       });
     }
     // ひょうたんの形をくり抜く(パネルから見た位置)

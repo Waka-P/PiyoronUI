@@ -2,7 +2,11 @@
   "name": "piyoron",
   "version": "0.1.0",
   "type": "module",
-  "files": ["dist", "tokens.css", "piyoron.css"],
+  "files": [
+    "dist",
+    "tokens.css",
+    "piyoron.css"
+  ],
   "exports": {
     ".": "./dist/piyoron.js",
     "./react": "./dist/react.js",
@@ -15,17 +19,27 @@
   },
   "peerDependencies": {
     "react": ">=19",
-    "react-dom": ">=19"
+    "react-dom": ">=19",
+    "@radix-ui/react-tabs": "^1.1.12",
+    "@radix-ui/react-toggle-group": "^1.1.10"
   },
   "peerDependenciesMeta": {
-    "react": { "optional": true },
-    "react-dom": { "optional": true }
-  },
-  "dependencies": {
-    "@radix-ui/react-tabs": "1.1.12",
-    "@radix-ui/react-toggle-group": "1.1.10"
+    "react": {
+      "optional": true
+    },
+    "react-dom": {
+      "optional": true
+    },
+    "@radix-ui/react-tabs": {
+      "optional": true
+    },
+    "@radix-ui/react-toggle-group": {
+      "optional": true
+    }
   },
   "devDependencies": {
+    "@radix-ui/react-tabs": "1.1.12",
+    "@radix-ui/react-toggle-group": "1.1.10",
     "@vitejs/plugin-react": "4.6.0",
     "react": "19.1.0",
     "react-dom": "19.1.0",

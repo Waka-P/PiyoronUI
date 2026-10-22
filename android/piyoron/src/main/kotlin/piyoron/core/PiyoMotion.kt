@@ -12,6 +12,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.platform.LocalContext
@@ -61,14 +62,20 @@ class IndicatorMotion internal constructor(initial: Int, private val easing: Eas
     val moving: Boolean get() = progress.value < 1f
 }
 
-// 選んだ項目が変わったら、印を動かす
+// 選んだ項目が変わったら、印を動かす。動いている途中なら start が返す位置(項目の番号)から動き直す
 @Composable
-fun rememberIndicatorMotion(selectedIndex: Int, durationMillis: Int, easing: Easing): IndicatorMotion {
+fun rememberIndicatorMotion(
+    selectedIndex: Int,
+    durationMillis: Int,
+    easing: Easing,
+    start: (IndicatorMotion) -> Float = { it.position },
+): IndicatorMotion {
     val motion = remember { IndicatorMotion(selectedIndex, easing) }
     val reduce = LocalPiyoReduceMotion.current
+    val currentStart by rememberUpdatedState(start)
     LaunchedEffect(selectedIndex) {
         if (selectedIndex == motion.to) return@LaunchedEffect
-        motion.from = motion.position
+        motion.from = if (motion.moving) currentStart(motion) else motion.to.toFloat()
         motion.to = selectedIndex
         if (reduce) {
             motion.progress.snapTo(1f)
