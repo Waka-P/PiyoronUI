@@ -164,29 +164,24 @@ private fun Density.blobAt(motion: IndicatorMotion, t: Float, bouncy: Boolean): 
     if (bouncy) {
         val a = PiyoTokens.Gourd.Anticipation.toPx()
         val o = PiyoTokens.Gourd.Overshoot.toPx()
+        // 遠くへ移るときも伸び縮みは隣へ移るときと同じにし、残りの距離は前の端と同じ割合で進める
+        val near = min(dist, step)
+        val extra = (dist - near) * smoothKeyframes(t, BounceFrontOffsets, floatArrayOf(0f, 0f, 1f, 1f, 1f))
         front = smoothKeyframes(t, BounceFrontOffsets, floatArrayOf(0f, -a, dist + o, dist - o * 0.3f, dist))
-        back = smoothKeyframes(t, BounceBackOffsets, floatArrayOf(0f, -a * 0.25f, -a * 0.25f, dist + o * 0.8f, dist - o * 0.2f, dist))
+        back = smoothKeyframes(t, BounceBackOffsets, floatArrayOf(0f, -a * 0.25f, -a * 0.25f, near + o * 0.8f, near - o * 0.2f, near)) + extra
     } else {
         front = dist * frontAt(t)
         back = dist * backAt(t)
-    }
-    if (dist > step) {
-        val cap = step * (if (bouncy) BouncePeakLead else PeakLead)
-        back = front - smoothMin(front - back, cap, cap * 0.2f)
+        if (dist > step) {
+            val cap = step * PeakLead
+            back = front - smoothMin(front - back, cap, cap * 0.2f)
+        }
     }
     val top = if (to > from) from + back else from - front
     val length = s + front - back
     val width = (s * (s / length).pow(STRETCH_POWER)).coerceIn(s * PiyoTokens.Gourd.Waist, s * 1.08f)
     val fit = smooth(t / FIT_RAMP) * smooth((1 - t) / FIT_RAMP)
     return Blob(top, length, width, fit)
-}
-
-// 弾みありで隣へ移るときの、前と後ろの差の最大(移動距離に対する割合)
-private val BouncePeakLead: Float by lazy {
-    (0..200).maxOf {
-        val t = it / 200f
-        smoothKeyframes(t, BounceFrontOffsets, floatArrayOf(0f, 0f, 1f, 1f, 1f)) - smoothKeyframes(t, BounceBackOffsets, floatArrayOf(0f, 0f, 0f, 1f, 1f, 1f))
-    }
 }
 
 // なめらかな小さいほう(差が k より小さいところを丸める)

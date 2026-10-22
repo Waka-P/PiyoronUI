@@ -69,16 +69,10 @@ function backAt(t, k) {
   return k.easing(part(t, k.trail, 1));
 }
 
-// 隣へ移るときの、前と後ろの差の最大(移動距離に対する割合)
-function peakLead(k, bouncy) {
+// 弾みなしで隣へ移るときの、前と後ろの差の最大(移動距離に対する割合)
+function peakLead(k) {
   let max = 0;
-  for (let i = 0; i <= 200; i++) {
-    const t = i / 200;
-    const d = bouncy
-      ? smoothKeyframes(t, BOUNCE_FRONT, [0, 0, 1, 1, 1]) - smoothKeyframes(t, BOUNCE_BACK, [0, 0, 0, 1, 1, 1])
-      : frontAt(t, k) - backAt(t, k);
-    max = Math.max(max, d);
-  }
+  for (let i = 0; i <= 200; i++) max = Math.max(max, frontAt(i / 200, k) - backAt(i / 200, k));
   return max;
 }
 
@@ -95,15 +89,18 @@ function blobAt(k, motion, t, bouncy, lead) {
   if (bouncy) {
     const a = k.anticipation;
     const o = k.overshoot;
+    // 遠くへ移るときも伸び縮みは隣へ移るときと同じにし、残りの距離は前の端と同じ割合で進める
+    const near = Math.min(dist, step);
+    const extra = (dist - near) * smoothKeyframes(t, BOUNCE_FRONT, [0, 0, 1, 1, 1]);
     front = smoothKeyframes(t, BOUNCE_FRONT, [0, -a, dist + o, dist - o * 0.3, dist]);
-    back = smoothKeyframes(t, BOUNCE_BACK, [0, -a * 0.25, -a * 0.25, dist + o * 0.8, dist - o * 0.2, dist]);
+    back = smoothKeyframes(t, BOUNCE_BACK, [0, -a * 0.25, -a * 0.25, near + o * 0.8, near - o * 0.2, near]) + extra;
   } else {
     front = dist * frontAt(t, k);
     back = dist * backAt(t, k);
-  }
-  if (dist > step) {
-    const cap = step * lead;
-    back = front - smoothMin(front - back, cap, cap * 0.2);
+    if (dist > step) {
+      const cap = step * lead;
+      back = front - smoothMin(front - back, cap, cap * 0.2);
+    }
   }
   const top = to > from ? from + back : from - front;
   const length = s + front - back;
@@ -155,7 +152,7 @@ class RailIndicator {
     this.horizontal = horizontal;
     this.k = gourdTokens(rail);
     this.motion = { from: selected, to: selected, t: 1, moving: false };
-    this.lead = peakLead(this.k, bouncy);
+    this.lead = peakLead(this.k);
     this.profile = new GourdProfile(railWidth(this.k), railLength(this.k, buttons.length), buttons.length);
     this.element = document.createElement('div');
     this.element.className = 'piyo-gourd-indicator';
