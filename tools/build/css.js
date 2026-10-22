@@ -90,7 +90,7 @@ function paletteDecls(semantic, input, prefix) {
 }
 
 // Glass の宣言の並びを作る
-function glassDecls(glass, semantic, prefix) {
+function glassDecls(glass, semantic, prefix, radius = {}) {
   const decls = [];
   for (const [path, token] of flatten(glass)) {
     if (token.$type === 'toneStops') {
@@ -102,6 +102,12 @@ function glassDecls(glass, semantic, prefix) {
   const stops = semantic.color.edgeStops.$value.stops;
   const edge = [...stops.map((s, i) => `var(--${prefix}-color-edge-${i}) ${num(s.angle)}deg`), `var(--${prefix}-color-edge-0) 360deg`];
   decls.push([varName(prefix, ['glass', 'edge']), `conic-gradient(from 0deg, ${edge.join(', ')})`]);
+  // 枠のマスク(角の丸みごと)。形の内側の帯を SVG の線で作るので、太さがどの向きでもそろう
+  const width = glass.glass.edge?.width?.$value ?? 1;
+  for (const [name, token] of Object.entries(radius)) {
+    const r = token.$value >= 999 ? '50%' : String(token.$value);
+    decls.push([varName(prefix, ['glass', 'edge', 'mask', name]), edgeMask(r, width)]);
+  }
   // タブのつまみの枠(選んだ色の枠を blend だけ透かして、通常の枠に重ねる)
   const blend = glass.glass.tabs?.thumbEdgeBlend?.$value;
   if (blend !== undefined) {
@@ -109,6 +115,13 @@ function glassDecls(glass, semantic, prefix) {
     decls.push([varName(prefix, ['glass', 'tabs', 'thumbEdge']), `${tone}, var(--${prefix}-glass-edge)`]);
   }
   return decls;
+}
+
+// 形の内側に太さ width の帯を残すマスク(SVG の線を枠の外まで太く引き、外側の半分は画像の外で切れる)
+// r は角の丸み(px の数か '50%')。rx を省くと ry と同じになるので、'50%' なら高さの半分の丸み(ピルと円)
+function edgeMask(r, width) {
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%"><rect width="100%" height="100%" ry="${r}" fill="none" stroke="#000" stroke-width="${width * 2}"/></svg>`;
+  return `url("data:image/svg+xml,${encodeURIComponent(svg)}")`;
 }
 
 // CSS ファイルの中身を作る
@@ -122,7 +135,7 @@ export function buildCss(t) {
     block('共通', ':root', coreDecls),
     block(`色: ${first[0]}(既定)`, `:root, [data-${attr}-palette="${first[0]}"]`, paletteDecls(t.semantic, first[1], prefix)),
     ...rest.map(([name, p]) => block(`色: ${name}`, `[data-${attr}-palette="${name}"]`, paletteDecls(t.semantic, p, prefix))),
-    block('Glass', `:root, [data-${attr}-style="glass"], [data-${attr}-palette]`, glassDecls(t.styles.glass, t.semantic, prefix)),
+    block('Glass', `:root, [data-${attr}-style="glass"], [data-${attr}-palette]`, glassDecls(t.styles.glass, t.semantic, prefix, t.primitives.radius)),
     ...Object.entries(t.presets).filter(([, p]) => p.toneUsesEdge).map(([name]) =>
       block(`${name}: 色付きの枠も枠の色の並びにする`, `[data-${attr}-palette="${name}"]`, [
         [`--${prefix}-glass-tone-edge-primary`, `var(--${prefix}-glass-edge)`],

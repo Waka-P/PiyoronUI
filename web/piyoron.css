@@ -70,7 +70,9 @@
   justify-content: center;
   gap: var(--piyo-control-gap);
   box-sizing: border-box;
-  margin-block: max(0px, (var(--piyo-touch-min-size) - var(--piyo-chip-padding-y) * 2 - var(--piyo-text-size-small)) / 2);
+  /* 押せる範囲の余白(Android と同じく、上は切り上げ、下は切り捨てで整数の px にする) */
+  margin-top: round(up, max(0px, (var(--piyo-touch-min-size) - var(--piyo-chip-padding-y) * 2 - var(--piyo-text-size-small)) / 2), 1px);
+  margin-bottom: round(down, max(0px, (var(--piyo-touch-min-size) - var(--piyo-chip-padding-y) * 2 - var(--piyo-text-size-small)) / 2), 1px);
   padding: var(--piyo-chip-padding-y) var(--piyo-chip-padding-x);
   border: 0;
   border-radius: var(--piyo-radius-pill);
@@ -165,7 +167,7 @@
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
-  padding: var(--piyo-card-padding-y) var(--piyo-card-padding-x);
+  padding: round(var(--piyo-card-padding-y), 1px) round(var(--piyo-card-padding-x), 1px);
   border-radius: var(--piyo-radius-lg);
   color: var(--piyo-color-content-default);
 }
@@ -339,6 +341,7 @@
   --piyo-s-edge: var(--piyo-glass-edge);
   --piyo-s-edge-opacity: 1;
   --piyo-s-edge-inset: 0px;
+  --piyo-s-edge-mask: var(--piyo-glass-edge-mask-pill);
   --piyo-s-ring-color: transparent;
   --piyo-s-ring-width: var(--piyo-glass-ring-width);
   --piyo-s-ring-blur: var(--piyo-glass-ring-blur);
@@ -348,20 +351,18 @@
   box-shadow: var(--piyo-s-shadow);
 }
 
-/* 枠(スイープの線を、マスクで縁だけにくり抜く) */
+/* 枠(スイープの線を、SVG の線のマスクで縁の帯だけにする。太さはどの向きでもそろう)
+   マスクは角の丸みごと(--piyo-glass-edge-mask-pill / -sm / -md / -lg)。丸みを変えたら --piyo-s-edge-mask も合わせる */
 :where([data-piyoron-style="glass"]) :where(.piyo-btn, .piyo-chip, .piyo-tabs, .piyo-tabs-thumb, .piyo-card)::before {
   content: "";
   position: absolute;
   z-index: -1;
   inset: var(--piyo-s-edge-inset);
-  padding: var(--piyo-glass-edge-width);
   border-radius: inherit;
   background: var(--piyo-s-edge);
   opacity: var(--piyo-s-edge-opacity);
-  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor;
-  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
-  mask-composite: exclude;
+  -webkit-mask: var(--piyo-s-edge-mask) 0 0 / 100% 100% no-repeat;
+  mask: var(--piyo-s-edge-mask) 0 0 / 100% 100% no-repeat;
   pointer-events: none;
 }
 
@@ -498,6 +499,7 @@
 
 /* カード(斜めのグラデーション、薄い枠) */
 :where([data-piyoron-style="glass"]) :where(.piyo-card) {
+  --piyo-s-edge-mask: var(--piyo-glass-edge-mask-lg);
   --piyo-s-fill: var(--piyo-glass-card-fill);
   --piyo-s-edge-opacity: var(--piyo-glass-card-edge-opacity);
   --piyo-s-ring-color: var(--piyo-color-ring-shadow);
