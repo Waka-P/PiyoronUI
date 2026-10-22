@@ -1,12 +1,12 @@
 // ジニー効果で出し入れする(閉じるとボタンに吸い込まれ、開くとそこから出てくる)
 
-import { GenieFrame, genieAlpha, roundRectShape, shapeToPath } from './geometry.js';
+import { GenieFrame, genieAlpha, layoutRect, roundRectShape, shapeToPath } from './geometry.js';
 import { animate, cssNumber, cssValue, easingFromCss, lerp, reduceMotion } from './motion.js';
 import { PaintedSurface } from './surface.js';
 
 // 吸い込まれる先の形(角の丸みは要素の border-radius。円のボタンなら円)
 function anchorShape(anchor, dx, dy) {
-  const r = anchor.getBoundingClientRect();
+  const r = layoutRect(anchor);
   const radius = Math.min(parseFloat(getComputedStyle(anchor).borderTopLeftRadius) || 0, r.width / 2, r.height / 2);
   return roundRectShape(r.left - dx, r.top - dy, r.width, r.height, radius);
 }
@@ -77,7 +77,7 @@ export class PiyoGenie {
     el.setAttribute('aria-hidden', String(!this.open));
     if (hidden) return;
     const p = this.easing(this.time);
-    const a = this.anchor.getBoundingClientRect();
+    const a = layoutRect(this.anchor);
     const target = [(a.left + a.right) / 2 - box.left, (a.top + a.bottom) / 2 - box.top];
     const frame = p > 0 ? new GenieFrame(p, w, h, target, this.neck, this.radius) : null;
     const alpha = String(genieAlpha(p));

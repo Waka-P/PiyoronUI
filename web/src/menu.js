@@ -1,6 +1,6 @@
 // メニュー(ボタンに少し重ねて出し、重なった所をくり抜く。開いている間にほかのボタンへ移ると滑って切り替わる)
 
-import { GenieFrame, genieAlpha, menuPosition, ovalShape, roundRectShape, shapeToPath } from './geometry.js';
+import { GenieFrame, genieAlpha, layoutRect, menuPosition, ovalShape, roundRectShape, shapeToPath } from './geometry.js';
 import { animate, cssNumber, cssValue, easingFromCss, lerp, reduceMotion } from './motion.js';
 import { PaintedSurface } from './surface.js';
 
@@ -283,10 +283,9 @@ export class PiyoMenu {
     window.addEventListener('scroll', this.onViewport, { signal, capture: true });
   }
 
-  // 中身の大きさ
+  // 中身の大きさ(開閉の変形を含まない、元の大きさ)
   measure() {
-    const r = this.body.getBoundingClientRect();
-    return { width: r.width, height: r.height };
+    return { width: this.body.offsetWidth, height: this.body.offsetHeight };
   }
 
   // 中身の大きさが変わったら、メニューの大きさをなめらかに合わせる
@@ -384,7 +383,7 @@ export class PiyoMenu {
 
   // ボタンの四角(画面から見た位置)
   anchorRect() {
-    return this.anchor.getBoundingClientRect();
+    return layoutRect(this.anchor);
   }
 
   // 置き場所を求める

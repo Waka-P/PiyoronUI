@@ -287,6 +287,18 @@ export class GenieFrame {
   }
 }
 
+// ---------- 要素の位置 ----------
+
+// 要素の画面上の四角(拡大・縮小の変形は含めない。中心は変形後の位置)
+export function layoutRect(element) {
+  const r = element.getBoundingClientRect();
+  const cx = (r.left + r.right) / 2;
+  const cy = (r.top + r.bottom) / 2;
+  const w = element.offsetWidth || r.width;
+  const h = element.offsetHeight || r.height;
+  return { left: cx - w / 2, top: cy - h / 2, right: cx + w / 2, bottom: cy + h / 2, width: w, height: h };
+}
+
 // ---------- メニューの置き場所 ----------
 
 // ボタンに沿った向きの位置。角はボタンの中心がメニューの角に、端はメニューとボタンの端どうしをそろえる
