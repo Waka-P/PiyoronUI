@@ -160,6 +160,7 @@ private fun CatalogContent(
             var kind by rememberSaveable { mutableIntStateOf(0) }
             var mode by rememberSaveable { mutableIntStateOf(1) }
             var view by rememberSaveable { mutableIntStateOf(0) }
+            Caption("長押ししたまま指を動かすと、選ぶ項目を移せる(離した所で選ぶ。外で離すと取り消し)")
             PiyoTabs(listOf("すべて", "未読", "既読", "保存"), kind, { kind = it }, Modifier.fillMaxWidth())
             PiyoTabs(listOf("カード", "一覧"), mode, { mode = it }, Modifier.fillMaxWidth())
             PiyoTabs(listOf("今日", "今週", "今月"), view, { view = it }, Modifier.fillMaxWidth(0.7f))
@@ -170,6 +171,7 @@ private fun CatalogContent(
             var transition by rememberSaveable { mutableStateOf(PiyoMenuTransition.Fade) }
             var density by rememberSaveable { mutableStateOf("ふつう") }
             Caption("開いている間に、ほかのボタンへマウスを乗せる(スマホでは押す)と、滑って切り替わる")
+            Caption("項目を長押ししたまま動かすと、離した所の項目を選べる")
             Caption("開閉の動き")
             PiyoChipGroup(PiyoMenuTransition.entries, transition, { transition = it }, label = { MenuTransitionNames.getValue(it) })
             var alignment by remember { mutableStateOf(PiyoMenuAlignment.EndCorner) }

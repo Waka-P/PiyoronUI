@@ -47,6 +47,8 @@ object PiyoTokens {
         val TouchShrink = 1.5.dp
         val HoverDuration = 180
         val ActiveDuration = 70
+        // 長押ししたまま動かして選ぶとき、動かせるようになるまでの長さ
+        val LongPressDelay = 400
     }
 
     object Touch {

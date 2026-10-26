@@ -19,6 +19,8 @@ PiyoTabs(tabs, index, { index = it }, indicator = { MyIndicator() })  // つま�
 
 選ぶと、つまみが 250ms で滑る(`duration.segmented`、`easing.standard`)。途中で別の項目を選ぶと、今の位置から向きを変える。
 
+長押し(0.4 秒、`press.longPressDelay`)したまま指を動かすと、つまみと文字の色が指の下の項目へ同じ動きで移る。離した所の項目で `onSelect` を呼ぶ。タブから離れて離すと取り消し、選んでいた項目に戻る。
+
 ## 寸法
 
 | 項目 | 値 | トークン |

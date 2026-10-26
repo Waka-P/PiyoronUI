@@ -161,6 +161,16 @@
   color: var(--piyo-color-content-selected);
 }
 
+/* 長押しで動かしている間は、つまみの乗った項目の文字だけを選んだ色にする */
+:where(.piyo-tabs[data-piyo-dragging]) :where(.piyo-tab:not([data-piyo-preview])) {
+  color: var(--piyo-color-content-muted);
+}
+
+/* 長押しで動かしている間の、つまみの乗った項目 */
+:where(.piyo-tabs[data-piyo-dragging]) :where(.piyo-tab[data-piyo-preview]) {
+  color: var(--piyo-color-content-selected);
+}
+
 /* カード */
 :where(.piyo-card) {
   position: relative;
@@ -218,6 +228,13 @@
     --piyo-grow: calc(var(--piyo-press-touch-shrink) * -1);
     transition-duration: var(--piyo-press-active-duration);
   }
+}
+
+/* 長押ししたまま動かして選べる入れ物(長押しで文字が選ばれたり、長押しのメニューが出たりしないように) */
+:where([data-piyo-drag-select]) {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
 }
 
 /* キーボードで選んだとき */
@@ -531,15 +548,26 @@
     drop-shadow(0 12px 13px color-mix(in srgb, var(--piyo-color-primary-strong) 20%, transparent));
 }
 
-/* マウスを乗せた・フォーカスした項目 */
-:where([data-piyoron-style="glass"]) :where(.piyo-menu-item):is(:hover, :focus-visible):not(:disabled, [aria-disabled="true"]) {
+/* マウスを乗せた・フォーカスした・長押しで動かして指の下にある項目 */
+:where([data-piyoron-style="glass"]) :where(.piyo-menu-item):is(:hover, :focus-visible, [data-piyo-preview]):not(:disabled, [aria-disabled="true"]) {
   background: var(--piyo-glass-menu-item-hover);
   color: var(--piyo-color-primary-strong);
 }
 
-/* マウスを乗せた・フォーカスした削除の項目 */
-:where([data-piyoron-style="glass"]) :where(.piyo-menu-item.piyo-danger):is(:hover, :focus-visible):not(:disabled, [aria-disabled="true"]) {
+/* マウスを乗せた・フォーカスした・指の下にある削除の項目 */
+:where([data-piyoron-style="glass"]) :where(.piyo-menu-item.piyo-danger):is(:hover, :focus-visible, [data-piyo-preview]):not(:disabled, [aria-disabled="true"]) {
   background: var(--piyo-glass-menu-item-danger-hover);
+  color: var(--piyo-color-danger);
+}
+
+/* 長押しで動かしている間は、指の下の項目だけを強調する(指で押した項目に残る hover を消す。上の指定と同じ詳細度にして後ろで勝つ) */
+:where([data-piyo-dragging]) :where(.piyo-menu-item):is(:hover, :focus-visible):not([data-piyo-preview], :disabled) {
+  background: transparent;
+  color: var(--piyo-color-content-default);
+}
+
+/* 長押しで動かしている間の、指の下にない削除の項目 */
+:where([data-piyo-dragging]) :where(.piyo-menu-item.piyo-danger):is(:hover, :focus-visible):not([data-piyo-preview], :disabled) {
   color: var(--piyo-color-danger);
 }
 

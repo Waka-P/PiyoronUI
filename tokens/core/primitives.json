@@ -29,7 +29,8 @@
     "activeShrink": {"$type": "dimension", "$description": "マウスで押したときに、乗せたときの大きさから縮む量", "$value": 1.1},
     "touchShrink": {"$type": "dimension", "$description": "指で押したときに、元の大きさから縮む量", "$value": 1.5},
     "hoverDuration": {"$type": "duration", "$value": 180},
-    "activeDuration": {"$type": "duration", "$value": 70}
+    "activeDuration": {"$type": "duration", "$value": 70},
+    "longPressDelay": {"$type": "duration", "$description": "長押ししたまま動かして選ぶとき、動かせるようになるまでの長さ", "$value": 400}
   },
   "touch": {
     "minSize": {"$type": "dimension", "$value": 48}

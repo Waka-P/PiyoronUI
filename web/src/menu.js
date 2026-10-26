@@ -3,6 +3,7 @@
 import { GenieFrame, genieAlpha, layoutRect, menuPosition, ovalShape, roundRectShape, shapeToPath } from './geometry.js';
 import { animate, cssNumber, cssValue, easingFromCss, lerp, reduceMotion } from './motion.js';
 import { PaintedSurface } from './surface.js';
+import { dragSelect } from './drag-select.js';
 
 // 名前で指定できる、ボタンに対する位置(角はボタンの中心がメニューの角に、端は端どうしをそろえる)
 export const PiyoMenuAlignment = {
@@ -269,6 +270,24 @@ export class PiyoMenu {
         this.close();
       }
     }, { signal });
+    // 長押ししたまま動かすと、指の下の項目を強調し、離した所の項目を押したことにする
+    let previewed = [];
+    // 強調する項目を変える
+    const mark = (i) => {
+      previewed.forEach((el) => el.removeAttribute('data-piyo-preview'));
+      previewed = i === null ? [] : [this.items()[i]];
+      previewed.forEach((el) => el.setAttribute('data-piyo-preview', ''));
+    };
+    this.stopDrag = dragSelect(this.element, {
+      items: () => this.items(),
+      onPreview: mark,
+      onCommit: (i) => {
+        const item = this.items()[i];
+        mark(null);
+        item?.click();
+      },
+      onCancel: () => mark(null),
+    });
     this.observer = new ResizeObserver(() => this.resize());
     this.observer.observe(this.body);
     this.onViewport = () => {
@@ -466,6 +485,7 @@ export class PiyoMenu {
     this.anchor.setAttribute('aria-expanded', 'false');
     this.observer.disconnect();
     this.abort.abort();
+    this.stopDrag();
     this.surface.destroy();
     this.group.menus = this.group.menus.filter((m) => m !== this);
   }

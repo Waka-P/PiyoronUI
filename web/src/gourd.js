@@ -5,6 +5,7 @@ import {
 } from './geometry.js';
 import { animate, cssNumber, cssValue, easingFromCss, lerp, part, reduceMotion, smooth, smoothKeyframes, smoothMin } from './motion.js';
 import { PaintedSurface } from './surface.js';
+import { dragSelect } from './drag-select.js';
 
 // ひょうたんの寸法と動きの値(トークンの CSS 変数から読む)
 function gourdTokens(element) {
@@ -264,6 +265,17 @@ export class GourdTabRail {
       b.addEventListener('click', () => (this.onSelect ? this.onSelect(i) : this.select(i)), { signal: this.abort.signal });
     });
     bindRailKeys(this.buttons, this.abort.signal);
+    // 長押ししたまま動かすと、印が指の下の項目へ動き、離した所で選ぶ
+    this.stopDrag = dragSelect(element, {
+      items: () => this.buttons,
+      onPreview: (i) => this.indicator.select(i ?? this.selected),
+      onCommit: (i) => {
+        if (i === this.selected) return;
+        if (this.onSelect) this.onSelect(i);
+        else this.select(i);
+      },
+      onCancel: () => this.indicator.select(this.selected),
+    });
     this.select(selected);
     this.draw();
   }
@@ -280,6 +292,7 @@ export class GourdTabRail {
 
   // 選んだ項目を変える
   select(index) {
+    this.selected = index;
     this.buttons.forEach((b, i) => b.setAttribute('aria-selected', String(i === index)));
     markTabStop(this.buttons, index);
     this.indicator.select(index);
@@ -288,6 +301,7 @@ export class GourdTabRail {
   // 後片付け
   destroy() {
     this.abort.abort();
+    this.stopDrag();
     this.surface.destroy();
     this.indicator.destroy();
   }
@@ -386,6 +400,15 @@ export class GourdRailPanel {
       b.addEventListener('click', () => this.press(i), { signal: this.abort.signal });
     });
     bindRailKeys(this.buttons, this.abort.signal);
+    // 長押ししたまま動かすと、印が指の下の項目へ動き、離した所で選ぶ(閉じていれば開く。選んでいる項目なら何もしない)
+    this.stopDrag = dragSelect(this.rail, {
+      items: () => this.buttons,
+      onPreview: (i) => this.indicator.select(i ?? this.selected),
+      onCommit: (i) => {
+        if (i !== this.selected) this.press(i);
+      },
+      onCancel: () => this.indicator.select(this.selected),
+    });
     if (!this.content.id) this.content.id = `piyo-gourd-panel-${++nextPanelId}`;
     this.content.setAttribute('role', 'tabpanel');
     this.buttons.forEach((b) => b.setAttribute('aria-controls', this.content.id));
@@ -544,6 +567,7 @@ export class GourdRailPanel {
   destroy() {
     this.stop?.();
     this.abort.abort();
+    this.stopDrag();
     this.observer.disconnect();
     this.surface.destroy();
     this.indicator.destroy();

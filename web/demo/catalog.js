@@ -5,6 +5,7 @@ import { PiyoMenu, PiyoMenuGroup, PiyoMenuAlignment } from '../src/menu.js';
 import { GourdRailPanel, GourdTabRail } from '../src/gourd.js';
 import { PiyoGenie } from '../src/genie.js';
 import '../src/press.js';
+import { PiyoTabs } from '../src/tabs.js';
 import { ICONS, barFraction, cssColor, drawBackdrop, drawBiasSlider, drawHueBar } from './draw.js';
 
 // ---------- 小さな道具 ----------
@@ -91,21 +92,12 @@ function multiChipGroup(items, selected, onChange) {
   }, item)));
 }
 
-// タブ。width は横幅の割合
+// タブ。width は横幅の割合(押す、矢印キー、長押ししたまま動かす、で選べる)
 function tabs(items, selected, onSelect, width = 1) {
-  const list = h('div', { className: 'piyo-tabs', role: 'tablist', style: `--piyo-tabs-n: ${items.length}; --piyo-tabs-i: ${selected}; width: ${width * 100}%` },
-    h('span', { className: 'piyo-tabs-thumb', 'aria-hidden': 'true' }));
-  items.forEach((label, i) => list.append(h('button', {
-    type: 'button',
-    className: 'piyo-tab',
-    role: 'tab',
-    'aria-selected': String(i === selected),
-    onclick: () => {
-      list.style.setProperty('--piyo-tabs-i', i);
-      list.querySelectorAll('.piyo-tab').forEach((t, j) => t.setAttribute('aria-selected', String(j === i)));
-      onSelect(i);
-    },
-  }, label)));
+  const list = h('div', { className: 'piyo-tabs', style: `width: ${width * 100}%` },
+    h('span', { className: 'piyo-tabs-thumb', 'aria-hidden': 'true' }),
+    items.map((label) => h('button', { type: 'button', className: 'piyo-tab' }, label)));
+  new PiyoTabs(list, { selected, onSelect });
   return list;
 }
 
@@ -269,6 +261,7 @@ function chipSection() {
 // タブのまとまり
 function tabsSection() {
   return section('タブ',
+    caption('長押ししたまま指を動かすと、選ぶ項目を移せる(離した所で選ぶ。外で離すと取り消し)'),
     tabs(['すべて', '未読', '既読', '保存'], 0, () => {}),
     tabs(['カード', '一覧'], 1, () => {}),
     tabs(['今日', '今週', '今月'], 0, () => {}, 0.7));
@@ -397,6 +390,7 @@ function menuSection() {
 
   return section('メニュー',
     caption('開いている間に、ほかのボタンへマウスを乗せる(スマホでは押す)と、滑って切り替わる'),
+    caption('項目を長押ししたまま動かすと、離した所の項目を選べる'),
     caption('開閉の動き'),
     chipGroup(Object.keys(TRANSITION_NAMES), 'fade', setTransition, { label: (t) => TRANSITION_NAMES[t] }),
     caption('ボタンに対する位置(名前で選ぶ)'),

@@ -22,6 +22,7 @@
   --piyo-press-touch-shrink: 1.5px;
   --piyo-press-hover-duration: 180ms;
   --piyo-press-active-duration: 70ms;
+  --piyo-press-long-press-delay: 400ms;
   --piyo-touch-min-size: 48px;
   --piyo-text-size: 14px;
   --piyo-text-size-small: 13px;

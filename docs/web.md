@@ -87,6 +87,8 @@ genie.setOpen(false);              // ボタンに吸い込まれる
 
 | 部品 | 要素 | 主な指定 |
 |---|---|---|
+| `PiyoTabs` | `.piyo-tabs` の中に `.piyo-tabs-thumb` と `.piyo-tab` | `selected`、`onSelect`。押す、矢印キー、長押ししたまま動かす、で選べる(つまみと `--piyo-tabs-i` も動かす) |
+| `dragSelect` | 入れ物の要素 | `items`(項目の要素の並びを返す関数)、`onPreview`、`onCommit`、`onCancel`。長押ししたまま動かして選ぶ仕組みを、ほかの部品に付ける |
 | `PiyoMenu` | ボタンと `.piyo-menu`(中身は自由) | `transition`(`fade` 既定、`scale`、`genie`、`none`)、`side`(`bottom`、`top`、`right`、`left`)、`align`(下の表か -1〜1 の数) |
 | `PiyoMenuGroup` | なし | 中のメニューの既定。開いている間にほかのボタンへ移ると滑って切り替わる |
 | `GourdTabRail` | `.piyo-gourd` と `.piyo-gourd-button` | `data-orientation="horizontal"` で横、`bouncy` で弾む動き。矢印キー、Home、End で項目を移れる(Tab で止まるのは選んだ丸ボタンだけ) |
@@ -105,6 +107,19 @@ genie.setOpen(false);              // ボタンに吸い込まれる
 
 - メニューの項目(`.piyo-menu-item`)を押すと閉じる。閉じたくない項目には `data-piyo-keep-open`
 - 外を押す、Esc、Tab で閉じる。矢印キー、Home、End で項目を移る
+- 項目を長押ししたまま動かすと、指の下の項目を強調し(`data-piyo-preview`)、離した所の項目を押したことにする
+
+### 長押ししたまま動かして選ぶ
+
+タブ(`PiyoTabs`)、ひょうたん(単体とパネル付き)、メニューの項目は、長押し(`--piyo-press-long-press-delay`、0.4 秒)したまま指やマウスを動かして選べる。
+
+| 動き | 内容 |
+|---|---|
+| 動かしている間 | 指の下の項目へ、タップと同じ動きで印(つまみ、ひょうたんの印、メニューの強調)が移る。入れ物の外でも 24px までは近い項目にする |
+| 離したとき | その項目を選ぶ。入れ物から離れて離すと取り消し、元の項目に戻る |
+| 止めること | 動かしている間は、画面のスクロール、長押しのメニュー、文字の選択、離した直後のクリックを止める。スマホでは動かせるようになったときに軽く振動させる |
+
+ほかの部品には `dragSelect(container, { items, onPreview, onCommit, onCancel })` で付けられる。
 - 中身の大きさが変わると、メニューの大きさもなめらかに変わる
 - 開いている間にボタンが動いたら(スクロールなど)閉じる
 

@@ -170,6 +170,7 @@ function TabsSection() {
   const [view, setView] = useState('今日');
   return (
     <Section title="タブ">
+      <Caption>長押ししたまま指を動かすと、選ぶ項目を移せる(離した所で選ぶ。外で離すと取り消し)</Caption>
       <PiyoTabs items={['すべて', '未読', '既読', '保存']} value={kind} onValueChange={setKind} style={{ width: '100%' }} />
       <PiyoTabs items={['カード', '一覧']} value={mode} onValueChange={setMode} style={{ width: '100%' }} />
       <PiyoTabs items={['今日', '今週', '今月']} value={view} onValueChange={setView} style={{ width: '70%' }} />
@@ -209,6 +210,7 @@ function MenuSection({ colorKey }) {
   return (
     <Section title="メニュー">
       <Caption>開いている間に、ほかのボタンへマウスを乗せる(スマホでは押す)と、滑って切り替わる</Caption>
+      <Caption>項目を長押ししたまま動かすと、離した所の項目を選べる</Caption>
       <Caption>開閉の動き</Caption>
       <Chips items={Object.keys(TRANSITION_NAMES)} value={transition} onChange={setTransition} label={(t) => TRANSITION_NAMES[t]} />
       <Caption>ボタンに対する位置(名前で選ぶ)</Caption>

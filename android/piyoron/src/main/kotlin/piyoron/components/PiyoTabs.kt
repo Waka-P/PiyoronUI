@@ -23,6 +23,9 @@ import piyoron.core.LocalPiyoTextStyle
 import piyoron.core.Piyo
 import piyoron.core.PiyoState
 import piyoron.core.PiyoText
+import piyoron.core.dragSelect
+import piyoron.core.dragSelectItem
+import piyoron.core.rememberDragSelectState
 import piyoron.core.PiyoTone
 import piyoron.core.SurfaceRole
 import piyoron.core.disabledAlpha
@@ -54,7 +57,10 @@ fun PiyoTabs(
     indicator: @Composable () -> Unit = { PiyoTabsDefaults.Indicator() },
 ) {
     val count = tabs.size.coerceAtLeast(1)
-    val motion = rememberIndicatorMotion(selectedIndex, PiyoTokens.Duration.Segmented, PiyoTokens.Easing.Standard)
+    // 長押ししたまま動かしている間は、指の下の項目に印を動かす(離した所で選ぶ)
+    val drag = rememberDragSelectState()
+    val shown = drag.preview as? Int ?: selectedIndex
+    val motion = rememberIndicatorMotion(shown, PiyoTokens.Duration.Segmented, PiyoTokens.Easing.Standard)
     val inset = PiyoTokens.Tabs.TrackPadding + PiyoTokens.Tabs.TrackBorder
     Box(
         modifier = modifier
@@ -62,7 +68,8 @@ fun PiyoTabs(
             .piyoSurface(Piyo.shapes.pill, SurfaceRole.TabTrack)
             .disabledAlpha(enabled)
             .padding(inset)
-            .selectableGroup(),
+            .selectableGroup()
+            .dragSelect(drag, enabled),
     ) {
         Box(Modifier.matchParentSize()) {
             Box(
@@ -74,17 +81,17 @@ fun PiyoTabs(
         }
         Row {
             tabs.forEachIndexed { i, label ->
-                TabItem(label, i == selectedIndex, enabled, { onSelect(i) }, Modifier.weight(1f))
+                TabItem(label, i == selectedIndex, i == shown, enabled, { onSelect(i) }, Modifier.weight(1f).dragSelectItem(drag, i, enabled) { onSelect(i) })
             }
         }
     }
 }
 
-// タブの1項目
+// タブの1項目。shown は印が乗っているか(長押しで動かしている間は、選んだ項目と違うことがある)
 @Composable
-private fun TabItem(label: String, selected: Boolean, enabled: Boolean, onClick: () -> Unit, modifier: Modifier) {
+private fun TabItem(label: String, selected: Boolean, shown: Boolean, enabled: Boolean, onClick: () -> Unit, modifier: Modifier) {
     val source = remember { MutableInteractionSource() }
-    val state = rememberPiyoState(source, selected = selected, enabled = enabled)
+    val state = rememberPiyoState(source, selected = shown, enabled = enabled)
     val color = Piyo.style.contentColor(SurfaceRole.TabTrack, state, PiyoTone.Default)
     val minHeight = PiyoTokens.Touch.MinSize - (PiyoTokens.Tabs.TrackPadding + PiyoTokens.Tabs.TrackBorder) * 2
     Box(

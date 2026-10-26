@@ -62,6 +62,9 @@ import piyoron.core.SurfaceRole
 import piyoron.core.focusRing
 import piyoron.core.lerp
 import piyoron.core.piyoSurface
+import piyoron.core.dragSelect
+import piyoron.core.dragSelectItem
+import piyoron.core.rememberDragSelectState
 import piyoron.core.rememberIndicatorMotion
 import piyoron.core.rememberPiyoState
 import piyoron.effects.genie.GenieFrame
@@ -275,8 +278,11 @@ private fun RailContent(
 ) {
     val duration = if (bouncy) PiyoTokens.Gourd.BounceDuration else PiyoTokens.Gourd.SwitchDuration
     val density = LocalDensity.current
+    // 長押ししたまま動かしている間は、指の下の項目に印を動かす(離した所で選ぶ。選んでいる項目なら何もしない)
+    val drag = rememberDragSelectState()
+    val shown = drag.preview as? Int ?: selectedIndex
     // 動いている途中で選び直したら、今描いている印の中心から動き直す(伸びた印が飛ばないように)
-    val motion = rememberIndicatorMotion(selectedIndex, duration, PiyoTokens.Gourd.SwitchEasing) { m ->
+    val motion = rememberIndicatorMotion(shown, duration, PiyoTokens.Gourd.SwitchEasing) { m ->
         with(density) {
             val blob = blobAt(m, m.progress.value, bouncy)
             val step = (PiyoTokens.Gourd.ButtonSize + PiyoTokens.Gourd.Gap).toPx()
@@ -287,17 +293,29 @@ private fun RailContent(
         derivedStateOf { if (!motion.moving || motion.progress.value >= PiyoTokens.Gourd.ArriveAt) motion.to else -1 }
     }
     val horizontal = orientation == Orientation.Horizontal
-    Box(modifier.size(railSize(tabs.size, orientation)).selectableGroup()) {
+    Box(modifier.size(railSize(tabs.size, orientation)).selectableGroup().dragSelect(drag)) {
         RailIndicator(motion, tabs.size, horizontal, bouncy, indicator)
         tabs.forEachIndexed { i, tab ->
-            RailButton(tab, i, horizontal, i == arrivedIndex, i == selectedIndex, { onTap(i) }, clickLabel(i))
+            RailButton(
+                tab, i, horizontal, i == arrivedIndex, i == selectedIndex, { onTap(i) }, clickLabel(i),
+                Modifier.dragSelectItem(drag, i) { if (i != selectedIndex) onTap(i) },
+            )
         }
     }
 }
 
 // ひょうたんの丸ボタン1つ
 @Composable
-private fun RailButton(tab: GourdTab, index: Int, horizontal: Boolean, arrived: Boolean, selected: Boolean, onClick: () -> Unit, clickLabel: String?) {
+private fun RailButton(
+    tab: GourdTab,
+    index: Int,
+    horizontal: Boolean,
+    arrived: Boolean,
+    selected: Boolean,
+    onClick: () -> Unit,
+    clickLabel: String?,
+    modifier: Modifier = Modifier,
+) {
     val source = remember { MutableInteractionSource() }
     val state = rememberPiyoState(source, selected = arrived)
     val color = Piyo.style.contentColor(SurfaceRole.TabTrack, state, PiyoTone.Default)
@@ -312,6 +330,7 @@ private fun RailButton(tab: GourdTab, index: Int, horizontal: Boolean, arrived: 
                 },
             )
             .size(PiyoTokens.Gourd.ButtonSize)
+            .then(modifier)
             .focusRing(state.focused, shape)
             .clickable(source, null, onClickLabel = clickLabel, role = Role.Tab, onClick = onClick)
             .semantics {

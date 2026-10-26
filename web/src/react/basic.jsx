@@ -1,10 +1,11 @@
 // 基本の部品(テーマ、ボタン、選ぶボタン、タブ、カード)。見た目は piyoron.css のクラスに任せる
 
-import { createContext, useLayoutEffect, useState } from 'react';
+import { createContext, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import * as Tabs from '@radix-ui/react-tabs';
 import * as ToggleGroup from '@radix-ui/react-toggle-group';
 import { setPiyoPreset, setPiyoSeed } from '../theme.js';
 import '../press.js';
+import { dragSelect } from '../drag-select.js';
 
 // クラス名をつなぐ(空は飛ばす)
 export function cx(...names) {
@@ -111,12 +112,27 @@ export function PiyoTabs({ items, value, defaultValue, onValueChange, className,
   const list = items.map(toItem);
   const [current, setCurrent] = useControllable(value, defaultValue ?? list[0]?.value, onValueChange);
   const index = Math.max(0, list.findIndex((i) => i.value === current));
+  // 長押ししたまま動かしている間の、つまみを置く番号(動かしていないときは null)
+  const [preview, setPreview] = useState(null);
+  const listRef = useRef(null);
+  const latest = useRef({ list, index, setCurrent });
+  latest.current = { list, index, setCurrent };
+  useEffect(() => dragSelect(listRef.current, {
+    items: () => [...listRef.current.querySelectorAll('.piyo-tab')],
+    onPreview: (i) => setPreview(i ?? latest.current.index),
+    onCommit: (i) => {
+      setPreview(null);
+      latest.current.setCurrent(latest.current.list[i].value);
+    },
+    onCancel: () => setPreview(null),
+  }), []);
+  const shown = preview ?? index;
   return (
     <Tabs.Root value={current} onValueChange={setCurrent} style={{ display: 'contents' }} {...props}>
-      <Tabs.List className={cx('piyo-tabs', className)} style={{ '--piyo-tabs-n': list.length, '--piyo-tabs-i': index, ...style }}>
+      <Tabs.List ref={listRef} className={cx('piyo-tabs', className)} style={{ '--piyo-tabs-n': list.length, '--piyo-tabs-i': shown, ...style }}>
         <span className="piyo-tabs-thumb" aria-hidden="true" />
-        {list.map((item) => (
-          <Tabs.Trigger key={item.value} value={item.value} className="piyo-tab" disabled={item.disabled}>
+        {list.map((item, i) => (
+          <Tabs.Trigger key={item.value} value={item.value} className="piyo-tab" disabled={item.disabled} data-piyo-preview={preview !== null && i === shown ? '' : undefined}>
             {item.label}
           </Tabs.Trigger>
         ))}

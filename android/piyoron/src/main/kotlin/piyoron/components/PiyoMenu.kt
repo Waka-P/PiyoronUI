@@ -93,7 +93,11 @@ import piyoron.core.PiyoIcon
 import piyoron.core.PiyoOverlay
 import piyoron.core.PiyoText
 import piyoron.core.PiyoTone
+import piyoron.core.DragSelectState
 import piyoron.core.SurfaceRole
+import piyoron.core.dragSelect
+import piyoron.core.dragSelectItem
+import piyoron.core.rememberDragSelectState
 import piyoron.core.disabledAlpha
 import piyoron.core.lerp
 import piyoron.core.piyoSurface
@@ -403,6 +407,9 @@ private val LocalPiyoMenuGroup = staticCompositionLocalOf<MenuGroup?> { null }
 // 項目を押したときにメニューを閉じる
 private val LocalPiyoMenuClose = staticCompositionLocalOf<() -> Unit> { {} }
 
+// 開いているメニューの、長押ししたまま動かして選ぶ仕組み(項目が自分を登録する)
+private val LocalPiyoMenuDrag = staticCompositionLocalOf<DragSelectState?> { null }
+
 // メニューの組を作り、最前面の層に描く場所を用意する
 @Composable
 private fun rememberMenuGroup(transition: PiyoMenuTransition, alignment: PiyoMenuAlignment, side: PiyoMenuSide): MenuGroup {
@@ -535,7 +542,8 @@ private fun MenuPanel(entry: MenuEntry, group: MenuGroup, overlay: PiyoOverlay) 
     // パネルから見た、くり抜く円(ボタンに余白を足した範囲)
     val notchGap = with(LocalDensity.current) { PiyoTokens.Menu.NotchGap.toPx() }
     val notch = { Rect(overlay.toLocal(entry.anchor.topLeft) - entry.placed, entry.anchor.size).inflate(notchGap) }
-    CompositionLocalProvider(LocalPiyoMenuClose provides close) {
+    val drag = rememberDragSelectState()
+    CompositionLocalProvider(LocalPiyoMenuClose provides close, LocalPiyoMenuDrag provides drag) {
         Box(
             modifier = Modifier
                 .layout { measurable, constraints ->
@@ -589,6 +597,7 @@ private fun MenuPanel(entry: MenuEntry, group: MenuGroup, overlay: PiyoOverlay) 
                     .animateContentSize(tween(if (group.reduceMotion) 0 else PiyoTokens.Menu.ResizeDuration, easing = PiyoTokens.Menu.Easing))
                     .width(IntrinsicSize.Max)
                     .widthIn(min = entry.minWidth)
+                    .dragSelect(drag)
                     .padding(entry.contentPadding),
             ) {
                 val scope = remember(close) { MenuScopeImpl(close) }
@@ -683,14 +692,21 @@ fun PiyoMenuItem(
     enabled: Boolean = true,
 ) {
     val close = LocalPiyoMenuClose.current
+    val drag = LocalPiyoMenuDrag.current
+    val key = remember { Any() }
     val source = remember { MutableInteractionSource() }
-    val state = rememberPiyoState(source, enabled = enabled)
+    // 長押ししたまま動かして指の下にあるときも、マウスを乗せたときと同じに強調する
+    val state = rememberPiyoState(source, enabled = enabled).let { if (drag?.preview == key) it.copy(hovered = true) else it }
     val color = Piyo.style.contentColor(SurfaceRole.MenuItem, state, tone)
     val textStyle = LocalPiyoTextStyle.current.copy(fontSize = PiyoTokens.Menu.TextSize)
     Row(
         modifier = modifier
             .fillMaxWidth()
             .heightIn(min = PiyoTokens.Touch.MinSize)
+            .dragSelectItem(drag, key, enabled) {
+                close()
+                onClick()
+            }
             .clickable(source, null, enabled = enabled, role = Role.Button) {
                 close()
                 onClick()

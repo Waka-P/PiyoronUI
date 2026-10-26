@@ -16,6 +16,7 @@
 | 項目 | 内容 | トークン |
 |---|---|---|
 | 触れる範囲 | 見た目が小さくても 48dp 以上(`Modifier.touchTarget`) | `touch.minSize` |
+| 長押ししたまま動かして選ぶ | 長押し(0.4 秒)すると、指やマウスの下の項目へ、タップと同じ動きで印が移る。離した所の項目を選び、入れ物から離れて離すと取り消す。タブ、ひょうたん(単体とパネル付き)、メニューの項目が対応。ほかの部品にも `Modifier.dragSelect` と `Modifier.dragSelectItem` で付けられる(Web は `dragSelect()`) | `press.longPressDelay` |
 | 押したときの動き | マウスで hover すると幅と高さが 1.5 大きく、押すとそこから 1.1 縮む。指で押すと元より 1.5 小さくなる。倍率ではなく量で決めるので、部品の大きさによらず縁が同じだけ動く(大きいカードでも動きすぎない)。速い一押しでも見えるよう、押した・離したの知らせから動かす(`Modifier.pressMotion`) | `press.*` |
 | フォーカス | キーボードで選ぶと、形に沿った 2dp の輪郭を 2dp 外に出す | `control.focusWidth` / `focusOffset` |
 | 無効 | 不透明度 .45、押せない | `control.disabledOpacity` |
