@@ -10,6 +10,9 @@ CLAUDE.md
 CLAUDE.local.md
 .claude/
 
+# Codex 関連(公開しない)
+AGENTS.md
+
 # 開発中の記録と参考画像(公開しない)
 docs/decisions.md
 docs/extraction-guide.md

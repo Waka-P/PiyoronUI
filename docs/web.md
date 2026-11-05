@@ -36,7 +36,7 @@ CSS だけで使える部品(ボタン、選ぶボタン、タブ、カード)�
 | `.piyo-chip` | 選ぶボタン。並びは `.piyo-chip-group` | `aria-pressed` / `aria-checked` / `data-selected` |
 | `.piyo-tabs` | タブ。つまみは `.piyo-tabs-thumb`、項目は `.piyo-tab` | `--piyo-tabs-n`(数)、`--piyo-tabs-i`(選んだ番号)、`aria-selected` |
 | `.piyo-card` | カード。押せるなら `button.piyo-card.piyo-pressable` | |
-| `.piyo-pressable` | カードに押したときの動きを付ける(`button.piyo-card.piyo-pressable`) | |
+| `.piyo-pressable` | 任意の要素に押したときの動きを付ける(押せるカードは `button.piyo-card.piyo-pressable`) | `:disabled` / `aria-disabled` |
 
 - スタイルは `data-piyoron-style`、プリセットの色は `data-piyoron-palette`(`ocean` など)で切り替える。どの要素に付けてもよく、中の部品に効く
 - セレクタは `:where()` で包んである(詳細度 0)。使う側のクラス1つで上書きできる
@@ -46,6 +46,20 @@ CSS だけで使える部品(ボタン、選ぶボタン、タブ、カード)�
   - Android 版と同じく、文字も含めて部品全体を拡大・縮小する(`scale`)。拡大率は「1 + 量 ÷ 幅」と「1 + 量 ÷ 高さ」
   - 幅と高さは `press.js` が、マウスを乗せたときと押したときに測って `--piyo-w`、`--piyo-h` に入れる。CSS では部品が自分の大きさを知れない(コンテナクエリは先祖しか測れず、部品自身をコンテナにすると中身に合わせた幅が決まらない)ため
   - `press.js` は `piyoron` か `piyoron/react` を読み込むと自動で動く。CSS だけで使うときは、押したときの大きさは変わらない
+  - 量と速さは CSS 変数で変える。要素に付ければその要素だけ、先祖(テーマの要素など)に付ければ中の部品すべてが変わる
+
+    | 変数 | 意味 | 既定 |
+    |---|---|---|
+    | `--piyo-press-hover-grow` | マウスを乗せたときに大きくなる量 | 1.5px |
+    | `--piyo-press-active-shrink` | マウスで押したときに、乗せたときの大きさから縮む量 | 1.1px |
+    | `--piyo-press-touch-shrink` | 指で押したときに、元の大きさから縮む量 | 1.5px |
+    | `--piyo-press-hover-duration` | 乗せたとき、離して戻るときの長さ | 180ms |
+    | `--piyo-press-active-duration` | 押したときの長さ | 70ms |
+
+  - JS: `piyoPressStyle({ hoverGrow, activeShrink, touchShrink, hoverDuration, activeDuration })` で変数の組(px とミリ秒の数を渡す)、`setPiyoPress(el, motion)` で要素に `.piyo-pressable` と変数を付ける(`{ addClass: false }` なら変数だけ。中の部品の既定を変えるとき)
+  - React: `<PiyoPressable as="div" motion={{ touchShrink: 6 }}>`(既定は `button`)、`<PiyoTheme pressMotion={...}>` で中の部品すべて
+  - `.piyo-pressable` は `transition` を使う。要素に自分の `transition` を書くと、拡大・縮小の動きが消える(書くなら `scale var(--piyo-press-hover-duration)` を足す)
+  - iOS の Safari は touchstart を受ける要素がないと `:active` にならないので、`press.js` が受けるだけの touchstart を置く
   - 部品は描画の層に分け(`will-change: scale`)、拡大率そのものを動かす。動きの途中で文字を描き直さないので、文字が跳ねない。毎コマ描き直すと、文字が画素にそろい直されて前後に跳ねる
 
 ### Glass のレシピ

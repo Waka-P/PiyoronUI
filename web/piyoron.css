@@ -209,6 +209,12 @@
     scale var(--piyo-press-hover-duration) cubic-bezier(.3, .7, .4, 1);
 }
 
+/* 任意の要素に付けたとき */
+:where(.piyo-pressable):not(:disabled, [aria-disabled="true"]) {
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
 /* マウスを乗せたとき */
 @media (hover: hover) {
   :where(.piyo-btn, .piyo-chip, .piyo-pressable):hover:not(:disabled, [aria-disabled="true"]) {

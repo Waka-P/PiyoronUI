@@ -4,7 +4,7 @@ import { createContext, useEffect, useLayoutEffect, useRef, useState } from 'rea
 import * as Tabs from '@radix-ui/react-tabs';
 import * as ToggleGroup from '@radix-ui/react-toggle-group';
 import { setPiyoPreset, setPiyoSeed } from '../theme.js';
-import '../press.js';
+import { piyoPressStyle } from '../press.js';
 import { dragSelect } from '../drag-select.js';
 
 // クラス名をつなぐ(空は飛ばす)
@@ -28,14 +28,14 @@ export function useControllable(value, defaultValue, onChange) {
 export const ThemeContext = createContext(null);
 
 // テーマ(中の部品にスタイルと色を渡す)。preset はプリセットの名前、seed はシード色、reduceMotion で動きを減らす
-export function PiyoTheme({ style = 'glass', preset, seed, reduceMotion, className, children, ...props }) {
+export function PiyoTheme({ style = 'glass', preset, seed, reduceMotion, pressMotion, className, children, ...props }) {
   const [element, setElement] = useState(null);
   useLayoutEffect(() => {
     if (element && seed) setPiyoSeed(seed, { element });
     else if (element) setPiyoPreset(preset ?? 'ocean', { element });
   }, [element, seed, preset]);
   return (
-    <div ref={setElement} data-piyoron-style={style} data-piyoron-reduce-motion={reduceMotion ? 'true' : undefined} className={className} {...props}>
+    <div ref={setElement} data-piyoron-style={style} data-piyoron-reduce-motion={reduceMotion ? 'true' : undefined} className={className} style={pressMotion && piyoPressStyle(pressMotion)} {...props}>
       <ThemeContext.Provider value={element}>{children}</ThemeContext.Provider>
     </div>
   );
@@ -149,6 +149,12 @@ export function PiyoTabPanel({ value, children, ...props }) {
       {children}
     </Tabs.Content>
   );
+}
+
+// 押したときの動きを付けた任意の要素
+export function PiyoPressable({ as: Tag = 'button', motion, className, style, ...props }) {
+  const extra = Tag === 'button' ? { type: 'button' } : {};
+  return <Tag {...extra} className={cx('piyo-pressable', className)} style={{ ...piyoPressStyle(motion), ...style }} {...props} />;
 }
 
 // カード。onClick を渡すと押せるカード(ボタン)になる

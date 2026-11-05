@@ -58,9 +58,11 @@ import piyoron.components.PiyoMultiChipGroup
 import piyoron.components.PiyoTabs
 import piyoron.core.LocalPiyoTextStyle
 import piyoron.core.Piyo
+import piyoron.core.PiyoPressMotion
 import piyoron.core.PiyoText
 import piyoron.core.PiyoTheme
 import piyoron.core.PiyoTone
+import piyoron.core.piyoClickable
 import piyoron.core.systemReduceMotion
 import piyoron.tokens.PiyoPreset
 
@@ -253,6 +255,34 @@ private fun CatalogContent(
                 Caption("押すと縮む。押した回数: $opened")
             }
         }
+
+        Section("押したときの動き") {
+            var tapped by rememberSaveable { mutableIntStateOf(0) }
+            Caption("任意の要素に Modifier.piyoClickable を付けると、ボタンと同じ動きになる。押した回数: $tapped")
+            Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                PressTile("既定", PiyoPressMotion.Default) { tapped++ }
+                PressTile("大きめ・ゆっくり", BigSlowPress) { tapped++ }
+            }
+        }
+    }
+}
+
+// 大きく、ゆっくり動く押したときの動き
+private val BigSlowPress = PiyoPressMotion(hoverGrow = 6.dp, activeShrink = 5.dp, touchShrink = 8.dp, hoverDuration = 320, activeDuration = 160)
+
+// 押したときの動きを付けた四角
+@Composable
+private fun PressTile(label: String, motion: PiyoPressMotion, onClick: () -> Unit) {
+    val c = Piyo.colors
+    Box(
+        modifier = Modifier
+            .size(104.dp)
+            .piyoClickable(onClick = onClick, motion = motion)
+            .clip(RoundedCornerShape(16.dp))
+            .background(Brush.linearGradient(listOf(c.primary, c.primaryStrong))),
+        contentAlignment = Alignment.Center,
+    ) {
+        PiyoText(label, color = Color.White, style = LocalPiyoTextStyle.current.copy(fontSize = 12.sp, fontWeight = FontWeight.Bold))
     }
 }
 

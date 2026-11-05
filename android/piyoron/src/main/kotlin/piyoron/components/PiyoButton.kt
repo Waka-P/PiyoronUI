@@ -29,7 +29,7 @@ import piyoron.core.SurfaceRole
 import piyoron.core.disabledAlpha
 import piyoron.core.focusRing
 import piyoron.core.piyoSurface
-import piyoron.core.pressMotion
+import piyoron.core.piyoPress
 import piyoron.core.rememberPiyoState
 import piyoron.core.touchTarget
 import piyoron.effects.genie.reportGenieAnchor
@@ -124,7 +124,7 @@ private fun ButtonFrame(
             .touchTarget()
             .reportGenieAnchor(shape)
             .disabledAlpha(enabled)
-            .pressMotion(source, state)
+            .piyoPress(source, enabled)
             .focusRing(state.focused, shape)
             .piyoSurface(shape, SurfaceRole.Button, state, tone),
         contentAlignment = Alignment.Center,

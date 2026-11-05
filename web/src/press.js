@@ -22,12 +22,34 @@ export function startPiyoPress(root = document) {
   started.add(root);
   root.addEventListener('pointerover', measure, true);
   root.addEventListener('pointerdown', measure, true);
+  root.addEventListener('touchstart', noop, { passive: true });
   // 止める
   return () => {
     started.delete(root);
     root.removeEventListener('pointerover', measure, true);
     root.removeEventListener('pointerdown', measure, true);
+    root.removeEventListener('touchstart', noop);
   };
+}
+
+// 何もしない(iOS の Safari で :active を効かせるため)
+function noop() {}
+
+// 押したときの動きの量(px)と速さ(ミリ秒)を CSS 変数の組にする
+export function piyoPressStyle({ hoverGrow, activeShrink, touchShrink, hoverDuration, activeDuration } = {}) {
+  const vars = {};
+  if (hoverGrow !== undefined) vars['--piyo-press-hover-grow'] = `${hoverGrow}px`;
+  if (activeShrink !== undefined) vars['--piyo-press-active-shrink'] = `${activeShrink}px`;
+  if (touchShrink !== undefined) vars['--piyo-press-touch-shrink'] = `${touchShrink}px`;
+  if (hoverDuration !== undefined) vars['--piyo-press-hover-duration'] = `${hoverDuration}ms`;
+  if (activeDuration !== undefined) vars['--piyo-press-active-duration'] = `${activeDuration}ms`;
+  return vars;
+}
+
+// 要素に押したときの動きを付ける
+export function setPiyoPress(element, motion = {}, { addClass = true } = {}) {
+  if (addClass) element.classList.add('piyo-pressable');
+  Object.entries(piyoPressStyle(motion)).forEach(([name, value]) => element.style.setProperty(name, value));
 }
 
 if (typeof document !== 'undefined') startPiyoPress();

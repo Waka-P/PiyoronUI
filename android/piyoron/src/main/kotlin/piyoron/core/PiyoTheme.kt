@@ -43,6 +43,9 @@ object Piyo {
 
     val reduceMotion: Boolean
         @Composable @ReadOnlyComposable get() = LocalPiyoReduceMotion.current
+
+    val pressMotion: PiyoPressMotion
+        @Composable @ReadOnlyComposable get() = LocalPiyoPressMotion.current
 }
 
 // シード色からテーマを作る。reduceMotion の既定は端末の「アニメーションを削除」
@@ -52,10 +55,11 @@ fun PiyoTheme(
     style: PiyoStyle = PiyoStyle.Glass,
     shapes: PiyoShapes = PiyoShapes(),
     reduceMotion: Boolean = systemReduceMotion(),
+    pressMotion: PiyoPressMotion = PiyoPressMotion.Default,
     content: @Composable () -> Unit,
 ) {
     val colors = remember(seed) { piyoColorRoles(seed) }
-    PiyoTheme(colors = colors, style = style, shapes = shapes, reduceMotion = reduceMotion, content = content)
+    PiyoTheme(colors = colors, style = style, shapes = shapes, reduceMotion = reduceMotion, pressMotion = pressMotion, content = content)
 }
 
 // プリセットからテーマを作る
@@ -65,10 +69,11 @@ fun PiyoTheme(
     style: PiyoStyle = PiyoStyle.Glass,
     shapes: PiyoShapes = PiyoShapes(),
     reduceMotion: Boolean = systemReduceMotion(),
+    pressMotion: PiyoPressMotion = PiyoPressMotion.Default,
     content: @Composable () -> Unit,
 ) {
     val colors = remember(preset) { preset.roles() }
-    PiyoTheme(colors = colors, style = style, shapes = shapes, reduceMotion = reduceMotion, content = content)
+    PiyoTheme(colors = colors, style = style, shapes = shapes, reduceMotion = reduceMotion, pressMotion = pressMotion, content = content)
 }
 
 // 作った色の組からテーマを作る
@@ -78,10 +83,12 @@ fun PiyoTheme(
     style: PiyoStyle = PiyoStyle.Glass,
     shapes: PiyoShapes = PiyoShapes(),
     reduceMotion: Boolean = systemReduceMotion(),
+    pressMotion: PiyoPressMotion = PiyoPressMotion.Default,
     content: @Composable () -> Unit,
 ) {
     CompositionLocalProvider(
         LocalPiyoReduceMotion provides reduceMotion,
+        LocalPiyoPressMotion provides pressMotion,
         LocalPiyoColors provides colors,
         LocalPiyoShapes provides shapes,
         LocalPiyoStyle provides style,

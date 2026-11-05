@@ -20,7 +20,7 @@ import piyoron.core.SurfaceRole
 import piyoron.core.disabledAlpha
 import piyoron.core.focusRing
 import piyoron.core.piyoSurface
-import piyoron.core.pressMotion
+import piyoron.core.piyoPress
 import piyoron.core.rememberPiyoState
 import piyoron.effects.genie.reportGenieAnchor
 import piyoron.tokens.PiyoTokens
@@ -58,7 +58,7 @@ fun PiyoCard(
         modifier
             .clickable(interactionSource = source, indication = null, enabled = enabled, role = Role.Button, onClick = onClick)
             .disabledAlpha(enabled)
-            .pressMotion(source, state)
+            .piyoPress(source, enabled)
             .focusRing(state.focused, shape),
         shape,
         state,

@@ -81,3 +81,16 @@ main { max-width: 560px; margin: 0 auto; padding: 16px 20px; display: flex; flex
 
 /* ジニーのカードの中身 */
 .genie-body { display: flex; flex-direction: column; gap: 8px; box-sizing: border-box; height: 100%; padding: 16px; }
+
+/* 押したときの動きの見本の四角 */
+.press-tile {
+  display: grid;
+  place-items: center;
+  width: 104px;
+  height: 104px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, var(--piyo-color-primary), var(--piyo-color-primary-strong));
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+}

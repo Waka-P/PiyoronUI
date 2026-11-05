@@ -63,6 +63,36 @@ PiyoMenuGroup(side = PiyoMenuSide.Bottom, alignment = PiyoMenuAlignment.EndEdge)
 }
 ```
 
+### 押したときの動き
+
+ボタンと同じ「乗せると大きく、押すと縮む」動きを、どの要素にも付けられる。文字やアイコンも位置がずれずに中心から拡大・縮小する。
+
+```kotlin
+// 押せるようにして動きを付ける(波紋は出さない)。見た目の modifier より前に付ける
+Box(Modifier.size(96.dp).piyoClickable(onClick = {}).clip(shape).background(brush))
+
+// clickable などを自分で付けるときは、同じ interactionSource を渡す
+Modifier.clickable(source, indication = null) { }.piyoPress(source)
+
+// 量(dp)と速さ(ミリ秒)を変える。省いた値は既定(ボタンと同じ)
+Modifier.piyoClickable(onClick = {}, motion = PiyoPressMotion(hoverGrow = 4.dp, touchShrink = 6.dp, activeDuration = 120))
+
+// アプリ全体(Piyoron の部品も含む)の既定を変える
+PiyoTheme(seed = seed, pressMotion = PiyoPressMotion(touchShrink = 3.dp)) { ... }
+```
+
+| 値 | 意味 | 既定 |
+|---|---|---|
+| `hoverGrow` | マウスを乗せたときに大きくなる量 | 1.5dp |
+| `activeShrink` | マウスで押したときに、乗せたときの大きさから縮む量 | 1.1dp |
+| `touchShrink` | 指で押したときに、元の大きさから縮む量 | 1.5dp |
+| `hoverDuration` | 乗せたとき、離して戻るときの長さ | 180ms |
+| `activeDuration` | 押したときの長さ | 70ms |
+
+- 量は倍率ではなく、縁が動く量。部品の大きさによらず同じだけ動く(大きいカードでも動きすぎない)
+- 動かさないときは `PiyoPressMotion.None`。端末の「アニメーションを削除」では動かない
+- 背景や枠の modifier より前に付ける(後ろに付けると、背景や枠が拡大・縮小しない)
+
 ### エフェクト
 
 ```kotlin
@@ -90,6 +120,7 @@ GenieVisibility(visible, anchor) { /* カードの中身 */ }
 ```
 
 - CSS だけの部品: `.piyo-btn`、`.piyo-chip`、`.piyo-tabs`、`.piyo-card`
+- 押したときの動き: 任意の要素に `.piyo-pressable`。量と速さは `--piyo-press-*` で変える(JS は `setPiyoPress(el, { touchShrink: 6 })`、React は `<PiyoPressable motion={...}>`)
 - JS の部品: メニュー、ひょうたん、ひょうたんとパネル、ジニー(`import { PiyoMenu } from 'piyoron'`)
 - React 版: `import { PiyoButton, PiyoMenu } from 'piyoron/react'`
 

@@ -4,7 +4,7 @@ import { StrictMode, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { createRoot } from 'react-dom/client';
 import {
   PiyoButton, PiyoCard, PiyoChip, PiyoChipGroup, PiyoChipItem, PiyoGenie, PiyoGourdPanel, PiyoGourdTabs, PiyoMenu, PiyoMenuDivider,
-  PiyoMenuGroup, PiyoMenuItem, PiyoTabs, PiyoTheme, piyoPresets, seedFromHue, usePiyoMenu,
+  PiyoMenuGroup, PiyoMenuItem, PiyoPressable, PiyoTabs, PiyoTheme, piyoPresets, seedFromHue, usePiyoMenu,
 } from '../src/react/index.js';
 import { ICONS, barFraction, cssColor, drawBackdrop, drawBiasSlider, drawHueBar } from './draw.js';
 
@@ -277,6 +277,25 @@ function CardSection() {
   );
 }
 
+// 大きく、ゆっくり動く押したときの動き
+const BIG_SLOW_PRESS = { hoverGrow: 6, activeShrink: 5, touchShrink: 8, hoverDuration: 320, activeDuration: 160 };
+
+// 押したときの動きのまとまり
+function PressSection() {
+  const [tapped, setTapped] = useState(0);
+  // 押した回数を足す
+  const count = () => setTapped((n) => n + 1);
+  return (
+    <Section title="押したときの動き">
+      <Caption>任意の要素に PiyoPressable を使うと、ボタンと同じ動きになる。押した回数: {tapped}</Caption>
+      <div className="row" style={{ gap: 16 }}>
+        <PiyoPressable as="div" role="button" tabIndex={0} className="press-tile" onClick={count}>既定</PiyoPressable>
+        <PiyoPressable as="div" role="button" tabIndex={0} className="press-tile" motion={BIG_SLOW_PRESS} onClick={count}>大きめ・ゆっくり</PiyoPressable>
+      </div>
+    </Section>
+  );
+}
+
 // ---------- エフェクトのページ ----------
 
 // ひょうたんのタブ
@@ -445,6 +464,7 @@ function App() {
               <TabsSection />
               <MenuSection colorKey={colorKey} />
               <CardSection />
+              <PressSection />
             </>
           ) : (
             <>

@@ -4,7 +4,7 @@ import { piyoPresets, setPiyoPreset, setPiyoSeed, seedFromHue } from '../src/the
 import { PiyoMenu, PiyoMenuGroup, PiyoMenuAlignment } from '../src/menu.js';
 import { GourdRailPanel, GourdTabRail } from '../src/gourd.js';
 import { PiyoGenie } from '../src/genie.js';
-import '../src/press.js';
+import { setPiyoPress } from '../src/press.js';
 import { PiyoTabs } from '../src/tabs.js';
 import { ICONS, barFraction, cssColor, drawBackdrop, drawBiasSlider, drawHueBar } from './draw.js';
 
@@ -419,6 +419,30 @@ function cardSection() {
     }, h('span', { className: 'bold' }, '押せるカード'), shown));
 }
 
+// 大きく、ゆっくり動く押したときの動き
+const BIG_SLOW_PRESS = { hoverGrow: 6, activeShrink: 5, touchShrink: 8, hoverDuration: 320, activeDuration: 160 };
+
+// 押したときの動きを付けた四角
+function pressTile(label, motion, onclick) {
+  const tile = h('div', { className: 'press-tile', role: 'button', tabindex: '0', onclick }, label);
+  setPiyoPress(tile, motion);
+  return tile;
+}
+
+// 押したときの動きのまとまり
+function pressSection() {
+  let tapped = 0;
+  const shown = caption('任意の要素に .piyo-pressable を付けると、ボタンと同じ動きになる。押した回数: 0');
+  // 押した回数を出す
+  const count = () => {
+    tapped += 1;
+    shown.textContent = `任意の要素に .piyo-pressable を付けると、ボタンと同じ動きになる。押した回数: ${tapped}`;
+  };
+  return section('押したときの動き',
+    shown,
+    h('div', { className: 'row', style: 'gap: 16px' }, pressTile('既定', {}, count), pressTile('大きめ・ゆっくり', BIG_SLOW_PRESS, count)));
+}
+
 // ---------- エフェクトのページ ----------
 
 // ひょうたんのタブ
@@ -576,7 +600,7 @@ function renderPage() {
   cleanups.forEach((c) => c());
   cleanups = [];
   const sections = state.page === 0
-    ? [buttonSection(), chipSection(), tabsSection(), menuSection(), cardSection()]
+    ? [buttonSection(), chipSection(), tabsSection(), menuSection(), cardSection(), pressSection()]
     : [railPanelSection(), railSection(), genieSection()];
   pageBox.replaceChildren(...sections);
 }
