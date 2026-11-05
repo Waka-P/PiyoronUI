@@ -115,19 +115,33 @@ data class GourdShape(val count: Int, val orientation: Orientation = Orientation
         )
 }
 
-// ひょうたんの大きさ(縦なら幅 x 長さ、横なら長さ x 幅)
-private fun railSize(n: Int, orientation: Orientation): DpSize =
-    if (orientation == Orientation.Vertical) DpSize(RailWidth, railHeight(n)) else DpSize(railHeight(n), RailWidth)
+// ひょうたんの寸法。ボタンの大きさに合わせて、ほかの寸法も同じ割合で変える
+@Immutable
+private data class GourdMetrics(val button: Dp = PiyoTokens.Gourd.ButtonSize) {
+    private val k = button / PiyoTokens.Gourd.ButtonSize
+    val gap = PiyoTokens.Gourd.Gap * k
+    val padding = PiyoTokens.Gourd.Padding * k
+    val icon = PiyoTokens.Gourd.IconSize * k
+    val fitInset = PiyoTokens.Gourd.FitInset * k
+    val anticipation = PiyoTokens.Gourd.Anticipation * k
+    val overshoot = PiyoTokens.Gourd.Overshoot * k
 
-// ひょうたんの幅
-private val RailWidth: Dp get() = PiyoTokens.Gourd.ButtonSize + PiyoTokens.Gourd.Padding * 2
+    // ひょうたんの幅
+    val railWidth: Dp get() = button + padding * 2
 
-// ひょうたんの高さ
-private fun railHeight(n: Int): Dp =
-    PiyoTokens.Gourd.ButtonSize * n + PiyoTokens.Gourd.Gap * (n - 1).coerceAtLeast(0) + PiyoTokens.Gourd.Padding * 2
+    // ひょうたんの高さ
+    fun railHeight(n: Int): Dp = button * n + gap * (n - 1).coerceAtLeast(0) + padding * 2
 
-// i 番目のボタンの上端
-private fun buttonTop(i: Float): Dp = PiyoTokens.Gourd.Padding + (PiyoTokens.Gourd.ButtonSize + PiyoTokens.Gourd.Gap) * i
+    // i 番目のボタンの上端
+    fun buttonTop(i: Float): Dp = padding + (button + gap) * i
+
+    // ひょうたんの大きさ(縦なら幅 x 長さ、横なら長さ x 幅)
+    fun railSize(n: Int, orientation: Orientation): DpSize =
+        if (orientation == Orientation.Vertical) DpSize(railWidth, railHeight(n)) else DpSize(railHeight(n), railWidth)
+}
+
+// 既定の寸法(パネル付きのひょうたんで使う)
+private val DefaultMetrics = GourdMetrics()
 
 // 印の形(レール上の上端、長さ、幅、くびれに合わせる強さ 0〜1。単位は px)
 private data class Blob(val top: Float, val length: Float, val width: Float, val fit: Float)
@@ -165,18 +179,18 @@ private fun smoothKeyframes(t: Float, offsets: FloatArray, values: FloatArray): 
 }
 
 // 時間 t(0〜1、直線)での印の形。bouncy なら、始めに縮んでため、終わりに通り過ぎて弾む
-private fun Density.blobAt(motion: IndicatorMotion, t: Float, bouncy: Boolean): Blob {
-    val s = PiyoTokens.Gourd.ButtonSize.toPx()
-    val step = (PiyoTokens.Gourd.ButtonSize + PiyoTokens.Gourd.Gap).toPx()
-    val from = buttonTop(motion.from).toPx()
-    val to = buttonTop(motion.to.toFloat()).toPx()
+private fun Density.blobAt(m: GourdMetrics, motion: IndicatorMotion, t: Float, bouncy: Boolean): Blob {
+    val s = m.button.toPx()
+    val step = (m.button + m.gap).toPx()
+    val from = m.buttonTop(motion.from).toPx()
+    val to = m.buttonTop(motion.to.toFloat()).toPx()
     if (!motion.moving || from == to) return Blob(to, s, s, 0f)
     val dist = abs(to - from)
     val front: Float
     var back: Float
     if (bouncy) {
-        val a = PiyoTokens.Gourd.Anticipation.toPx()
-        val o = PiyoTokens.Gourd.Overshoot.toPx()
+        val a = m.anticipation.toPx()
+        val o = m.overshoot.toPx()
         // 遠くへ移るときも伸び縮みは隣へ移るときと同じにし、残りの距離は前の端と同じ割合で進める
         val near = min(dist, step)
         val extra = (dist - near) * smoothKeyframes(t, BounceFrontOffsets, floatArrayOf(0f, 0f, 1f, 1f, 1f))
@@ -254,19 +268,19 @@ private class BlobShape(
 
 // 選んだ項目の印(動いている間は、形を毎コマ作り直す。内側の影も形に合わせるため)
 @Composable
-private fun RailIndicator(motion: IndicatorMotion, count: Int, horizontal: Boolean, bouncy: Boolean, indicator: @Composable (Shape) -> Unit) {
+private fun RailIndicator(m: GourdMetrics, motion: IndicatorMotion, count: Int, horizontal: Boolean, bouncy: Boolean, indicator: @Composable (Shape) -> Unit) {
     val density = LocalDensity.current
-    val profile = remember(count, density) { with(density) { GourdProfile(RailWidth.toPx(), railHeight(count).toPx(), count) } }
-    val blob = with(density) { blobAt(motion, motion.progress.value, bouncy) }
+    val profile = remember(m, count, density) { with(density) { GourdProfile(m.railWidth.toPx(), m.railHeight(count).toPx(), count) } }
+    val blob = with(density) { blobAt(m, motion, motion.progress.value, bouncy) }
     // 止まっているときも同じ描き方にする(動き始めと終わりで内側の影の描き方が変わらないように)
     val shape = remember(blob, profile, horizontal, density) {
-        with(density) { BlobShape(blob, profile, PiyoTokens.Gourd.FitInset.toPx(), PiyoTokens.Gourd.FitInset.toPx() * 1.5f, horizontal) }
+        with(density) { BlobShape(blob, profile, m.fitInset.toPx(), m.fitInset.toPx() * 1.5f, horizontal) }
     }
     Box(
         Modifier.layout { measurable, _ ->
             val w = blob.width.roundToInt()
             val len = blob.length.roundToInt()
-            val cross = ((RailWidth.toPx() - w) / 2).roundToInt()
+            val cross = ((m.railWidth.toPx() - w) / 2).roundToInt()
             val main = blob.top.roundToInt()
             val placeable = measurable.measure(if (horizontal) Constraints.fixed(len, w) else Constraints.fixed(w, len))
             layout(0, 0) { if (horizontal) placeable.place(main, cross) else placeable.place(cross, main) }
@@ -286,6 +300,7 @@ private fun RailContent(
     indicator: @Composable (Shape) -> Unit,
     modifier: Modifier = Modifier,
     iconColors: GourdIconColors? = null,
+    m: GourdMetrics = DefaultMetrics,
 ) {
     val duration = if (bouncy) PiyoTokens.Gourd.BounceDuration else PiyoTokens.Gourd.SwitchDuration
     val density = LocalDensity.current
@@ -293,24 +308,25 @@ private fun RailContent(
     val drag = rememberDragSelectState()
     val shown = drag.preview as? Int ?: selectedIndex
     // 動いている途中で選び直したら、今描いている印の中心から動き直す(伸びた印が飛ばないように)
-    val motion = rememberIndicatorMotion(shown, duration, PiyoTokens.Gourd.SwitchEasing) { m ->
+    val motion = rememberIndicatorMotion(shown, duration, PiyoTokens.Gourd.SwitchEasing) { mo ->
         with(density) {
-            val blob = blobAt(m, m.progress.value, bouncy)
-            val step = (PiyoTokens.Gourd.ButtonSize + PiyoTokens.Gourd.Gap).toPx()
-            (blob.top + blob.length / 2 - PiyoTokens.Gourd.Padding.toPx() - PiyoTokens.Gourd.ButtonSize.toPx() / 2) / step
+            val blob = blobAt(m, mo, mo.progress.value, bouncy)
+            val step = (m.button + m.gap).toPx()
+            (blob.top + blob.length / 2 - m.padding.toPx() - m.button.toPx() / 2) / step
         }
     }
     val arrivedIndex by remember(motion) {
         derivedStateOf { if (!motion.moving || motion.progress.value >= PiyoTokens.Gourd.ArriveAt) motion.to else -1 }
     }
     val horizontal = orientation == Orientation.Horizontal
-    Box(modifier.size(railSize(tabs.size, orientation)).selectableGroup().dragSelect(drag)) {
-        RailIndicator(motion, tabs.size, horizontal, bouncy, indicator)
+    Box(modifier.size(m.railSize(tabs.size, orientation)).selectableGroup().dragSelect(drag)) {
+        RailIndicator(m, motion, tabs.size, horizontal, bouncy, indicator)
         tabs.forEachIndexed { i, tab ->
             RailButton(
                 tab, i, horizontal, i == arrivedIndex, i == selectedIndex, { onTap(i) }, clickLabel(i),
                 Modifier.dragSelectItem(drag, i) { if (i != selectedIndex) onTap(i) },
                 iconColors,
+                m,
             )
         }
     }
@@ -328,6 +344,7 @@ private fun RailButton(
     clickLabel: String?,
     modifier: Modifier = Modifier,
     iconColors: GourdIconColors? = null,
+    m: GourdMetrics = DefaultMetrics,
 ) {
     val source = remember { MutableInteractionSource() }
     val state = rememberPiyoState(source, selected = arrived)
@@ -345,12 +362,12 @@ private fun RailButton(
         modifier = Modifier
             .then(
                 if (horizontal) {
-                    Modifier.offset(buttonTop(index.toFloat()), PiyoTokens.Gourd.Padding)
+                    Modifier.offset(m.buttonTop(index.toFloat()), m.padding)
                 } else {
-                    Modifier.offset(PiyoTokens.Gourd.Padding, buttonTop(index.toFloat()))
+                    Modifier.offset(m.padding, m.buttonTop(index.toFloat()))
                 },
             )
-            .size(PiyoTokens.Gourd.ButtonSize)
+            .size(m.button)
             .then(modifier)
             .focusRing(state.focused, shape)
             .clickable(source, null, onClickLabel = clickLabel, role = Role.Tab, onClick = onClick)
@@ -361,12 +378,12 @@ private fun RailButton(
         contentAlignment = Alignment.Center,
     ) {
         CompositionLocalProvider(LocalPiyoContentColor provides color) {
-            PiyoIcon(tab.icon, contentDescription = null, size = PiyoTokens.Gourd.IconSize)
+            PiyoIcon(tab.icon, contentDescription = null, size = m.icon)
         }
     }
 }
 
-// ひょうたん型のタブ(縦か横に並ぶ丸ボタンを、くびれのある形で包む)。bouncy で弾み、track、indicator、iconColors で見た目を差し替える
+// ひょうたん型のタブ(縦か横に並ぶ丸ボタンを、くびれのある形で包む)。bouncy で弾み、buttonSize で大きさ、track、indicator、iconColors で見た目を変える
 @Composable
 fun GourdTabRail(
     tabs: List<GourdTab>,
@@ -378,10 +395,12 @@ fun GourdTabRail(
     track: @Composable (Shape) -> Modifier = { GourdTabRailDefaults.Track(it) },
     indicator: @Composable (Shape) -> Unit = { GourdTabRailDefaults.Indicator(it) },
     iconColors: GourdIconColors? = null,
+    buttonSize: Dp = PiyoTokens.Gourd.ButtonSize,
 ) {
     val shape = GourdShape(tabs.size, orientation)
-    Box(modifier.size(railSize(tabs.size, orientation)).reportGenieAnchor(shape).then(track(shape))) {
-        RailContent(tabs, selectedIndex, onSelect, { null }, orientation, bouncy, indicator, iconColors = iconColors)
+    val m = remember(buttonSize) { GourdMetrics(buttonSize) }
+    Box(modifier.size(m.railSize(tabs.size, orientation)).reportGenieAnchor(shape).then(track(shape))) {
+        RailContent(tabs, selectedIndex, onSelect, { null }, orientation, bouncy, indicator, iconColors = iconColors, m = m)
     }
 }
 
@@ -477,13 +496,14 @@ private class RailPanelLayout(val rail: Rect, val panel: Rect, val target: Offse
 
 // 選んだ番号と寄せ方から配置を求める
 private fun Density.railPanelLayout(map: SideMap, count: Int, selected: Int, panelSize: Dp?, align: GourdAlignment): RailPanelLayout {
+    val m = DefaultMetrics
     val pl = PiyoTokens.Gourd.PanelLeft.toPx()
     val pw = panelSize?.toPx() ?: (map.size.width - pl)
-    val len = railHeight(count).toPx()
+    val len = m.railHeight(count).toPx()
     val top = max(0f, map.size.height - len) * (align.bias.coerceIn(-1f, 1f) + 1) / 2
-    val rail = map.map(Rect(0f, top, RailWidth.toPx(), top + len))
+    val rail = map.map(Rect(0f, top, m.railWidth.toPx(), top + len))
     val panel = map.map(Rect(pl, 0f, pl + pw, map.size.height))
-    val center = map.map(Offset(RailWidth.toPx() / 2, top + (buttonTop(selected.toFloat()) + PiyoTokens.Gourd.ButtonSize / 2).toPx()))
+    val center = map.map(Offset(m.railWidth.toPx() / 2, top + (m.buttonTop(selected.toFloat()) + m.button / 2).toPx()))
     return RailPanelLayout(rail, panel, center - panel.topLeft, top, pw)
 }
 
@@ -514,8 +534,9 @@ private class JoinShape(
     private fun build(size: Size, density: Density, k: JoinKey, selected: Int): Outline = with(density) {
         val map = SideMap(side, size)
         val layout = railPanelLayout(map, count, selected, panelSize, align)
-        val w = RailWidth.toPx()
-        val h = railHeight(count).toPx()
+        val m = DefaultMetrics
+        val w = m.railWidth.toPx()
+        val h = m.railHeight(count).toPx()
         val r = PiyoTokens.Radius.Lg.toPx()
         val pl = PiyoTokens.Gourd.PanelLeft.toPx()
         val f = PiyoTokens.Gourd.Fillet.toPx()
@@ -526,7 +547,7 @@ private class JoinShape(
         val (rBottom, fBottom) = cornerFit(ch - top - h, r, f)
         val seam = k.seam
         val frame = k.panel?.let { p ->
-            val target = Offset(cx - pl, top + (buttonTop(selected.toFloat()) + PiyoTokens.Gourd.ButtonSize / 2).toPx())
+            val target = Offset(cx - pl, top + (m.buttonTop(selected.toFloat()) + m.button / 2).toPx())
             GenieFrame(p, Size(layout.panelWidth, ch), target, PiyoTokens.Genie.Neck.toPx(), r, rTop, rBottom)
         }
         // 継ぎ目の上端と下端は、パネルの行き先側の辺に合わせる(縮んでいくパネルから継ぎ目がはみ出さないように)

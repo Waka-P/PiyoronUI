@@ -106,6 +106,9 @@ GourdTabRail(tabs, index, { index = it },
     indicator = { shape -> Box(Modifier.fillMaxSize().background(thumbColor, shape)) },
     iconColors = GourdIconColors(selected = onThumb, unselected = muted))
 
+// 大きさを変える(余白、アイコン、印の動きも同じ割合で変わる。既定は 48dp)
+GourdTabRail(tabs, index, { index = it }, buttonSize = 60.dp)
+
 // ひょうたんとパネル。表示中のタブをもう一度押すとジニー効果で開閉する
 GourdRailPanel(tabs, index, { index = it }, panelOpen = open, onPanelOpenChange = { open = it },
     side = GourdSide.Left, railAlignment = GourdAlignment.Center) { /* パネルの中身 */ }
