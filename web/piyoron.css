@@ -366,6 +366,103 @@
   }
 }
 
+/* ---------- Plain(既定。役割の色で塗るだけ) ---------- */
+
+/* 平らな面の変数(枠と線状の影はなし)。JS が描く面もこの変数を使う */
+:where([data-piyoron-style="plain"]) :where(.piyo-btn, .piyo-chip, .piyo-tabs, .piyo-tabs-thumb, .piyo-card, .piyo-menu, .piyo-gourd, .piyo-gourd-indicator, .piyo-gourd-panel-surface, .piyo-genie-surface) {
+  --piyo-s-fill: transparent;
+  --piyo-s-shadow: none;
+  --piyo-s-edge: transparent;
+  --piyo-s-edge-opacity: 0;
+  --piyo-s-ring-color: transparent;
+  --piyo-s-ring-width: 0px;
+  --piyo-s-ring-blur: 0px;
+  --piyo-s-ring-x: 0px;
+  --piyo-s-ring-y: 0px;
+}
+
+/* CSS で描く面 */
+:where([data-piyoron-style="plain"]) :where(.piyo-btn, .piyo-chip, .piyo-tabs, .piyo-tabs-thumb, .piyo-card) {
+  background: var(--piyo-s-fill);
+}
+
+/* ボタン */
+:where([data-piyoron-style="plain"]) :where(.piyo-btn) {
+  --piyo-s-fill: var(--piyo-color-fill-selected-bottom);
+}
+
+/* 主な操作 */
+:where([data-piyoron-style="plain"]) :where(.piyo-btn.piyo-primary) {
+  --piyo-s-fill: var(--piyo-color-primary);
+}
+
+/* 取り消せない操作 */
+:where([data-piyoron-style="plain"]) :where(.piyo-btn.piyo-danger) {
+  --piyo-s-fill: var(--piyo-color-danger);
+}
+
+/* マウスを乗せた主な操作と取り消せない操作 */
+@media (hover: hover) {
+  :where([data-piyoron-style="plain"]) :where(.piyo-btn.piyo-primary):hover:not(:disabled, [aria-disabled="true"]) {
+    --piyo-s-fill: var(--piyo-color-primary-strong);
+  }
+
+  /* 取り消せない操作 */
+  :where([data-piyoron-style="plain"]) :where(.piyo-btn.piyo-danger):hover:not(:disabled, [aria-disabled="true"]) {
+    --piyo-s-fill: var(--piyo-color-danger-strong);
+  }
+
+  /* 選ぶボタン */
+  :where([data-piyoron-style="plain"]) :where(.piyo-chip):not([aria-pressed="true"], [aria-checked="true"], [data-selected="true"], :disabled):hover {
+    color: var(--piyo-color-primary);
+  }
+}
+
+/* 選ぶボタン */
+:where([data-piyoron-style="plain"]) :where(.piyo-chip) {
+  --piyo-s-fill: var(--piyo-color-background);
+}
+
+/* 選んだ選ぶボタン */
+:where([data-piyoron-style="plain"]) :where(.piyo-chip:is([aria-pressed="true"], [aria-checked="true"], [data-selected="true"])) {
+  --piyo-s-fill: var(--piyo-color-fill-selected-bottom);
+}
+
+/* タブの土台、カード、ひょうたん、パネル */
+:where([data-piyoron-style="plain"]) :where(.piyo-tabs, .piyo-card, .piyo-gourd, .piyo-gourd-panel-surface, .piyo-genie-surface) {
+  --piyo-s-fill: var(--piyo-color-background);
+}
+
+/* タブのつまみ、ひょうたんの印 */
+:where([data-piyoron-style="plain"]) :where(.piyo-tabs-thumb, .piyo-gourd-indicator) {
+  --piyo-s-fill: var(--piyo-color-surface);
+}
+
+/* メニューの面(浮くので、細い枠で背景と分ける) */
+:where([data-piyoron-style="plain"]) :where(.piyo-menu) {
+  --piyo-s-fill: var(--piyo-menu-color, var(--piyo-color-surface));
+  --piyo-s-edge: var(--piyo-color-ring-shadow);
+  --piyo-s-edge-opacity: 1;
+  --piyo-s-edge-width: var(--piyo-plain-edge-width);
+}
+
+/* マウスを乗せた・フォーカスした・長押しで動かして指の下にある項目 */
+:where([data-piyoron-style="plain"]) :where(.piyo-menu-item):is(:hover, :focus-visible, [data-piyo-preview]):not(:disabled, [aria-disabled="true"]) {
+  background: var(--piyo-color-fill-selected-bottom);
+  color: var(--piyo-color-primary-strong);
+}
+
+/* 削除の項目 */
+:where([data-piyoron-style="plain"]) :where(.piyo-menu-item.piyo-danger):is(:hover, :focus-visible, [data-piyo-preview]):not(:disabled, [aria-disabled="true"]) {
+  background: var(--piyo-color-fill-selected-bottom);
+  color: var(--piyo-color-danger);
+}
+
+/* 区切り線 */
+:where([data-piyoron-style="plain"]) :where(.piyo-menu-divider) {
+  background: var(--piyo-color-background);
+}
+
 /* ---------- Glass ---------- */
 
 /* ガラスの面のレシピ(塗り + 枠 + 線状の影)。部品は --piyo-s-* を変えるだけ */

@@ -138,7 +138,7 @@ export class PaintedSurface {
     useMask(this.edge, `${this.id}-edge`);
     useMask(this.ring, `${this.id}-ring`);
     // 線の太さは最初に読んでおく(毎コマ読むとスタイルの計算が走る)
-    this.edgeWidth = px(style, '--piyo-glass-edge-width', 1);
+    this.edgeWidth = px(style, '--piyo-s-edge-width', px(style, '--piyo-glass-edge-width', 1));
     this.ringWidth = px(style, '--piyo-s-ring-width', 1);
     host.prepend(this.root);
   }

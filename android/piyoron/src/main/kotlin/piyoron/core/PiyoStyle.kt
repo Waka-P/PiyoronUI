@@ -1,5 +1,7 @@
 package piyoron.core
 
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
@@ -7,6 +9,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import piyoron.style.glass.GlassStyle
+import piyoron.style.plain.PlainStyle
+import piyoron.tokens.PiyoTokens
 
 // 面の種類。スタイルはこれを見て描き分ける
 enum class SurfaceRole { Button, Chip, TabTrack, TabThumb, Card, Field, Menu, MenuItem, Divider }
@@ -37,6 +41,10 @@ interface PiyoStyle {
     fun contentColor(role: SurfaceRole, state: PiyoState, tone: PiyoTone): Color
 
     companion object {
+        // 飾りのない平らな面(既定)
+        val Plain: PiyoStyle = PlainStyle
+
+        // ガラス風の面
         val Glass: PiyoStyle = GlassStyle
     }
 }
@@ -50,3 +58,31 @@ fun Modifier.piyoSurface(
     tone: PiyoTone = PiyoTone.Default,
     fill: Color? = null,
 ): Modifier = with(Piyo.style) { this@piyoSurface.surface(shape, role, state, tone, fill) }
+
+// 面の上の文字・アイコンの色(スタイルに共通の決め方)
+@Composable
+internal fun baseContentColor(role: SurfaceRole, state: PiyoState, tone: PiyoTone): Color {
+    val roles = Piyo.colors
+    val target = when (role) {
+        SurfaceRole.Button, SurfaceRole.Field -> if (tone == PiyoTone.Default) roles.contentSelected else roles.contentOnPrimary
+        SurfaceRole.Chip -> when {
+            state.selected -> roles.contentSelected
+            state.hovered -> roles.primary
+            else -> roles.contentMuted
+        }
+        SurfaceRole.TabTrack, SurfaceRole.TabThumb -> if (state.selected) roles.contentSelected else roles.contentMuted
+        SurfaceRole.Card, SurfaceRole.Menu, SurfaceRole.Divider -> roles.contentDefault
+        SurfaceRole.MenuItem -> when {
+            tone == PiyoTone.Danger -> roles.danger
+            state.hovered || state.focused || state.pressed -> roles.primaryStrong
+            else -> roles.contentDefault
+        }
+    }
+    val duration = when {
+        Piyo.reduceMotion -> 0
+        role == SurfaceRole.MenuItem -> PiyoTokens.Menu.ItemDuration
+        role == SurfaceRole.TabTrack || role == SurfaceRole.TabThumb -> PiyoTokens.Duration.Segmented
+        else -> PiyoTokens.Duration.Toggle
+    }
+    return animateColorAsState(target, tween(duration), label = "content").value
+}

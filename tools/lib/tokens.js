@@ -26,7 +26,7 @@ export function loadTokens() {
     semantic: readJson('tokens', 'core', 'semantic.json'),
     presets: readJson('tokens', 'core', 'presets.json'),
     effects: readDir('tokens', 'effects'),
-    styles: { glass: readDir('tokens', 'styles', 'glass') },
+    styles: { glass: readDir('tokens', 'styles', 'glass'), plain: readDir('tokens', 'styles', 'plain') },
   };
 }
 

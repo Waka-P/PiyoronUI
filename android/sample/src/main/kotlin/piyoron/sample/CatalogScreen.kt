@@ -59,6 +59,7 @@ import piyoron.components.PiyoTabs
 import piyoron.core.LocalPiyoTextStyle
 import piyoron.core.Piyo
 import piyoron.core.PiyoPressMotion
+import piyoron.core.PiyoStyle
 import piyoron.core.PiyoText
 import piyoron.core.PiyoTheme
 import piyoron.core.PiyoTone
@@ -68,19 +69,25 @@ import piyoron.tokens.PiyoPreset
 
 private const val CUSTOM = "カスタム"
 
+// スタイルの名前
+private const val PLAIN = "普通"
+private const val GLASS = "ガラス"
+
 // 色を選べる、全部品のカタログ
 @Composable
 fun CatalogScreen() {
     var palette by rememberSaveable { mutableStateOf(PiyoPreset.Ocean.name) }
     var hue by rememberSaveable { mutableFloatStateOf(265f) }
     var reduce by rememberSaveable { mutableStateOf(false) }
+    var styleName by rememberSaveable { mutableStateOf(GLASS) }
+    val style = if (styleName == GLASS) PiyoStyle.Glass else PiyoStyle.Plain
     val reduceMotion = reduce || systemReduceMotion()
     val content: @Composable () -> Unit = {
-        CatalogContent(palette, { palette = it }, hue, { hue = it }, reduce, { reduce = it })
+        CatalogContent(palette, { palette = it }, hue, { hue = it }, reduce, { reduce = it }, styleName, { styleName = it })
     }
     val preset = PiyoPreset.entries.firstOrNull { it.name == palette }
-    if (preset != null) PiyoTheme(preset = preset, reduceMotion = reduceMotion, content = content)
-    else PiyoTheme(seed = seedFromHue(hue), reduceMotion = reduceMotion, content = content)
+    if (preset != null) PiyoTheme(preset = preset, style = style, reduceMotion = reduceMotion, content = content)
+    else PiyoTheme(seed = seedFromHue(hue), style = style, reduceMotion = reduceMotion, content = content)
 }
 
 // 色相からシード色を作る
@@ -95,6 +102,8 @@ private fun CatalogContent(
     onHue: (Float) -> Unit,
     reduce: Boolean,
     onReduce: (Boolean) -> Unit,
+    styleName: String,
+    onStyle: (String) -> Unit,
 ) {
     var page by rememberSaveable { mutableIntStateOf(0) }
     Column(
@@ -107,6 +116,10 @@ private fun CatalogContent(
         verticalArrangement = Arrangement.spacedBy(14.dp),
     ) {
         PiyoText("Piyoron カタログ", style = LocalPiyoTextStyle.current.copy(fontSize = 20.sp, fontWeight = FontWeight.Bold))
+
+        Section("スタイル") {
+            PiyoChipGroup(listOf(PLAIN, GLASS), styleName, onStyle)
+        }
 
         Section("色") {
             PiyoChipGroup(PiyoPreset.entries.map { it.name } + CUSTOM, palette, onPalette)

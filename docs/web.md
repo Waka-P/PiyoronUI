@@ -16,7 +16,7 @@ CSS だけで使える部品(ボタン、選ぶボタン、タブ、カード)�
 ## 使い方(CSS)
 
 ```html
-<html data-piyoron-style="glass">
+<html data-piyoron-style="plain">
 <link rel="stylesheet" href="piyoron/tokens.css">
 <link rel="stylesheet" href="piyoron/piyoron.css">
 
@@ -38,7 +38,7 @@ CSS だけで使える部品(ボタン、選ぶボタン、タブ、カード)�
 | `.piyo-card` | カード。押せるなら `button.piyo-card.piyo-pressable` | |
 | `.piyo-pressable` | 任意の要素に押したときの動きを付ける(押せるカードは `button.piyo-card.piyo-pressable`) | `:disabled` / `aria-disabled` |
 
-- スタイルは `data-piyoron-style`、プリセットの色は `data-piyoron-palette`(`ocean` など)で切り替える。どの要素に付けてもよく、中の部品に効く
+- スタイルは `data-piyoron-style`(`plain` が普通、`glass` がガラス風。React の `PiyoTheme` は省くと `plain`)、プリセットの色は `data-piyoron-palette`(`ocean` など)で切り替える。どの要素に付けてもよく、中の部品に効く
 - セレクタは `:where()` で包んである(詳細度 0)。使う側のクラス1つで上書きできる
 - 端末の「動きを減らす」設定か、`data-piyoron-reduce-motion="true"` を付けた要素の中では、動きを止める
 - ボタン、円のボタン、選ぶボタンは、Android 版と同じく押せる範囲を 48px 取る(見た目の外側に余白を付ける)。並べたときの間隔も Android 版と同じになる

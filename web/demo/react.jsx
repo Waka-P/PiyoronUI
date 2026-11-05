@@ -442,11 +442,14 @@ function App() {
   const [palette, setPalette] = useState('Ocean');
   const [hue, setHue] = useState(265);
   const [reduce, setReduce] = useState(false);
+  const [styleName, setStyleName] = useState(new URLSearchParams(location.search).get('style') === 'plain' ? '普通' : 'ガラス');
   const [page, setPage] = useState(new URLSearchParams(location.search).get('page') === '1' ? 'エフェクト' : '部品');
   const custom = palette === CUSTOM;
   const colorKey = custom ? `hue-${hue}` : palette;
   return (
     <PiyoTheme
+      key={styleName}
+      style={styleName === '普通' ? 'plain' : 'glass'}
       className="theme-page"
       preset={custom ? undefined : palette.toLowerCase()}
       seed={custom ? seedFromHue(hue) : undefined}
@@ -454,6 +457,9 @@ function App() {
     >
       <main>
         <h1 className="title">Piyoron カタログ</h1>
+        <Section title="スタイル">
+          <Chips items={['普通', 'ガラス']} value={styleName} onChange={(v) => v && setStyleName(v)} />
+        </Section>
         <ColorSection palette={palette} setPalette={setPalette} hue={hue} setHue={setHue} reduce={reduce} setReduce={setReduce} colorKey={colorKey} />
         <PiyoTabs items={['部品', 'エフェクト']} value={page} onValueChange={setPage} />
         <div className="page">

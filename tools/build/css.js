@@ -135,6 +135,7 @@ export function buildCss(t) {
     block('共通', ':root', coreDecls),
     block(`色: ${first[0]}(既定)`, `:root, [data-${attr}-palette="${first[0]}"]`, paletteDecls(t.semantic, first[1], prefix)),
     ...rest.map(([name, p]) => block(`色: ${name}`, `[data-${attr}-palette="${name}"]`, paletteDecls(t.semantic, p, prefix))),
+    block('Plain', ':root', flatten(t.styles.plain).map(([p, tok]) => [varName(prefix, p), valueToCss(tok, prefix)])),
     block('Glass', `:root, [data-${attr}-style="glass"], [data-${attr}-palette]`, glassDecls(t.styles.glass, t.semantic, prefix, t.primitives.radius)),
     ...Object.entries(t.presets).filter(([, p]) => p.toneUsesEdge).map(([name]) =>
       block(`${name}: 色付きの枠も枠の色の並びにする`, `[data-${attr}-palette="${name}"]`, [

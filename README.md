@@ -1,6 +1,6 @@
 # Piyoron UI
 
-お気に入りのUIを元にした、自分用のデザインシステムとUIライブラリ。最初のスタイルは「ガラス風(Glass)」。Jetpack Compose 版と Web 版(CSS、JS、React)がある。
+お気に入りのUIを元にした、自分用のデザインシステムとUIライブラリ。スタイルは「普通(Plain)」(既定)と「ガラス風(Glass)」。Jetpack Compose 版と Web 版(CSS、JS、React)がある。
 
 名前は仮(`piyoron.config.json`、`android/gradle.properties`、このファイルに集約)。
 
@@ -38,7 +38,8 @@ Compose のバージョンはライブラリが BOM ごと持ってくるので�
 ### テーマ
 
 ```kotlin
-PiyoTheme(seed = Color(0xFF2293C7)) { ... }   // シード色から(style を省くと Glass)
+PiyoTheme(seed = Color(0xFF2293C7)) { ... }   // シード色から(style を省くと Plain。飾りのない平らな面)
+PiyoTheme(seed = seed, style = PiyoStyle.Glass) { ... }   // ガラス風にする
 PiyoTheme(preset = PiyoPreset.Mint) { ... }    // プリセット: Ocean, Mint, Rose, Violet, Amber, Gold, Bubble
 Piyo.colors.primary                            // 色の取り出し
 ```
@@ -99,6 +100,12 @@ PiyoTheme(seed = seed, pressMotion = PiyoPressMotion(touchShrink = 3.dp)) { ... 
 // ひょうたん型のタブ(縦・横)
 GourdTabRail(tabs, index, { index = it }, orientation = Orientation.Horizontal)
 
+// 外枠、印、アイコンの色を差し替える(ガラスにしないとき)
+GourdTabRail(tabs, index, { index = it },
+    track = { shape -> Modifier.background(trackColor, shape) },
+    indicator = { shape -> Box(Modifier.fillMaxSize().background(thumbColor, shape)) },
+    iconColors = GourdIconColors(selected = onThumb, unselected = muted))
+
 // ひょうたんとパネル。表示中のタブをもう一度押すとジニー効果で開閉する
 GourdRailPanel(tabs, index, { index = it }, panelOpen = open, onPanelOpenChange = { open = it },
     side = GourdSide.Left, railAlignment = GourdAlignment.Center) { /* パネルの中身 */ }
@@ -112,7 +119,7 @@ GenieVisibility(visible, anchor) { /* カードの中身 */ }
 ## 使い方(Web)
 
 ```html
-<html data-piyoron-style="glass">
+<html data-piyoron-style="plain">   <!-- ガラス風は "glass" -->
 <link rel="stylesheet" href="piyoron/tokens.css">
 <link rel="stylesheet" href="piyoron/piyoron.css">
 
@@ -136,7 +143,7 @@ GenieVisibility(visible, anchor) { /* カードの中身 */ }
 | `web/piyoron.css` | 部品の CSS |
 | `web/src` | JS(色、メニュー、ひょうたん)と React 版(`web/src/react`) |
 | `web/demo` | Web のカタログ(素の HTML と React。Android のサンプルと同じ構成) |
-| `android/piyoron` | Compose ライブラリ(`core`、`components`、`style.glass`、`effects`、`tokens` のパッケージ) |
+| `android/piyoron` | Compose ライブラリ(`core`、`components`、`style.plain`、`style.glass`、`effects`、`tokens` のパッケージ) |
 | `android/sample` | カタログアプリ(全部品、エフェクト、色の切り替え) |
 | `docs/` | 分解メモ(スタイル、部品、エフェクト) |
 
@@ -144,6 +151,7 @@ GenieVisibility(visible, anchor) { /* カードの中身 */ }
 
 | ファイル | 内容 |
 |---|---|
+| `docs/styles/plain.md` | Plain の分解メモ(役割ごとの色) |
 | `docs/styles/glass.md` | Glass の分解メモ(どの値か、なぜこの見た目か、Android での描き方) |
 | `docs/components/` | 部品ごとのメモ |
 | `docs/effects/README.md` | ジニーとひょうたんの形と動き、重さへの対策 |

@@ -27,8 +27,8 @@ export function useControllable(value, defaultValue, onChange) {
 // テーマの要素(メニューなど、外に出す部品の置き場所)
 export const ThemeContext = createContext(null);
 
-// テーマ(中の部品にスタイルと色を渡す)。preset はプリセットの名前、seed はシード色、reduceMotion で動きを減らす
-export function PiyoTheme({ style = 'glass', preset, seed, reduceMotion, pressMotion, className, children, ...props }) {
+// テーマ(中の部品にスタイルと色を渡す)。style の既定は plain(ガラスは 'glass')。preset はプリセットの名前、seed はシード色、reduceMotion で動きを減らす
+export function PiyoTheme({ style = 'plain', preset, seed, reduceMotion, pressMotion, className, children, ...props }) {
   const [element, setElement] = useState(null);
   useLayoutEffect(() => {
     if (element && seed) setPiyoSeed(seed, { element });

@@ -112,6 +112,7 @@ function isColorish(type) {
 function tokensFile(t, pkg) {
   const core = [...flatten(t.primitives), ...flatten(t.effects)];
   const glass = flatten(t.styles.glass.glass).filter(([, tok]) => !isColorish(tok.$type));
+  const plain = flatten(t.styles.plain.plain);
   return [
     HEADER,
     `package ${pkg}`,
@@ -129,6 +130,11 @@ function tokensFile(t, pkg) {
     '// Glass スタイルの、色によらない値',
     'object GlassTokens {',
     ...objectTree(glass).slice(1),
+    '}',
+    '',
+    '// Plain スタイルの値',
+    'object PlainTokens {',
+    ...objectTree(plain).slice(1),
     '}',
     '',
   ].join('\n');

@@ -1,0 +1,7 @@
+{
+  "plain": {
+    "edge": {
+      "width": { "$type": "dimension", "$description": "メニューの面の枠の太さ(浮く面だけ、背景と分けるために付ける)", "$value": 1 }
+    }
+  }
+}

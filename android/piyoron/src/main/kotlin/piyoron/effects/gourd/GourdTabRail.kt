@@ -1,5 +1,6 @@
 package piyoron.effects.gourd
 
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
@@ -29,6 +30,7 @@ import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.ClipOp
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Matrix
 import androidx.compose.ui.graphics.addOutline
 import androidx.compose.ui.graphics.drawscope.clipPath
@@ -84,8 +86,16 @@ import kotlin.math.sqrt
 @Immutable
 data class GourdTab(val icon: ImageVector, val label: String)
 
+// アイコンの色(選んだ項目 / ほかの項目)。渡さないときは現在のスタイルの色
+@Immutable
+data class GourdIconColors(val selected: Color, val unselected: Color)
+
 // ひょうたん型のタブの既定値
 object GourdTabRailDefaults {
+
+    // ひょうたんの外枠(現在のスタイルの面)
+    @Composable
+    fun Track(shape: Shape): Modifier = Modifier.piyoSurface(shape, SurfaceRole.TabTrack)
 
     // 選んだ項目の印(現在のスタイルの面)。shape は動きに合わせて変わる印の形
     @Composable
@@ -275,6 +285,7 @@ private fun RailContent(
     bouncy: Boolean,
     indicator: @Composable (Shape) -> Unit,
     modifier: Modifier = Modifier,
+    iconColors: GourdIconColors? = null,
 ) {
     val duration = if (bouncy) PiyoTokens.Gourd.BounceDuration else PiyoTokens.Gourd.SwitchDuration
     val density = LocalDensity.current
@@ -299,6 +310,7 @@ private fun RailContent(
             RailButton(
                 tab, i, horizontal, i == arrivedIndex, i == selectedIndex, { onTap(i) }, clickLabel(i),
                 Modifier.dragSelectItem(drag, i) { if (i != selectedIndex) onTap(i) },
+                iconColors,
             )
         }
     }
@@ -315,10 +327,19 @@ private fun RailButton(
     onClick: () -> Unit,
     clickLabel: String?,
     modifier: Modifier = Modifier,
+    iconColors: GourdIconColors? = null,
 ) {
     val source = remember { MutableInteractionSource() }
     val state = rememberPiyoState(source, selected = arrived)
-    val color = Piyo.style.contentColor(SurfaceRole.TabTrack, state, PiyoTone.Default)
+    val color = if (iconColors == null) {
+        Piyo.style.contentColor(SurfaceRole.TabTrack, state, PiyoTone.Default)
+    } else {
+        animateColorAsState(
+            if (arrived) iconColors.selected else iconColors.unselected,
+            tween(if (Piyo.reduceMotion) 0 else PiyoTokens.Duration.Segmented),
+            label = "gourdIcon",
+        ).value
+    }
     val shape = Piyo.shapes.circle
     Box(
         modifier = Modifier
@@ -345,7 +366,7 @@ private fun RailButton(
     }
 }
 
-// ひょうたん型のタブ(縦か横に並ぶ丸ボタンを、くびれのある形で包む)。bouncy で印の動きに弾みを付ける
+// ひょうたん型のタブ(縦か横に並ぶ丸ボタンを、くびれのある形で包む)。bouncy で弾み、track、indicator、iconColors で見た目を差し替える
 @Composable
 fun GourdTabRail(
     tabs: List<GourdTab>,
@@ -354,11 +375,13 @@ fun GourdTabRail(
     modifier: Modifier = Modifier,
     orientation: Orientation = Orientation.Vertical,
     bouncy: Boolean = false,
+    track: @Composable (Shape) -> Modifier = { GourdTabRailDefaults.Track(it) },
     indicator: @Composable (Shape) -> Unit = { GourdTabRailDefaults.Indicator(it) },
+    iconColors: GourdIconColors? = null,
 ) {
     val shape = GourdShape(tabs.size, orientation)
-    Box(modifier.size(railSize(tabs.size, orientation)).reportGenieAnchor(shape).piyoSurface(shape, SurfaceRole.TabTrack)) {
-        RailContent(tabs, selectedIndex, onSelect, { null }, orientation, bouncy, indicator)
+    Box(modifier.size(railSize(tabs.size, orientation)).reportGenieAnchor(shape).then(track(shape))) {
+        RailContent(tabs, selectedIndex, onSelect, { null }, orientation, bouncy, indicator, iconColors = iconColors)
     }
 }
 

@@ -28,7 +28,7 @@ data class PiyoShapes(
 
 internal val LocalPiyoColors = staticCompositionLocalOf { piyoColorRoles(PiyoPreset.Ocean.seed) }
 internal val LocalPiyoShapes = staticCompositionLocalOf { PiyoShapes() }
-internal val LocalPiyoStyle = staticCompositionLocalOf<PiyoStyle> { PiyoStyle.Glass }
+internal val LocalPiyoStyle = staticCompositionLocalOf<PiyoStyle> { PiyoStyle.Plain }
 
 // 現在のテーマの取り出し口
 object Piyo {
@@ -48,11 +48,11 @@ object Piyo {
         @Composable @ReadOnlyComposable get() = LocalPiyoPressMotion.current
 }
 
-// シード色からテーマを作る。reduceMotion の既定は端末の「アニメーションを削除」
+// シード色からテーマを作る。style の既定は Plain(ガラスは PiyoStyle.Glass)。reduceMotion の既定は端末の「アニメーションを削除」
 @Composable
 fun PiyoTheme(
     seed: Color = PiyoPreset.Ocean.seed,
-    style: PiyoStyle = PiyoStyle.Glass,
+    style: PiyoStyle = PiyoStyle.Plain,
     shapes: PiyoShapes = PiyoShapes(),
     reduceMotion: Boolean = systemReduceMotion(),
     pressMotion: PiyoPressMotion = PiyoPressMotion.Default,
@@ -66,7 +66,7 @@ fun PiyoTheme(
 @Composable
 fun PiyoTheme(
     preset: PiyoPreset,
-    style: PiyoStyle = PiyoStyle.Glass,
+    style: PiyoStyle = PiyoStyle.Plain,
     shapes: PiyoShapes = PiyoShapes(),
     reduceMotion: Boolean = systemReduceMotion(),
     pressMotion: PiyoPressMotion = PiyoPressMotion.Default,
@@ -80,7 +80,7 @@ fun PiyoTheme(
 @Composable
 fun PiyoTheme(
     colors: PiyoColorRoles,
-    style: PiyoStyle = PiyoStyle.Glass,
+    style: PiyoStyle = PiyoStyle.Plain,
     shapes: PiyoShapes = PiyoShapes(),
     reduceMotion: Boolean = systemReduceMotion(),
     pressMotion: PiyoPressMotion = PiyoPressMotion.Default,

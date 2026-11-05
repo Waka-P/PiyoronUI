@@ -187,6 +187,18 @@ function swatches() {
   return [row, seed];
 }
 
+// スタイルの名前(表示名と data-piyoron-style の値)
+const STYLES = [['普通', 'plain'], ['ガラス', 'glass']];
+
+// スタイルのまとまり(切り替えると全体を描き直す。JS が描く面も作り直すため)
+function styleSection() {
+  const current = STYLES.find(([, v]) => v === document.documentElement.dataset.piyoronStyle)?.[0] ?? 'ガラス';
+  return section('スタイル', chipGroup(STYLES.map(([n]) => n), current, (name) => {
+    document.documentElement.dataset.piyoronStyle = STYLES.find(([n]) => n === name)[1];
+    render();
+  }));
+}
+
 // 色のまとまり
 function colorSection() {
   const hue = hueBar(state.hue, (v) => {
@@ -609,6 +621,7 @@ function renderPage() {
 function render() {
   document.getElementById('app').replaceChildren(
     h('h1', { className: 'title' }, 'Piyoron カタログ'),
+    styleSection(),
     colorSection(),
     tabs(['部品', 'エフェクト'], state.page, (i) => {
       state.page = i;
@@ -622,10 +635,11 @@ function render() {
 // ページの中身の置き場所
 const pageBox = h('div', { className: 'page' });
 
-// URL でページと色を選べる(確認用。?page=1、?palette=Gold)
+// URL でページ、色、スタイルを選べる(確認用。?page=1、?palette=Gold、?style=plain)
 const query = new URLSearchParams(location.search);
 state.page = Number(query.get('page') ?? 0);
 state.palette = query.get('palette') ?? state.palette;
+if (query.get('style')) document.documentElement.dataset.piyoronStyle = query.get('style');
 applyColors();
 render();
 document.body.dataset.ready = 'true';

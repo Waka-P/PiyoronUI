@@ -215,3 +215,11 @@ object GlassTokens {
         val BackdropSaturate = 1.5f
     }
 }
+
+// Plain スタイルの値
+object PlainTokens {
+    object Edge {
+        // メニューの面の枠の太さ(浮く面だけ、背景と分けるために付ける)
+        val Width = 1.dp
+    }
+}

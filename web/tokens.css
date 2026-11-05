@@ -354,6 +354,11 @@
   --piyo-color-edge-12: #cabdf9;
 }
 
+/* Plain */
+:root {
+  --piyo-plain-edge-width: 1px;
+}
+
 /* Glass */
 :root, [data-piyoron-style="glass"], [data-piyoron-palette] {
   --piyo-glass-edge-width: 1px;
