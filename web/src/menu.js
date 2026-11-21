@@ -1,6 +1,6 @@
 // メニュー(ボタンに少し重ねて出し、重なった所をくり抜く。開いている間にほかのボタンへ移ると滑って切り替わる)
 
-import { GenieFrame, genieAlpha, layoutRect, menuPosition, ovalShape, roundRectShape, shapeToPath } from './geometry.js';
+import { GenieFrame, genieAlpha, layoutRect, menuPosition, openedSide, ovalShape, parseTranslate, roundRectShape, shapeToPath, shiftToward } from './geometry.js';
 import { animate, cssNumber, cssValue, easingFromCss, lerp, reduceMotion } from './motion.js';
 import { PaintedSurface } from './surface.js';
 import { dragSelect } from './drag-select.js';
@@ -44,6 +44,7 @@ function menuTokens(element) {
     genieDuration: cssNumber('--piyo-genie-duration', element),
     genieEasing: easingFromCss(cssValue('--piyo-genie-easing', element)),
     neck: cssNumber('--piyo-genie-neck', element),
+    growDuration: cssNumber('--piyo-press-hover-duration', element),
   };
 }
 
@@ -347,6 +348,7 @@ export class PiyoMenu {
     this.box = this.measure();
     this.lastAnchor = null;
     this.place();
+    this.growAnchor(true);
     this.onOpenChange?.(true);
     if (slide && !reduceMotion(this.element)) {
       this.stops.time?.();
@@ -373,6 +375,7 @@ export class PiyoMenu {
   hide(slide, to) {
     if (!this.shown) return;
     this.anchor.setAttribute('aria-expanded', 'false');
+    this.growAnchor(false);
     this.onOpenChange?.(false);
     // 見えなくする
     const finish = () => {
@@ -400,15 +403,42 @@ export class PiyoMenu {
     }, finish);
   }
 
-  // ボタンの四角(画面から見た位置)
+  // ボタンの四角(画面から見た位置)。開いている間に大きくした分のずれは戻す
   anchorRect() {
-    return layoutRect(this.anchor);
+    const r = layoutRect(this.anchor);
+    const t = parseTranslate(getComputedStyle(this.anchor).translate);
+    return { ...r, left: r.left - t.x, right: r.right - t.x, top: r.top - t.y, bottom: r.bottom - t.y };
+  }
+
+  // 今の大きくした量(px)。CSS がメニューの側へ「量の半分」ずらしているので、そこから求める
+  anchorGrow() {
+    const t = parseTranslate(getComputedStyle(this.anchor).translate);
+    return Math.abs(t.x || t.y) * 2;
+  }
+
+  // 開いている間はボタンをメニューの側へ少し大きくする(CSS が動かす。メニューとくり抜きをずらすため、その間は描き直す)
+  growAnchor(open) {
+    if (open) {
+      this.anchor.style.setProperty('--piyo-w', `${this.anchor.offsetWidth}px`);
+      this.anchor.style.setProperty('--piyo-h', `${this.anchor.offsetHeight}px`);
+      this.anchor.setAttribute('data-piyo-open-side', this.openedSide());
+    } else {
+      this.anchor.removeAttribute('data-piyo-open-side');
+    }
+    if (!reduceMotion(this.element)) this.run('grow', this.k.growDuration + 34, () => {});
+  }
+
+  // 実際に出た側
+  openedSide() {
+    return this.pos && this.box ? openedSide(this.anchorRect(), this.pos, this.box, this.side) : this.side;
   }
 
   // 置き場所を求める
   place() {
     const area = { width: document.documentElement.clientWidth, height: document.documentElement.clientHeight };
-    this.pos = menuPosition(this.anchorRect(), this.box, area, this.k.overlap, this.k.margin, this.side, this.align);
+    // 開いているボタンを大きくした分だけ、メニューもその側へずらす(重なり方を変えない)
+    const shifted = shiftToward(this.anchorRect(), this.openedSide(), this.anchorGrow());
+    this.pos = menuPosition(shifted, this.box, area, this.k.overlap, this.k.margin, this.side, this.align);
   }
 
   // 今の状態で、置き場所、面の形、中身の変形を描く
@@ -421,7 +451,10 @@ export class PiyoMenu {
     if (this.isOpen) this.lastAnchor = { left: a.left, top: a.top };
     const target = [(a.left + a.right) / 2 - this.pos.x, (a.top + a.bottom) / 2 - this.pos.y];
     const g = k.notchGap;
-    const notch = ovalShape(a.left - this.pos.x - g, a.top - this.pos.y - g, a.right - this.pos.x + g, a.bottom - this.pos.y + g);
+    const side = this.openedSide();
+    if (this.isOpen && this.anchor.getAttribute('data-piyo-open-side') !== side) this.anchor.setAttribute('data-piyo-open-side', side);
+    const b = shiftToward(a, side, this.anchorGrow());
+    const notch = ovalShape(b.left - this.pos.x - g, b.top - this.pos.y - g, b.right - this.pos.x + g, b.bottom - this.pos.y + g);
     const t = this.time;
     let alpha = 1;
     let scale = 1;
@@ -483,6 +516,7 @@ export class PiyoMenu {
     Object.values(this.stops).forEach((stop) => stop());
     this.element.hidden = true;
     this.anchor.setAttribute('aria-expanded', 'false');
+    this.anchor.removeAttribute('data-piyo-open-side');
     this.observer.disconnect();
     this.abort.abort();
     this.stopDrag();

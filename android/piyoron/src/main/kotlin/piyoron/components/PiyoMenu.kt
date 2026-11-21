@@ -149,6 +149,34 @@ private fun alongPosition(start: Float, end: Float, length: Float, limit: Float,
     return wanted.coerceIn(margin, maxOf(margin, limit - margin - length))
 }
 
+// 実際に出た側(入らずに反対側へ出たときは、そちらを返す)。anchor と placed、size は同じ座標
+internal fun openedSide(anchor: Rect, placed: Offset, size: Size, side: PiyoMenuSide): PiyoMenuSide = when (side) {
+    PiyoMenuSide.Bottom, PiyoMenuSide.Top ->
+        if (placed.y + size.height / 2 >= anchor.center.y) PiyoMenuSide.Bottom else PiyoMenuSide.Top
+    PiyoMenuSide.Right, PiyoMenuSide.Left ->
+        if (placed.x + size.width / 2 >= anchor.center.x) PiyoMenuSide.Right else PiyoMenuSide.Left
+}
+
+// ボタンの四角を side の側へ amount だけずらす(大きくしたボタンに合わせて、メニューとくり抜きを動かす)
+internal fun shiftToward(anchor: Rect, side: PiyoMenuSide, amount: Float): Rect = when (side) {
+    PiyoMenuSide.Bottom -> anchor.translate(0f, amount)
+    PiyoMenuSide.Top -> anchor.translate(0f, -amount)
+    PiyoMenuSide.Right -> anchor.translate(amount, 0f)
+    PiyoMenuSide.Left -> anchor.translate(-amount, 0f)
+}
+
+// 大きくするときの拡大の中心(ボタンの見た目の、side と反対側の縁の中央)。box は触れる範囲、visual はボタンの見た目の大きさ
+internal fun growOrigin(box: Size, visual: Float, side: PiyoMenuSide): TransformOrigin {
+    val padY = ((box.height - visual) / 2).coerceAtLeast(0f) / box.height.coerceAtLeast(1f)
+    val padX = ((box.width - visual) / 2).coerceAtLeast(0f) / box.width.coerceAtLeast(1f)
+    return when (side) {
+        PiyoMenuSide.Bottom -> TransformOrigin(0.5f, padY)
+        PiyoMenuSide.Top -> TransformOrigin(0.5f, 1f - padY)
+        PiyoMenuSide.Right -> TransformOrigin(padX, 0.5f)
+        PiyoMenuSide.Left -> TransformOrigin(1f - padX, 0.5f)
+    }
+}
+
 // メニューをボタンのどちら側に出すか(入らなければ反対側に出す)
 enum class PiyoMenuSide { Bottom, Top, Right, Left }
 
@@ -254,10 +282,15 @@ internal class MenuEntry {
     var contentPadding by mutableStateOf(PaddingValues(PiyoTokens.Menu.Padding))
     var minWidth by mutableStateOf(PiyoTokens.Menu.MinWidth)
 
-    // 層に出しているか、置いた位置と大きさ(層から見た位置)
+    // 層に出しているか、置いた位置と大きさ(層から見た位置)、実際に出た側
     var shown by mutableStateOf(false)
     var placed by mutableStateOf(Offset.Zero)
     var size by mutableStateOf(Size.Zero)
+    var opened by mutableStateOf<PiyoMenuSide?>(null)
+    val openedSide: PiyoMenuSide get() = opened ?: side
+
+    // ボタンを大きくする進み(0〜1。開いている間は 1)
+    val grow = Animatable(0f)
 
     // 開閉の進み(0〜1)と向き
     val time = Animatable(1f)
@@ -331,8 +364,16 @@ internal class MenuGroup(private val scope: CoroutineScope, private val overlay:
         if (current != null && current != entry) switchTo(entry)
     }
 
+    // ボタンの大きさを、開いているかに合わせて変える
+    private fun growTo(entry: MenuEntry, target: Float) {
+        scope.launch {
+            if (reduceMotion) entry.grow.snapTo(target) else entry.grow.animateTo(target, tween(PiyoTokens.Press.HoverDuration, easing = PiyoTokens.Easing.Standard))
+        }
+    }
+
     // 開く(動きはメニューごとの種類で)
     fun open(entry: MenuEntry) {
+        growTo(entry, 1f)
         current = entry
         entry.slideIn = null
         entry.closing = false
@@ -347,6 +388,7 @@ internal class MenuGroup(private val scope: CoroutineScope, private val overlay:
 
     // 閉じる(動きはメニューごとの種類で)
     fun close(entry: MenuEntry) {
+        growTo(entry, 0f)
         if (current == entry) current = null
         if (!entry.shown) return
         entry.closing = true
@@ -368,6 +410,8 @@ internal class MenuGroup(private val scope: CoroutineScope, private val overlay:
             return
         }
         current = next
+        growTo(prev, 0f)
+        growTo(next, 1f)
         next.closing = false
         next.slideFrom = prev.placed
         next.slideIn = true
@@ -496,6 +540,7 @@ fun PiyoMenu(
     LaunchedEffect(hovered) { if (hovered) group.hover(entry) }
     val size = PiyoButtonDefaults.Height
     val sizePx = with(LocalDensity.current) { size.toPx() }
+    val growPx = with(LocalDensity.current) { PiyoTokens.Menu.OpenGrow.toPx() }
     PiyoIconButton(
         icon = icon,
         contentDescription = contentDescription,
@@ -508,7 +553,16 @@ fun PiyoMenu(
             entry.anchor = visual
             // 開いている間にボタンが動いた(スクロール、画面の大きさの変化)ら閉じる
             if (moved && group.current == entry) group.close(entry)
-        },
+        }
+            // 開いている間は、メニューの側へ少し大きくする(位置を測った後にかけるので、測る位置は変わらない)
+            .graphicsLayer {
+                val g = growPx * entry.grow.value
+                if (g <= 0f) return@graphicsLayer
+                val scale = 1f + g / sizePx
+                scaleX = scale
+                scaleY = scale
+                transformOrigin = growOrigin(this.size, sizePx, entry.openedSide)
+            },
         enabled = enabled,
         size = size,
         interactionSource = source,
@@ -541,7 +595,11 @@ private fun MenuPanel(entry: MenuEntry, group: MenuGroup, overlay: PiyoOverlay) 
     val target = { overlay.toLocal(entry.anchor.center) - entry.placed }
     // パネルから見た、くり抜く円(ボタンに余白を足した範囲)
     val notchGap = with(LocalDensity.current) { PiyoTokens.Menu.NotchGap.toPx() }
-    val notch = { Rect(overlay.toLocal(entry.anchor.topLeft) - entry.placed, entry.anchor.size).inflate(notchGap) }
+    val growPx = with(LocalDensity.current) { PiyoTokens.Menu.OpenGrow.toPx() }
+    val notch = {
+        val button = Rect(overlay.toLocal(entry.anchor.topLeft) - entry.placed, entry.anchor.size)
+        shiftToward(button, entry.openedSide, growPx * entry.grow.value).inflate(notchGap)
+    }
     val drag = rememberDragSelectState()
     CompositionLocalProvider(LocalPiyoMenuClose provides close, LocalPiyoMenuDrag provides drag) {
         Box(
@@ -551,9 +609,13 @@ private fun MenuPanel(entry: MenuEntry, group: MenuGroup, overlay: PiyoOverlay) 
                     val size = Size(placeable.width.toFloat(), placeable.height.toFloat())
                     val area = Size(constraints.maxWidth.toFloat(), constraints.maxHeight.toFloat())
                     val anchor = Rect(overlay.toLocal(entry.anchor.topLeft), entry.anchor.size)
-                    val pos = menuPosition(anchor, size, area, PiyoTokens.Menu.Overlap.toPx(), PiyoTokens.Menu.Margin.toPx(), entry.side, entry.alignment)
+                    // 開いているボタンを大きくした分だけ、メニューもその側へずらす(重なり方を変えない)
+                    val shifted = shiftToward(anchor, entry.openedSide, growPx * entry.grow.value)
+                    val pos = menuPosition(shifted, size, area, PiyoTokens.Menu.Overlap.toPx(), PiyoTokens.Menu.Margin.toPx(), entry.side, entry.alignment)
                     if (entry.placed != pos) entry.placed = pos
                     if (entry.size != size) entry.size = size
+                    val opened = openedSide(anchor, pos, size, entry.side)
+                    if (entry.opened != opened) entry.opened = opened
                     layout(0, 0) { placeable.place(pos.x.roundToInt(), pos.y.roundToInt()) }
                 }
                 .graphicsLayer {

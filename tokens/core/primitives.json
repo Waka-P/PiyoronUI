@@ -63,6 +63,7 @@
     "minWidth": {"$type": "dimension", "$value": 140},
     "padding": {"$type": "dimension", "$value": 5},
     "radius": {"$type": "dimension", "$value": 14},
+    "openGrow": {"$type": "dimension", "$description": "メニューを開いているボタンが大きくなる量(メニューの側へ。反対側の端はそろえたまま)", "$value": 4},
     "overlap": {"$type": "dimension", "$description": "メニューをボタンに重ねる幅", "$value": 10},
     "backdropBlur": {"$type": "dimension", "$description": "メニューの後ろの画面をぼかす強さ(Android 12 以上)", "$value": 8},
     "notchGap": {"$type": "dimension", "$description": "重なった所をくり抜くときの、ボタンのまわりの余白", "$value": 4},

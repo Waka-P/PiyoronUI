@@ -2,7 +2,7 @@
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { GourdProfile, menuPosition } from '../src/geometry.js';
+import { GourdProfile, menuPosition, openedSide, parseTranslate, shiftToward } from '../src/geometry.js';
 import { PiyoMenuAlignment as A } from '../src/menu.js';
 
 const area = { width: 400, height: 800 };
@@ -71,4 +71,35 @@ test('gourdProfile', () => {
   assert.ok(Math.abs(p.halfWidth(24) - 24) < 0.5);
   assert.equal(p.halfWidth(0), 0);
   assert.ok(p.halfWidth(52) < 20);
+});
+
+// 下に出せたら下、入らずに上へ出たら上と分かる(Android 版の openedSideFollowsFlip と同じ値)
+test('openedSideFollowsFlip', () => {
+  const low = rect(300, 100, 338, 138);
+  const high = rect(300, 700, 338, 738);
+  assert.equal(openedSide(low, place(low), size, 'bottom'), 'bottom');
+  assert.equal(openedSide(high, place(high), size, 'bottom'), 'top');
+});
+
+// ボタンを大きくした分だけ、メニューの側へずらす(Android 版の shiftsTowardMenu と同じ値)
+test('shiftsTowardMenu', () => {
+  const a = rect(100, 50, 138, 88);
+  const pick = (r) => [r.left, r.top, r.right, r.bottom];
+  assert.deepEqual(pick(shiftToward(a, 'bottom', 4)), [100, 54, 138, 92]);
+  assert.deepEqual(pick(shiftToward(a, 'top', 4)), [100, 46, 138, 84]);
+  assert.deepEqual(pick(shiftToward(a, 'right', 4)), [104, 50, 142, 88]);
+  assert.deepEqual(pick(shiftToward(a, 'left', 4)), [96, 50, 134, 88]);
+});
+
+// ずらしたボタンで置くと、メニューも同じだけ下へ動く(Android 版の menuMovesWithGrownButton と同じ値)
+test('menuMovesWithGrownButton', () => {
+  const shifted = shiftToward(rect(300, 100, 338, 138), 'bottom', 4);
+  assert.deepEqual(place(shifted), { x: 169, y: 132 });
+});
+
+// CSS の translate の値を読む
+test('parseTranslate', () => {
+  assert.deepEqual(parseTranslate('none'), { x: 0, y: 0 });
+  assert.deepEqual(parseTranslate('0px 2px'), { x: 0, y: 2 });
+  assert.deepEqual(parseTranslate('-2px'), { x: -2, y: 0 });
 });

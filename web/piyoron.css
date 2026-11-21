@@ -198,7 +198,8 @@
    部品は描画の層に分けておく(will-change)。動きの途中で文字を描き直さず、描いたものをそのまま拡大するので、文字が跳ねない */
 :where(.piyo-btn, .piyo-chip, .piyo-pressable) {
   --piyo-grow: 0px;
-  scale: calc(1 + var(--piyo-grow) / var(--piyo-w, 1e6px)) calc(1 + var(--piyo-grow) / var(--piyo-h, 1e6px));
+  --piyo-open-grow: 0px;
+  scale: calc(1 + (var(--piyo-grow) + var(--piyo-open-grow)) / var(--piyo-w, 1e6px)) calc(1 + (var(--piyo-grow) + var(--piyo-open-grow)) / var(--piyo-h, 1e6px));
   will-change: scale;
 }
 
@@ -206,7 +207,34 @@
 :where(.piyo-btn, .piyo-chip, .piyo-pressable):not(:disabled, [aria-disabled="true"]) {
   transition:
     background .15s, color .15s, box-shadow .15s,
-    scale var(--piyo-press-hover-duration) cubic-bezier(.3, .7, .4, 1);
+    scale var(--piyo-press-hover-duration) cubic-bezier(.3, .7, .4, 1),
+    translate var(--piyo-press-hover-duration) cubic-bezier(.3, .7, .4, 1);
+}
+
+/* メニューを開いているボタン(メニューの側へ少し大きくし、反対側の端はほかのボタンとそろえる)
+   中心から大きくして、メニューの側へ量の半分ずらす。どちら側かは menu.js が data-piyo-open-side に入れる */
+:where(.piyo-btn, .piyo-chip, .piyo-pressable)[data-piyo-open-side] {
+  --piyo-open-grow: var(--piyo-menu-open-grow);
+}
+
+/* 下に出たとき */
+:where(.piyo-btn, .piyo-chip, .piyo-pressable)[data-piyo-open-side="bottom"] {
+  translate: 0 calc(var(--piyo-open-grow) / 2);
+}
+
+/* 上に出たとき */
+:where(.piyo-btn, .piyo-chip, .piyo-pressable)[data-piyo-open-side="top"] {
+  translate: 0 calc(var(--piyo-open-grow) / -2);
+}
+
+/* 右に出たとき */
+:where(.piyo-btn, .piyo-chip, .piyo-pressable)[data-piyo-open-side="right"] {
+  translate: calc(var(--piyo-open-grow) / 2) 0;
+}
+
+/* 左に出たとき */
+:where(.piyo-btn, .piyo-chip, .piyo-pressable)[data-piyo-open-side="left"] {
+  translate: calc(var(--piyo-open-grow) / -2) 0;
 }
 
 /* 任意の要素に付けたとき */

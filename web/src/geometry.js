@@ -336,3 +336,24 @@ export function menuPosition(anchor, size, area, overlap, margin, side = 'bottom
   const main = Math.min(Math.max(raw, margin), Math.max(margin, limit - margin - length));
   return vertical ? { x: cross, y: main } : { x: main, y: cross };
 }
+
+// ---------- 開いているボタンを大きくする ----------
+
+// 実際に出た側(入らずに反対側へ出たときは、そちらを返す)。anchor と pos、size は同じ座標
+export function openedSide(anchor, pos, size, side = 'bottom') {
+  if (side === 'bottom' || side === 'top') return pos.y + size.height / 2 >= (anchor.top + anchor.bottom) / 2 ? 'bottom' : 'top';
+  return pos.x + size.width / 2 >= (anchor.left + anchor.right) / 2 ? 'right' : 'left';
+}
+
+// ボタンの四角を side の側へ amount だけずらす(大きくしたボタンに合わせて、メニューとくり抜きを動かす)
+export function shiftToward(a, side, amount) {
+  const [dx, dy] = { bottom: [0, amount], top: [0, -amount], right: [amount, 0], left: [-amount, 0] }[side];
+  return { ...a, left: a.left + dx, right: a.right + dx, top: a.top + dy, bottom: a.bottom + dy };
+}
+
+// CSS の translate の値(「x」か「x y」)を px の組にする
+export function parseTranslate(value) {
+  if (!value || value === 'none') return { x: 0, y: 0 };
+  const [x, y] = value.trim().split(/\s+/).map((v) => parseFloat(v) || 0);
+  return { x, y: y ?? 0 };
+}

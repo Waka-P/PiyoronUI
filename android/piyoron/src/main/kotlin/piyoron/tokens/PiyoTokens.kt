@@ -90,6 +90,8 @@ object PiyoTokens {
         val MinWidth = 140.dp
         val Padding = 5.dp
         val Radius = 14.dp
+        // メニューを開いているボタンが大きくなる量(メニューの側へ。反対側の端はそろえたまま)
+        val OpenGrow = 4.dp
         // メニューをボタンに重ねる幅
         val Overlap = 10.dp
         // メニューの後ろの画面をぼかす強さ(Android 12 以上)
