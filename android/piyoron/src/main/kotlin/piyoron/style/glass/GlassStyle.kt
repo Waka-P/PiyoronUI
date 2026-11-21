@@ -54,7 +54,8 @@ internal object GlassStyle : PiyoStyle {
             SurfaceRole.Chip -> chipLook(roles, glass, state)
             SurfaceRole.TabTrack -> trackLook(roles, glass)
             SurfaceRole.TabThumb -> thumbLook(roles, glass)
-            SurfaceRole.Card -> cardLook(roles, glass)
+            SurfaceRole.Card -> cardLook(roles, glass, clickable = false)
+            SurfaceRole.ClickableCard -> cardLook(roles, glass, clickable = true)
             SurfaceRole.Menu -> menuLook(glass)
             SurfaceRole.MenuItem -> menuItemLook(glass, state, tone)
             SurfaceRole.Divider -> GlassLook(fill = solidFill(glass.menuDivider), shadows = emptyList(), ring = null, edge = null)
@@ -238,15 +239,15 @@ private fun menuItemLook(glass: GlassColors, state: PiyoState, tone: PiyoTone): 
     return GlassLook(fill = { shape -> fillShape(shape, SolidColor(color)) }, shadows = emptyList(), ring = null, edge = null)
 }
 
-// カード(斜めのグラデーション、薄い枠)
-private fun cardLook(roles: PiyoColorRoles, glass: GlassColors) = GlassLook(
+// カード(斜めのグラデーション、薄い枠)。押せないカードは枠と線状の影をさらに薄くし、押せるカードと見分けやすくする
+private fun cardLook(roles: PiyoColorRoles, glass: GlassColors, clickable: Boolean) = GlassLook(
     fill = gradientFill(glass.cardFill),
     shadows = emptyList(),
     ring = Ring(
-        roles.ringShadow,
+        if (clickable) roles.ringShadow else roles.ringShadow.copy(alpha = roles.ringShadow.alpha * GlassTokens.Card.StaticRingOpacity),
         GlassTokens.Card.RingWidth,
         GlassTokens.Card.RingBlur,
         DpOffset(GlassTokens.Card.RingOffsetX, GlassTokens.Card.RingOffsetY),
     ),
-    edge = sweepEdge(roles.edgeStops, GlassTokens.Card.EdgeOpacity),
+    edge = sweepEdge(roles.edgeStops, if (clickable) GlassTokens.Card.EdgeOpacity else GlassTokens.Card.StaticEdgeOpacity),
 )

@@ -6,5 +6,6 @@ export { GourdTabRail, GourdRailPanel } from './gourd.js';
 export { PiyoGenie } from './genie.js';
 export { PaintedSurface } from './surface.js';
 export { startPiyoPress, piyoPressStyle, setPiyoPress } from './press.js';
+export { startPiyoCards, cardRadius } from './card.js';
 export { PiyoTabs } from './tabs.js';
 export { dragSelect } from './drag-select.js';

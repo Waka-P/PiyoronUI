@@ -20,7 +20,7 @@ import piyoron.tokens.PiyoColorRoles
 import piyoron.tokens.PiyoTokens
 import piyoron.tokens.PlainTokens
 
-// 飾りのない平らなスタイル(役割の色で塗るだけ。浮くメニューだけ細い枠)
+// 飾りのない平らなスタイル(役割の色で塗るだけ。浮くメニューと押せるカードだけ細い枠)
 internal object PlainStyle : PiyoStyle {
 
     // role ごとに平らな面を描く
@@ -29,7 +29,7 @@ internal object PlainStyle : PiyoStyle {
         val roles = Piyo.colors
         val duration = if (Piyo.reduceMotion) 0 else if (role == SurfaceRole.MenuItem) PiyoTokens.Menu.ItemDuration else PiyoTokens.Duration.Toggle
         val color = animateColorAsState(fill ?: plainFill(roles, role, state, tone), tween(duration), label = "plain").value
-        val edge = if (role == SurfaceRole.Menu) roles.ringShadow else null
+        val edge = if (role == SurfaceRole.Menu || role == SurfaceRole.ClickableCard) roles.ringShadow else null
         return drawBehind {
             val outline = shape.createOutline(size, layoutDirection, this)
             drawOutline(outline, color)
@@ -50,7 +50,7 @@ private fun plainFill(roles: PiyoColorRoles, role: SurfaceRole, state: PiyoState
         PiyoTone.Danger -> if (state.hovered) roles.dangerStrong else roles.danger
     }
     SurfaceRole.Chip -> if (state.selected) roles.fillSelectedBottom else roles.background
-    SurfaceRole.TabTrack, SurfaceRole.Card, SurfaceRole.Divider -> roles.background
+    SurfaceRole.TabTrack, SurfaceRole.Card, SurfaceRole.ClickableCard, SurfaceRole.Divider -> roles.background
     SurfaceRole.TabThumb, SurfaceRole.Menu -> roles.surface
     SurfaceRole.MenuItem -> {
         val active = state.enabled && (state.hovered || state.focused || state.pressed)

@@ -56,7 +56,8 @@
   },
   "card": {
     "paddingX": {"$type": "dimension", "$description": "カードの左右の余白(参照実装の 1.5rem)", "$value": 24},
-    "paddingY": {"$type": "dimension", "$description": "カードの上下の余白(参照実装の 1.3rem)", "$value": 20.8}
+    "paddingY": {"$type": "dimension", "$description": "カードの上下の余白(参照実装の 1.3rem)", "$value": 20.8},
+    "roundness": {"$type": "number", "$description": "カードの丸み度合い(短い辺に対する角の半径の割合。カタログのジニーの「お知らせ」240x150 の角丸 20 が基準)", "$value": 0.1333}
   },
   "menu": {
     "minWidth": {"$type": "dimension", "$value": 140},

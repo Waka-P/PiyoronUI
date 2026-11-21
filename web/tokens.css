@@ -39,6 +39,7 @@
   --piyo-chip-gap: 8px;
   --piyo-card-padding-x: 24px;
   --piyo-card-padding-y: 20.8px;
+  --piyo-card-roundness: 0.1333;
   --piyo-menu-min-width: 140px;
   --piyo-menu-padding: 5px;
   --piyo-menu-radius: 14px;
@@ -410,6 +411,8 @@
   --piyo-glass-tabs-ring-offset-y: 1.5px;
   --piyo-glass-card-fill: linear-gradient(160deg, color-mix(in srgb, var(--piyo-color-surface) 96%, transparent) 0%, color-mix(in srgb, color-mix(in srgb, var(--piyo-color-primary) 5%, var(--piyo-color-surface)) 90%, transparent) 100%);
   --piyo-glass-card-edge-opacity: 0.5;
+  --piyo-glass-card-static-edge-opacity: 0.3;
+  --piyo-glass-card-static-ring-opacity: 0.25;
   --piyo-glass-card-ring-width: 0.5px;
   --piyo-glass-card-ring-blur: 1px;
   --piyo-glass-card-ring-offset-x: 1.5px;

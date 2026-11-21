@@ -12,10 +12,11 @@
 | 選ぶボタン | `background`、選ぶと `fillSelectedBottom` | `contentMuted`、乗せると `primary`、選ぶと `contentSelected` |
 | タブの土台、カード、ひょうたん、パネル | `background` | `contentMuted` / `contentDefault` |
 | タブのつまみ、ひょうたんの印 | `surface` | `contentSelected` |
+| 押せるカード | `background` と、`ringShadow` の細い枠(`plain.edge.width`、1) | `contentDefault` |
 | メニュー | `surface` と、`ringShadow` の細い枠(`plain.edge.width`、1) | `contentDefault` |
 | メニューの項目 | 乗せたときだけ `fillSelectedBottom` | `contentDefault`、乗せると `primaryStrong`、削除は `danger` |
 | 区切り線 | `background` | |
 
-- 枠はメニューだけ。浮く面なので、背景と分けるため
+- 枠はメニューと押せるカードだけ。メニューは浮く面なので背景と分けるため、押せるカードは押せないカードと見分けるため
 - 文字・アイコンの色の決め方は Glass と同じ(Android は `baseContentColor` を共有)
 - 押したときの動き、無効の薄さ、フォーカスの輪郭はスタイルによらず共通(core)

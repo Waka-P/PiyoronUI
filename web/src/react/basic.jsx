@@ -5,6 +5,7 @@ import * as Tabs from '@radix-ui/react-tabs';
 import * as ToggleGroup from '@radix-ui/react-toggle-group';
 import { setPiyoPreset, setPiyoSeed } from '../theme.js';
 import { piyoPressStyle } from '../press.js';
+import '../card.js';
 import { dragSelect } from '../drag-select.js';
 
 // クラス名をつなぐ(空は飛ばす)

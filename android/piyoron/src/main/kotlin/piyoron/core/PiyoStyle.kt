@@ -13,7 +13,7 @@ import piyoron.style.plain.PlainStyle
 import piyoron.tokens.PiyoTokens
 
 // 面の種類。スタイルはこれを見て描き分ける
-enum class SurfaceRole { Button, Chip, TabTrack, TabThumb, Card, Field, Menu, MenuItem, Divider }
+enum class SurfaceRole { Button, Chip, TabTrack, TabThumb, Card, ClickableCard, Field, Menu, MenuItem, Divider }
 
 // 色の調子
 enum class PiyoTone { Default, Primary, Danger }
@@ -71,7 +71,7 @@ internal fun baseContentColor(role: SurfaceRole, state: PiyoState, tone: PiyoTon
             else -> roles.contentMuted
         }
         SurfaceRole.TabTrack, SurfaceRole.TabThumb -> if (state.selected) roles.contentSelected else roles.contentMuted
-        SurfaceRole.Card, SurfaceRole.Menu, SurfaceRole.Divider -> roles.contentDefault
+        SurfaceRole.Card, SurfaceRole.ClickableCard, SurfaceRole.Menu, SurfaceRole.Divider -> roles.contentDefault
         SurfaceRole.MenuItem -> when {
             tone == PiyoTone.Danger -> roles.danger
             state.hovered || state.focused || state.pressed -> roles.primaryStrong

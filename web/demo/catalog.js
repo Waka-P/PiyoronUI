@@ -5,6 +5,7 @@ import { PiyoMenu, PiyoMenuGroup, PiyoMenuAlignment } from '../src/menu.js';
 import { GourdRailPanel, GourdTabRail } from '../src/gourd.js';
 import { PiyoGenie } from '../src/genie.js';
 import { setPiyoPress } from '../src/press.js';
+import '../src/card.js';
 import { PiyoTabs } from '../src/tabs.js';
 import { ICONS, barFraction, cssColor, drawBackdrop, drawBiasSlider, drawHueBar } from './draw.js';
 

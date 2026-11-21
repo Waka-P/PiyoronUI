@@ -41,6 +41,7 @@ Compose のバージョンはライブラリが BOM ごと持ってくるので�
 PiyoTheme(seed = Color(0xFF2293C7)) { ... }   // シード色から(style を省くと Plain。飾りのない平らな面)
 PiyoTheme(seed = seed, style = PiyoStyle.Glass) { ... }   // ガラス風にする
 PiyoTheme(preset = PiyoPreset.Mint) { ... }    // プリセット: Ocean, Mint, Rose, Violet, Amber, Gold, Bubble
+PiyoTheme(seed = seed, shapes = PiyoShapes(cardRoundness = 0.2f)) { ... }   // カードの丸み度合い(短い辺に対する角の半径の割合)
 Piyo.colors.primary                            // 色の取り出し
 ```
 

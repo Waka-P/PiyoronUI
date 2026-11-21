@@ -82,6 +82,8 @@ object PiyoTokens {
         val PaddingX = 24.dp
         // カードの上下の余白(参照実装の 1.3rem)
         val PaddingY = 20.8.dp
+        // カードの丸み度合い(短い辺に対する角の半径の割合。カタログのジニーの「お知らせ」240x150 の角丸 20 が基準)
+        val Roundness = 0.1333f
     }
 
     object Menu {
@@ -207,6 +209,8 @@ object GlassTokens {
 
     object Card {
         val EdgeOpacity = 0.5f
+        val StaticEdgeOpacity = 0.3f
+        val StaticRingOpacity = 0.25f
         val RingWidth = 0.5.dp
         val RingBlur = 1.dp
         val RingOffsetX = 1.5.dp

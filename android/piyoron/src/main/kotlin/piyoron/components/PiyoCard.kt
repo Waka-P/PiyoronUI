@@ -34,11 +34,11 @@ object PiyoCardDefaults {
 @Composable
 fun PiyoCard(
     modifier: Modifier = Modifier,
-    shape: Shape = Piyo.shapes.large,
+    shape: Shape = Piyo.shapes.card,
     contentPadding: PaddingValues = PiyoCardDefaults.ContentPadding,
     content: @Composable ColumnScope.() -> Unit,
 ) {
-    CardFrame(modifier, shape, PiyoState(), contentPadding, content)
+    CardFrame(modifier, shape, PiyoState(), SurfaceRole.Card, contentPadding, content)
 }
 
 // 押せるカード(押下の動きはボタンと同じ)
@@ -47,7 +47,7 @@ fun PiyoCard(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    shape: Shape = Piyo.shapes.large,
+    shape: Shape = Piyo.shapes.card,
     contentPadding: PaddingValues = PiyoCardDefaults.ContentPadding,
     interactionSource: MutableInteractionSource? = null,
     content: @Composable ColumnScope.() -> Unit,
@@ -62,6 +62,7 @@ fun PiyoCard(
             .focusRing(state.focused, shape),
         shape,
         state,
+        SurfaceRole.ClickableCard,
         contentPadding,
         content,
     )
@@ -73,15 +74,16 @@ private fun CardFrame(
     modifier: Modifier,
     shape: Shape,
     state: PiyoState,
+    role: SurfaceRole,
     contentPadding: PaddingValues,
     content: @Composable ColumnScope.() -> Unit,
 ) {
-    val color = Piyo.style.contentColor(SurfaceRole.Card, state, PiyoTone.Default)
+    val color = Piyo.style.contentColor(role, state, PiyoTone.Default)
     CompositionLocalProvider(LocalPiyoContentColor provides color) {
         Column(
             modifier = modifier
                 .reportGenieAnchor(shape)
-                .piyoSurface(shape, SurfaceRole.Card, state)
+                .piyoSurface(shape, role, state)
                 .padding(contentPadding),
             content = content,
         )

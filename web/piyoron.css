@@ -179,12 +179,12 @@
   flex-direction: column;
   box-sizing: border-box;
   padding: round(var(--piyo-card-padding-y), 1px) round(var(--piyo-card-padding-x), 1px);
-  border-radius: var(--piyo-radius-lg);
+  border-radius: var(--piyo-card-radius, var(--piyo-radius-lg));
   color: var(--piyo-color-content-default);
 }
 
 /* 押せるカード */
-:where(button.piyo-card, a.piyo-card, .piyo-card[role="button"]) {
+:where(button.piyo-card, a.piyo-card, .piyo-card[role="button"], .piyo-card.piyo-pressable) {
   border: 0;
   font: inherit;
   text-align: inherit;
@@ -433,6 +433,11 @@
   --piyo-s-fill: var(--piyo-color-background);
 }
 
+/* 押せるカード(細い枠で、押せないカードと見分ける) */
+:where([data-piyoron-style="plain"]) :where(button.piyo-card, a.piyo-card, .piyo-card[role="button"], .piyo-card.piyo-pressable) {
+  box-shadow: inset 0 0 0 var(--piyo-plain-edge-width) var(--piyo-color-ring-shadow);
+}
+
 /* タブのつまみ、ひょうたんの印 */
 :where([data-piyoron-style="plain"]) :where(.piyo-tabs-thumb, .piyo-gourd-indicator) {
   --piyo-s-fill: var(--piyo-color-surface);
@@ -628,16 +633,23 @@
   z-index: 0;
 }
 
-/* カード(斜めのグラデーション、薄い枠) */
+/* カード(斜めのグラデーション、薄い枠)。押せないカードは枠と線状の影をさらに薄くする
+   角の丸みは card.js が大きさから求めて --piyo-card-radius と枠のマスクを入れる。ないときは radius.lg */
 :where([data-piyoron-style="glass"]) :where(.piyo-card) {
-  --piyo-s-edge-mask: var(--piyo-glass-edge-mask-lg);
+  --piyo-s-edge-mask: var(--piyo-card-edge-mask, var(--piyo-glass-edge-mask-lg));
   --piyo-s-fill: var(--piyo-glass-card-fill);
-  --piyo-s-edge-opacity: var(--piyo-glass-card-edge-opacity);
-  --piyo-s-ring-color: var(--piyo-color-ring-shadow);
+  --piyo-s-edge-opacity: var(--piyo-glass-card-static-edge-opacity);
+  --piyo-s-ring-color: color-mix(in srgb, var(--piyo-color-ring-shadow) calc(var(--piyo-glass-card-static-ring-opacity) * 100%), transparent);
   --piyo-s-ring-width: var(--piyo-glass-card-ring-width);
   --piyo-s-ring-blur: var(--piyo-glass-card-ring-blur);
   --piyo-s-ring-x: var(--piyo-glass-card-ring-offset-x);
   --piyo-s-ring-y: var(--piyo-glass-card-ring-offset-y);
+}
+
+/* 押せるカード(枠と線状の影を元の濃さにする) */
+:where([data-piyoron-style="glass"]) :where(button.piyo-card, a.piyo-card, .piyo-card[role="button"], .piyo-card.piyo-pressable) {
+  --piyo-s-edge-opacity: var(--piyo-glass-card-edge-opacity);
+  --piyo-s-ring-color: var(--piyo-color-ring-shadow);
 }
 
 /* メニューの面(塗り、1本の枠、外の影、後ろのぼかし。形とくり抜きは JS が描く) */

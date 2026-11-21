@@ -35,7 +35,7 @@ CSS だけで使える部品(ボタン、選ぶボタン、タブ、カード)�
 | `.piyo-btn` | ボタン。`.piyo-primary`、`.piyo-danger`、`.piyo-icon-btn`(円。大きさは `--piyo-btn-size`、アイコンは `--piyo-btn-icon-size`) | `:disabled` |
 | `.piyo-chip` | 選ぶボタン。並びは `.piyo-chip-group` | `aria-pressed` / `aria-checked` / `data-selected` |
 | `.piyo-tabs` | タブ。つまみは `.piyo-tabs-thumb`、項目は `.piyo-tab` | `--piyo-tabs-n`(数)、`--piyo-tabs-i`(選んだ番号)、`aria-selected` |
-| `.piyo-card` | カード。押せるなら `button.piyo-card.piyo-pressable` | |
+| `.piyo-card` | カード。押せるなら `button.piyo-card.piyo-pressable`。角の丸みは `card.js` が大きさから決める(`--piyo-card-roundness`) | |
 | `.piyo-pressable` | 任意の要素に押したときの動きを付ける(押せるカードは `button.piyo-card.piyo-pressable`) | `:disabled` / `aria-disabled` |
 
 - スタイルは `data-piyoron-style`(`plain` が普通、`glass` がガラス風。React の `PiyoTheme` は省くと `plain`)、プリセットの色は `data-piyoron-palette`(`ocean` など)で切り替える。どの要素に付けてもよく、中の部品に効く
