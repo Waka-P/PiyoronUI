@@ -2,7 +2,7 @@
 
 お気に入りのUIを元にした、自分用のデザインシステムとUIライブラリ。スタイルは「普通(Plain)」(既定)と「ガラス風(Glass)」。Jetpack Compose 版と Web 版(CSS、JS、React)がある。
 
-名前は仮(`piyoron.config.json`、`android/gradle.properties`、このファイルに集約)。
+名前の設定は `piyoron.config.json`、`android/gradle.properties`、このファイルに集約している。
 
 ## 特徴
 
@@ -177,10 +177,13 @@ GenieVisibility(visible, anchor) { /* カードの中身 */ }
 
 Node.js 24、JDK 17 以上(Android Studio 付属の JBR で可)が要る。生成した Kotlin はリポジトリに含めるので、ライブラリのビルドだけなら Node.js は要らない。
 
-## 未定
+## 対応範囲
 
-| 項目 | 今の仮の値 |
+| 項目 | 値 |
 |---|---|
-| 名前 | Piyoron |
-| ライセンス | 未定(決めるまで、他の人が使ったり改変したりする許可はない) |
-| minSdk | 26 |
+| Android | minSdk 26 |
+| Web | ブラウザの CSS 変数、`color-mix`、`scale` / `translate` プロパティが使えること |
+
+## ライセンス
+
+MIT(`LICENSE`)
