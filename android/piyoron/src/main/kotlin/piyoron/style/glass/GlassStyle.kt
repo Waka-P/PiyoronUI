@@ -144,7 +144,7 @@ private fun buttonLook(roles: PiyoColorRoles, glass: GlassColors, state: PiyoSta
             edge = sweepEdge(roles.edgeStops),
         )
         PiyoTone.Primary -> GlassLook(
-            fill = roles.toneFill?.takeIf { it.size >= 2 }?.let { toneGradientFill(it, hover) } ?: solidFill(if (hover) glass.tonePrimaryFillHover else glass.tonePrimaryFill),
+            fill = roles.toneFill?.takeIf { it.size >= 2 }?.let { toneGradientFill(it, roles.toneFillAt, hover) } ?: solidFill(if (hover) glass.tonePrimaryFillHover else glass.tonePrimaryFill),
             shadows = shadows,
             ring = ring,
             edge = sweepEdge(glass.toneEdgePrimary),
@@ -187,8 +187,9 @@ private fun fieldLook(roles: PiyoColorRoles, glass: GlassColors, state: PiyoStat
 }
 
 // 主な操作をグラデーションで塗る(Web と同じ向き。押したときは少し暗く)
-private fun toneGradientFill(colors: List<Color>, hover: Boolean): DrawScope.(Shape) -> Unit = { shape ->
-    fillShape(shape, evenGradient(GlassTokens.Tone.FillAngle, colors).toBrush(size))
+private fun toneGradientFill(colors: List<Color>, at: List<Float>?, hover: Boolean): DrawScope.(Shape) -> Unit = { shape ->
+    val gradient = if (at != null && at.size == colors.size) PiyoGradient(GlassTokens.Tone.FillAngle, at.zip(colors)) else evenGradient(GlassTokens.Tone.FillAngle, colors)
+    fillShape(shape, gradient.toBrush(size))
     if (hover) fillShape(shape, SolidColor(Color.Black.copy(alpha = GlassTokens.Tone.HoverDarken)))
 }
 

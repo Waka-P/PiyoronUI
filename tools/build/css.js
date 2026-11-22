@@ -125,7 +125,7 @@ function edgeMask(r, width) {
 }
 
 // プリセットの toneFill から、主な操作の塗りの変数を作る(Glass はグラデーション、Plain は真ん中の色)
-function toneFillDecls(t, colors, prefix) {
+function toneFillDecls(t, colors, prefix, at = null) {
   const angle = t.styles.glass.glass.tone.fillAngle.$value;
   const darken = t.styles.glass.glass.tone.hoverDarken.$value;
   const middle = colors[Math.floor(colors.length / 2)];
@@ -135,7 +135,8 @@ function toneFillDecls(t, colors, prefix) {
   ];
   if (colors.length < 2) return decls;
   const shade = `linear-gradient(rgb(0 0 0 / ${darken}), rgb(0 0 0 / ${darken}))`;
-  const gradient = `linear-gradient(${angle}deg, ${colors.join(', ')})`;
+  const stops = colors.map((c, i) => (at && at.length === colors.length ? `${c} ${Math.round(at[i] * 1000) / 10}%` : c));
+  const gradient = `linear-gradient(${angle}deg, ${stops.join(', ')})`;
   return [...decls, [`--${prefix}-glass-tone-primary-fill`, gradient], [`--${prefix}-glass-tone-primary-fill-hover`, `${shade}, ${gradient}`]];
 }
 
@@ -158,7 +159,7 @@ export function buildCss(t) {
         [`--${prefix}-glass-tabs-thumb-edge`, `var(--${prefix}-glass-edge)`],
       ])),
     ...Object.entries(t.presets).filter(([, p]) => p.toneFill).map(([name, p]) =>
-      block(`${name}: 主な操作の塗りをグラデーションにする(押したときは少し暗く。Plain は真ん中の色)`, `[data-${attr}-palette="${name}"]`, toneFillDecls(t, p.toneFill, prefix))),
+      block(`${name}: 主な操作の塗りをグラデーションにする(押したときは少し暗く。Plain は真ん中の色)`, `[data-${attr}-palette="${name}"]`, toneFillDecls(t, p.toneFill, prefix, p.toneFillAt))),
   ];
   return parts.join('\n');
 }

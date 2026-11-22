@@ -446,8 +446,8 @@
 
 /* bubble: 主な操作の塗りをグラデーションにする(押したときは少し暗く。Plain は真ん中の色) */
 [data-piyoron-palette="bubble"] {
-  --piyo-plain-tone-primary-fill: #477CA2;
-  --piyo-plain-tone-primary-fill-hover: color-mix(in srgb, black 10%, #477CA2);
-  --piyo-glass-tone-primary-fill: linear-gradient(120deg, #696EC6, #5276BB, #477CA2, #008387);
-  --piyo-glass-tone-primary-fill-hover: linear-gradient(rgb(0 0 0 / 0.1), rgb(0 0 0 / 0.1)), linear-gradient(120deg, #696EC6, #5276BB, #477CA2, #008387);
+  --piyo-plain-tone-primary-fill: #5FB9D6;
+  --piyo-plain-tone-primary-fill-hover: color-mix(in srgb, black 10%, #5FB9D6);
+  --piyo-glass-tone-primary-fill: linear-gradient(120deg, #C797CF 0%, #BF99D6 22%, #5FB9D6 67%, #73BBAE 100%);
+  --piyo-glass-tone-primary-fill-hover: linear-gradient(rgb(0 0 0 / 0.1), rgb(0 0 0 / 0.1)), linear-gradient(120deg, #C797CF 0%, #BF99D6 22%, #5FB9D6 67%, #73BBAE 100%);
 }
