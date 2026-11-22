@@ -1,5 +1,6 @@
 package piyoron.components
 
+import androidx.compose.ui.graphics.takeOrElse
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -44,8 +45,7 @@ object PiyoTextFieldDefaults {
     val PaddingY = 10.dp
 }
 
-// 入力欄(文字列)。面は入力欄の役割(タグより濃い塗りで、少し凹んで見える)。フォーカス中は枠で示す。無効はほかの部品と同じく全体を薄くする
-// leading は左(検索の印など)、trailing は右(単位、消すボタンなど)に置く。singleLine が false なら minHeight まで縦に広がる
+// 入力欄(文字列)
 @Composable
 fun PiyoTextField(
     value: String,
@@ -65,11 +65,11 @@ fun PiyoTextField(
 ) {
     val source = remember { MutableInteractionSource() }
     val state = rememberPiyoState(source, enabled = enabled)
-    val style = textStyle.copy(color = Piyo.colors.contentDefault, textAlign = textAlign)
+    val style = textStyle.copy(color = textStyle.color.takeOrElse { Piyo.colors.contentDefault }, textAlign = textAlign)
     BasicTextField(
         value = value,
         onValueChange = onValueChange,
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier,
         enabled = enabled,
         singleLine = singleLine,
         textStyle = style,
@@ -82,7 +82,7 @@ fun PiyoTextField(
     )
 }
 
-// 入力欄(カーソルや選んだ範囲も扱う TextFieldValue)。見た目は文字列の入力欄と同じ
+// 入力欄(カーソルや選んだ範囲も扱う TextFieldValue)
 @Composable
 fun PiyoTextField(
     value: TextFieldValue,
@@ -102,11 +102,11 @@ fun PiyoTextField(
 ) {
     val source = remember { MutableInteractionSource() }
     val state = rememberPiyoState(source, enabled = enabled)
-    val style = textStyle.copy(color = Piyo.colors.contentDefault, textAlign = textAlign)
+    val style = textStyle.copy(color = textStyle.color.takeOrElse { Piyo.colors.contentDefault }, textAlign = textAlign)
     BasicTextField(
         value = value,
         onValueChange = onValueChange,
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier,
         enabled = enabled,
         singleLine = singleLine,
         textStyle = style,
@@ -144,8 +144,21 @@ private fun FieldFrame(
         CompositionLocalProvider(LocalPiyoContentColor provides Piyo.colors.contentMuted) {
             leading?.invoke()
         }
-        Box(Modifier.weight(1f), contentAlignment = if (style.textAlign == TextAlign.End) Alignment.CenterEnd else Alignment.CenterStart) {
-            if (empty && placeholder.isNotEmpty()) PiyoText(placeholder, color = Piyo.colors.contentMuted.copy(alpha = PlaceholderAlpha), style = style)
+        val align = when (style.textAlign) {
+            TextAlign.End, TextAlign.Right -> Alignment.CenterEnd
+            TextAlign.Center -> Alignment.Center
+            else -> Alignment.CenterStart
+        }
+        Box(Modifier.weight(1f), contentAlignment = align) {
+            if (empty && placeholder.isNotEmpty()) {
+                PiyoText(
+                    placeholder,
+                    Modifier.fillMaxWidth(),
+                    color = Piyo.colors.contentMuted.copy(alpha = PlaceholderAlpha),
+                    style = style,
+                    maxLines = if (singleLine) 1 else Int.MAX_VALUE,
+                )
+            }
             inner()
         }
         CompositionLocalProvider(LocalPiyoContentColor provides Piyo.colors.contentMuted) {

@@ -177,13 +177,13 @@ private fun CatalogContent(
             var query by rememberSaveable { mutableStateOf("") }
             var memo by rememberSaveable { mutableStateOf("") }
             Caption("1行")
-            PiyoTextField(name, { name = it }, placeholder = "名前")
+            PiyoTextField(name, { name = it }, Modifier.fillMaxWidth(), placeholder = "名前")
             Caption("左右に印")
-            PiyoTextField(query, { query = it }, placeholder = "探す", leading = { PiyoText("Q") }, trailing = { PiyoText("円") })
+            PiyoTextField(query, { query = it }, Modifier.fillMaxWidth(), placeholder = "探す", leading = { PiyoText("Q") }, trailing = { PiyoText("円") })
             Caption("複数行")
-            PiyoTextField(memo, { memo = it }, placeholder = "メモ", singleLine = false, minHeight = 96.dp)
+            PiyoTextField(memo, { memo = it }, Modifier.fillMaxWidth(), placeholder = "メモ", singleLine = false, minHeight = 96.dp)
             Caption("無効")
-            PiyoTextField("入力できない", {}, enabled = false)
+            PiyoTextField("入力できない", {}, Modifier.fillMaxWidth(), enabled = false)
         }
 
         Section("タブ") {

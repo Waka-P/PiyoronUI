@@ -9,9 +9,10 @@ const SELECTOR = '.piyo-card';
 export function cardRadius(width, height, roundness, growth = 0.3, base = 150) {
   const r = Math.min(Math.max(Number(roundness) || 0, 0), 0.5);
   const g = Math.min(Math.max(Number(growth), 0), 1);
+  const b = Number(base) > 0 ? Number(base) : 150;
   const side = Math.min(width, height);
   if (side <= 0) return 0;
-  const radius = Math.min(side / 2, r * base * Math.pow(side / base, g));
+  const radius = Math.min(side / 2, r * b * Math.pow(side / b, g));
   return Math.round(radius * 10) / 10;
 }
 
@@ -28,8 +29,9 @@ function apply(el, width, height) {
   const roundness = parseFloat(style.getPropertyValue('--piyo-card-roundness'));
   if (Number.isNaN(roundness)) return;
   const growth = parseFloat(style.getPropertyValue('--piyo-card-roundness-growth'));
-  const base = parseFloat(style.getPropertyValue('--piyo-card-roundness-base'));
-  const r = cardRadius(width, height, roundness, Number.isNaN(growth) ? 0.3 : growth, Number.isNaN(base) ? 150 : base);
+  const baseText = style.getPropertyValue('--piyo-card-roundness-base').trim();
+  const base = baseText.endsWith('px') ? parseFloat(baseText) : NaN;
+  const r = cardRadius(width, height, roundness, Number.isNaN(growth) ? 0.3 : growth, Number.isNaN(base) || base <= 0 ? 150 : base);
   const edge = parseFloat(style.getPropertyValue('--piyo-glass-edge-width')) || 1;
   if (el.style.getPropertyValue('--piyo-card-radius') === `${r}px`) return;
   el.style.setProperty('--piyo-card-radius', `${r}px`);

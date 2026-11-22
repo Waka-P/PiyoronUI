@@ -124,6 +124,21 @@ function edgeMask(r, width) {
   return `url("data:image/svg+xml,${encodeURIComponent(svg)}")`;
 }
 
+// プリセットの toneFill から、主な操作の塗りの変数を作る(Glass はグラデーション、Plain は真ん中の色)
+function toneFillDecls(t, colors, prefix) {
+  const angle = t.styles.glass.glass.tone.fillAngle.$value;
+  const darken = t.styles.glass.glass.tone.hoverDarken.$value;
+  const middle = colors[Math.floor(colors.length / 2)];
+  const decls = [
+    [`--${prefix}-plain-tone-primary-fill`, middle],
+    [`--${prefix}-plain-tone-primary-fill-hover`, `color-mix(in srgb, black ${Math.round(darken * 100)}%, ${middle})`],
+  ];
+  if (colors.length < 2) return decls;
+  const shade = `linear-gradient(rgb(0 0 0 / ${darken}), rgb(0 0 0 / ${darken}))`;
+  const gradient = `linear-gradient(${angle}deg, ${colors.join(', ')})`;
+  return [...decls, [`--${prefix}-glass-tone-primary-fill`, gradient], [`--${prefix}-glass-tone-primary-fill-hover`, `${shade}, ${gradient}`]];
+}
+
 // CSS ファイルの中身を作る
 export function buildCss(t) {
   const prefix = t.config.cssPrefix;
@@ -143,9 +158,7 @@ export function buildCss(t) {
         [`--${prefix}-glass-tabs-thumb-edge`, `var(--${prefix}-glass-edge)`],
       ])),
     ...Object.entries(t.presets).filter(([, p]) => p.toneFill).map(([name, p]) =>
-      block(`${name}: 主な操作の塗りをグラデーションにする(押したときは少し暗く)`, `[data-${attr}-palette="${name}"]`, [
-        [`--${prefix}-glass-tone-primary-fill`, `linear-gradient(120deg, ${p.toneFill.join(', ')})`],
-        [`--${prefix}-glass-tone-primary-fill-hover`, `linear-gradient(rgb(0 0 0 / 0.1), rgb(0 0 0 / 0.1)), linear-gradient(120deg, ${p.toneFill.join(', ')})`],      ])),
+      block(`${name}: 主な操作の塗りをグラデーションにする(押したときは少し暗く。Plain は真ん中の色)`, `[data-${attr}-palette="${name}"]`, toneFillDecls(t, p.toneFill, prefix))),
   ];
   return parts.join('\n');
 }

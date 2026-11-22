@@ -49,10 +49,10 @@ internal object PlainStyle : PiyoStyle {
 
 // role と状態ごとの塗りの色
 private fun plainFill(roles: PiyoColorRoles, role: SurfaceRole, state: PiyoState, tone: PiyoTone): Color = when (role) {
-    SurfaceRole.Field -> mixSrgb(roles.toneEdge?.let { it[it.size / 2].second } ?: roles.primary, roles.surface, if (state.focused) 0.1f else 0.2f)
+    SurfaceRole.Field -> mixSrgb(roles.toneEdge?.takeIf { it.isNotEmpty() }?.let { it[it.size / 2].second } ?: roles.primary, roles.surface, if (state.focused) 0.1f else 0.2f)
     SurfaceRole.Button -> when (tone) {
         PiyoTone.Default -> roles.fillSelectedBottom
-        PiyoTone.Primary -> roles.toneFill?.let { it[it.size / 2] } ?: if (state.hovered) roles.primaryStrong else roles.primary
+        PiyoTone.Primary -> roles.toneFill?.takeIf { it.isNotEmpty() }?.let { plainToneFill(it, state.hovered) } ?: if (state.hovered) roles.primaryStrong else roles.primary
         PiyoTone.Danger -> if (state.hovered) roles.dangerStrong else roles.danger
     }
     SurfaceRole.Chip -> if (state.selected) roles.fillSelectedBottom else roles.background
@@ -62,4 +62,10 @@ private fun plainFill(roles: PiyoColorRoles, role: SurfaceRole, state: PiyoState
         val active = state.enabled && (state.hovered || state.focused || state.pressed)
         if (active) roles.fillSelectedBottom else roles.fillSelectedBottom.copy(alpha = 0f)
     }
+}
+
+// 主な操作の色の並びから、Plain の1色を決める(真ん中の色。マウスを乗せたら少し暗く)
+internal fun plainToneFill(colors: List<Color>, hovered: Boolean): Color {
+    val middle = colors[colors.size / 2]
+    return if (hovered) mixSrgb(Color.Black, middle, PlainTokens.Tone.HoverDarken) else middle
 }

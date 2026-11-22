@@ -421,7 +421,7 @@
 
 /* 主な操作 */
 :where([data-piyoron-style="plain"]) :where(.piyo-btn.piyo-primary) {
-  --piyo-s-fill: var(--piyo-color-primary);
+  --piyo-s-fill: var(--piyo-plain-tone-primary-fill, var(--piyo-color-primary));
 }
 
 /* 取り消せない操作 */
@@ -432,7 +432,7 @@
 /* マウスを乗せた主な操作と取り消せない操作 */
 @media (hover: hover) {
   :where([data-piyoron-style="plain"]) :where(.piyo-btn.piyo-primary):hover:not(:disabled, [aria-disabled="true"]) {
-    --piyo-s-fill: var(--piyo-color-primary-strong);
+    --piyo-s-fill: var(--piyo-plain-tone-primary-fill-hover, var(--piyo-color-primary-strong));
   }
 
   /* 取り消せない操作 */

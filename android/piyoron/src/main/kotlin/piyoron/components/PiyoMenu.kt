@@ -795,8 +795,7 @@ fun PiyoMenuItem(
     }
 }
 
-// 自作の中身を、メニューの項目と同じ決まりで選べるようにする(押すと閉じてから onClick。長押ししたまま動かして、指を離した所でも選べる)
-// key は項目を見分ける値。メニューの外で使ったときは、押すだけの部品になる
+// 自作の中身を、メニューの項目と同じく押しても長押しで動かしても選べるようにする
 @Composable
 fun Modifier.piyoMenuSelectable(key: Any, enabled: Boolean = true, onClick: () -> Unit): Modifier {
     val close = LocalPiyoMenuClose.current

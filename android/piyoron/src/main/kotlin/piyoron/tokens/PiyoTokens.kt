@@ -190,6 +190,13 @@ object GlassTokens {
         val Saturate = 1.4f
     }
 
+    object Tone {
+        // プリセットが toneFill を持つときの、主な操作のグラデーションの向き(CSS の角度)
+        val FillAngle = 120f
+        // toneFill のグラデーションを押したときに重ねる黒の濃さ
+        val HoverDarken = 0.1f
+    }
+
     object Chip {
         val TintRest = 0.03f
         val TintHover = 0.08f
@@ -237,5 +244,10 @@ object PlainTokens {
     object Edge {
         // メニューの面の枠の太さ(浮く面だけ、背景と分けるために付ける)
         val Width = 1.dp
+    }
+
+    object Tone {
+        // プリセットが toneFill を持つとき、主な操作にマウスを乗せたら真ん中の色に混ぜる黒の割合
+        val HoverDarken = 0.1f
     }
 }

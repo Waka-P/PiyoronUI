@@ -361,6 +361,7 @@
 /* Plain */
 :root {
   --piyo-plain-edge-width: 1px;
+  --piyo-plain-tone-hover-darken: 0.1;
 }
 
 /* Glass */
@@ -380,6 +381,8 @@
   --piyo-glass-tone-primary-fill-hover: color-mix(in srgb, var(--piyo-color-primary-strong) 85%, transparent);
   --piyo-glass-tone-danger-fill: color-mix(in srgb, var(--piyo-color-danger) 92%, transparent);
   --piyo-glass-tone-danger-fill-hover: color-mix(in srgb, var(--piyo-color-danger-strong) 94%, transparent);
+  --piyo-glass-tone-fill-angle: 120;
+  --piyo-glass-tone-hover-darken: 0.1;
   --piyo-glass-tone-edge-primary: conic-gradient(from 0deg, color-mix(in srgb, var(--piyo-color-primary) 55%, var(--piyo-color-surface)) 0deg, color-mix(in srgb, var(--piyo-color-primary) 85%, var(--piyo-color-surface)) 90deg, color-mix(in srgb, var(--piyo-color-primary) 100%, var(--piyo-color-surface)) 160deg, color-mix(in srgb, var(--piyo-color-primary) 60%, var(--piyo-color-surface)) 240deg, color-mix(in srgb, var(--piyo-color-primary) 30%, var(--piyo-color-surface)) 312deg, color-mix(in srgb, var(--piyo-color-primary) 55%, var(--piyo-color-surface)) 360deg);
   --piyo-glass-tone-edge-danger: conic-gradient(from 0deg, color-mix(in srgb, var(--piyo-color-danger) 55%, var(--piyo-color-surface)) 0deg, color-mix(in srgb, var(--piyo-color-danger) 85%, var(--piyo-color-surface)) 90deg, color-mix(in srgb, var(--piyo-color-danger) 100%, var(--piyo-color-surface)) 160deg, color-mix(in srgb, var(--piyo-color-danger) 60%, var(--piyo-color-surface)) 240deg, color-mix(in srgb, var(--piyo-color-danger) 30%, var(--piyo-color-surface)) 312deg, color-mix(in srgb, var(--piyo-color-danger) 55%, var(--piyo-color-surface)) 360deg);
   --piyo-glass-menu-fill: color-mix(in srgb, var(--piyo-color-surface) 85%, transparent);
@@ -406,7 +409,6 @@
   --piyo-glass-field-tint: 0.1;
   --piyo-glass-field-tint-focus: 0.05;
   --piyo-glass-field-edge: color-mix(in srgb, var(--piyo-color-primary-strong) 18%, transparent);
-  --piyo-glass-field-edge-focus: color-mix(in srgb, var(--piyo-color-primary) 85%, transparent);
   --piyo-glass-field-edge-focus-width: 1px;
   --piyo-glass-field-shadow: inset 0px 1.5px 3px 0px color-mix(in srgb, var(--piyo-color-primary-strong) 20%, transparent), inset 0px -1px 0.5px 0px color-mix(in srgb, var(--piyo-color-surface) 80%, transparent);
   --piyo-glass-tabs-track-fill: linear-gradient(180deg, color-mix(in srgb, var(--piyo-color-primary) 1%, var(--piyo-color-surface)) 0%, color-mix(in srgb, var(--piyo-color-primary) 3%, var(--piyo-color-surface)) 100%);
@@ -442,8 +444,10 @@
   --piyo-glass-tabs-thumb-edge: var(--piyo-glass-edge);
 }
 
-/* bubble: 主な操作の塗りをグラデーションにする(押したときは少し暗く) */
+/* bubble: 主な操作の塗りをグラデーションにする(押したときは少し暗く。Plain は真ん中の色) */
 [data-piyoron-palette="bubble"] {
+  --piyo-plain-tone-primary-fill: #477CA2;
+  --piyo-plain-tone-primary-fill-hover: color-mix(in srgb, black 10%, #477CA2);
   --piyo-glass-tone-primary-fill: linear-gradient(120deg, #696EC6, #5276BB, #477CA2, #008387);
   --piyo-glass-tone-primary-fill-hover: linear-gradient(rgb(0 0 0 / 0.1), rgb(0 0 0 / 0.1)), linear-gradient(120deg, #696EC6, #5276BB, #477CA2, #008387);
 }

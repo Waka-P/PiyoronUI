@@ -38,3 +38,9 @@ test('edgeMask', () => {
   assert.ok(mask.includes('ry="20"'));
   assert.ok(mask.includes('stroke-width="2"'));
 });
+
+// 基準の長さが 0 以下なら、既定の 150 で求める(角が壊れない)
+test('badBase', () => {
+  assert.equal(cardRadius(400, 250, 0.1333, 0.3, 0), cardRadius(400, 250, 0.1333));
+  assert.equal(cardRadius(400, 250, 0.1333, 0.3, -5), cardRadius(400, 250, 0.1333));
+});

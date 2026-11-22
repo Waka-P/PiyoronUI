@@ -2,6 +2,9 @@
   "plain": {
     "edge": {
       "width": { "$type": "dimension", "$description": "メニューの面の枠の太さ(浮く面だけ、背景と分けるために付ける)", "$value": 1 }
+    },
+    "tone": {
+      "hoverDarken": { "$type": "number", "$description": "プリセットが toneFill を持つとき、主な操作にマウスを乗せたら真ん中の色に混ぜる黒の割合", "$value": 0.1 }
     }
   }
 }

@@ -38,6 +38,8 @@
       "primaryFillHover": { "$type": "color", "$value": { "from": "{color.primaryStrong}", "alpha": 0.85 } },
       "dangerFill": { "$type": "color", "$value": { "from": "{color.danger}", "alpha": 0.92 } },
       "dangerFillHover": { "$type": "color", "$value": { "from": "{color.dangerStrong}", "alpha": 0.94 } },
+      "fillAngle": { "$type": "number", "$description": "プリセットが toneFill を持つときの、主な操作のグラデーションの向き(CSS の角度)", "$value": 120 },
+      "hoverDarken": { "$type": "number", "$description": "toneFill のグラデーションを押したときに重ねる黒の濃さ", "$value": 0.1 },
       "edge": {
         "$type": "toneStops",
         "$description": "色付きの枠。amount は tone 色と surface の混色の割合",
@@ -99,7 +101,6 @@
       "tint": { "$type": "number", "$value": 0.1 },
       "tintFocus": { "$type": "number", "$value": 0.05 },
       "edge": { "$type": "color", "$value": { "from": "{color.primaryStrong}", "alpha": 0.18 } },
-      "edgeFocus": { "$type": "color", "$value": { "from": "{color.primary}", "alpha": 0.85 } },
       "edgeFocusWidth": { "$type": "dimension", "$value": 1 },
       "shadow": {
         "$type": "shadow",

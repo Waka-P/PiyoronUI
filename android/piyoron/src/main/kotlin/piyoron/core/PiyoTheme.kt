@@ -33,8 +33,7 @@ data class PiyoShapes(
     val card: Shape = piyoCardShape(cardRoundness, cardRoundnessGrowth)
 }
 
-// 丸み度合いから、大きさに合わせて角が決まる形を作る
-// 角の半径 = 度合い x 基準の長さ x (短い辺 / 基準の長さ)^growth。growth が 1 なら短い辺に比例、0 なら固定。半径は短い辺の半分まで
+// 丸み度合いと増え方から、大きさに合わせて角が決まる形を作る
 fun piyoCardShape(roundness: Float, growth: Float = PiyoTokens.Card.RoundnessGrowth): Shape =
     RoundedCornerShape(GrowingCorner(roundness.coerceIn(0f, 0.5f), growth.coerceIn(0f, 1f)))
 
