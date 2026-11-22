@@ -29,7 +29,7 @@ dependencyResolutionManagement {
 
 // app/build.gradle.kts
 dependencies {
-    implementation("com.github.Waka-P:PiyoronUI:0.2.1")
+    implementation("com.github.Waka-P:PiyoronUI:0.2.2")
 }
 ```
 

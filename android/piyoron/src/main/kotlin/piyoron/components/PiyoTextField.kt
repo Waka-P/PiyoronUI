@@ -17,6 +17,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.TextFieldValue
@@ -55,6 +56,7 @@ fun PiyoTextField(
     enabled: Boolean = true,
     singleLine: Boolean = true,
     minHeight: Dp = PiyoTextFieldDefaults.MinHeight,
+    shape: Shape = Piyo.shapes.medium,
     textStyle: TextStyle = LocalPiyoTextStyle.current,
     textAlign: TextAlign = TextAlign.Start,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
@@ -78,7 +80,7 @@ fun PiyoTextField(
         visualTransformation = visualTransformation,
         interactionSource = source,
         cursorBrush = SolidColor(Piyo.colors.primary),
-        decorationBox = { inner -> FieldFrame(state, value.isEmpty(), placeholder, style, minHeight, singleLine, leading, trailing, inner) },
+        decorationBox = { inner -> FieldFrame(state, shape, value.isEmpty(), placeholder, style, minHeight, singleLine, leading, trailing, inner) },
     )
 }
 
@@ -92,6 +94,7 @@ fun PiyoTextField(
     enabled: Boolean = true,
     singleLine: Boolean = true,
     minHeight: Dp = PiyoTextFieldDefaults.MinHeight,
+    shape: Shape = Piyo.shapes.medium,
     textStyle: TextStyle = LocalPiyoTextStyle.current,
     textAlign: TextAlign = TextAlign.Start,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
@@ -115,7 +118,7 @@ fun PiyoTextField(
         visualTransformation = visualTransformation,
         interactionSource = source,
         cursorBrush = SolidColor(Piyo.colors.primary),
-        decorationBox = { inner -> FieldFrame(state, value.text.isEmpty(), placeholder, style, minHeight, singleLine, leading, trailing, inner) },
+        decorationBox = { inner -> FieldFrame(state, shape, value.text.isEmpty(), placeholder, style, minHeight, singleLine, leading, trailing, inner) },
     )
 }
 
@@ -123,6 +126,7 @@ fun PiyoTextField(
 @Composable
 private fun FieldFrame(
     state: PiyoState,
+    shape: Shape,
     empty: Boolean,
     placeholder: String,
     style: TextStyle,
@@ -135,7 +139,7 @@ private fun FieldFrame(
     Row(
         Modifier
             .alpha(if (state.enabled) 1f else PiyoTokens.Control.DisabledOpacity)
-            .piyoSurface(Piyo.shapes.medium, SurfaceRole.Field, state, PiyoTone.Default)
+            .piyoSurface(shape, SurfaceRole.Field, state, PiyoTone.Default)
             .heightIn(min = minHeight)
             .padding(horizontal = PiyoTextFieldDefaults.PaddingX, vertical = PiyoTextFieldDefaults.PaddingY),
         verticalAlignment = if (singleLine) Alignment.CenterVertically else Alignment.Top,

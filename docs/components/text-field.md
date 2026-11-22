@@ -12,6 +12,7 @@ PiyoTextField(memo, { memo = it }, singleLine = false, minHeight = 96.dp)
 ```
 
 - 値は文字列か `TextFieldValue`(カーソルや選んだ範囲も扱う)
+- 形は `shape` で変えられる(既定は `Piyo.shapes.medium`。検索欄などは `Piyo.shapes.pill` の左右が丸い形)
 - 幅は使う側が決める(横いっぱいなら `Modifier.fillMaxWidth()`、ボタンと並べるなら `Modifier.weight(1f)`)
 - 案内は、入力の揃え方(`textAlign`)に合わせて置き、1行の欄では折り返さない
 - 文字の色は、`textStyle` に色があればそれを使い、なければ `contentDefault`
