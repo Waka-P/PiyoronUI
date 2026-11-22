@@ -191,6 +191,8 @@ function rolesFile(t, pkg) {
     '    val edgeStops: List<Pair<Float, Color>>,',
     '    // 色付きの枠(選んだもの、主な操作)にも枠の色の並びを使うとき、その並び',
     '    val toneEdge: List<Pair<Float, Color>>? = null,',
+    '    // 主な操作の塗りをグラデーションにするとき、その色の並び(斜めに流す。白い文字が読める濃さ)',
+    '    val toneFill: List<Color>? = null,',
     ')',
     '',
     '// シード色から全roleを作る。danger / ok / warn は任意で上書きできる',
@@ -203,6 +205,7 @@ function rolesFile(t, pkg) {
     '    overrides: Map<String, Color> = emptyMap(),',
     '    edge: List<Pair<Float, Color>>? = null,',
     '    toneUsesEdge: Boolean = false,',
+    '    toneFill: List<Color>? = null,',
     '): PiyoColorRoles {',
     '    val o = overrides.mapValues { Rgba.of(it.value) }',
     ...body,
@@ -214,6 +217,7 @@ function rolesFile(t, pkg) {
     ...names.map((n) => `        ${n} = ${local(n)}.toColor(),`),
     '        edgeStops = stops,',
     '        toneEdge = if (toneUsesEdge) stops else null,',
+    '        toneFill = toneFill,',
     '    )',
     '}',
     '',
@@ -225,7 +229,8 @@ function presetsFile(t, pkg) {
   const entries = Object.entries(t.presets).map(([name, p]) => {
     const o = Object.entries(p.overrides).map(([k, v]) => `"${k}" to Color(${argbLiteral(v)})`);
     const e = p.edge ? `listOf(${p.edge.map((s) => `${flt(s.angle / 360)} to Color(${argbLiteral(s.color)})`).join(', ')})` : 'null';
-    return `    ${pascal(name)}(Color(${argbLiteral(p.seed)}), mapOf(${o.join(', ')}), ${e}, ${!!p.toneUsesEdge}),`;
+    const f = p.toneFill ? `listOf(${p.toneFill.map((c) => `Color(${argbLiteral(c)})`).join(', ')})` : 'null';
+    return `    ${pascal(name)}(Color(${argbLiteral(p.seed)}), mapOf(${o.join(', ')}), ${e}, ${!!p.toneUsesEdge}, ${f}),`;
   });
   return [
     HEADER,
@@ -239,11 +244,12 @@ function presetsFile(t, pkg) {
     '    internal val overrides: Map<String, Color>,',
     '    internal val edge: List<Pair<Float, Color>>?,',
     '    internal val toneUsesEdge: Boolean,',
+    '    internal val toneFill: List<Color>?,',
     ') {',
     ...entries.map((e, i) => (i === entries.length - 1 ? e.replace(/,$/, ';') : e)),
     '',
     '    // このプリセットの全roleを作る',
-    '    fun roles(): PiyoColorRoles = generateRoles(seed, overrides, edge, toneUsesEdge)',
+    '    fun roles(): PiyoColorRoles = generateRoles(seed, overrides, edge, toneUsesEdge, toneFill)',
     '}',
     '',
   ].join('\n');

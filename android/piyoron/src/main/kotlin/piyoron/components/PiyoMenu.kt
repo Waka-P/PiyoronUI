@@ -795,6 +795,28 @@ fun PiyoMenuItem(
     }
 }
 
+// 自作の中身を、メニューの項目と同じ決まりで選べるようにする(押すと閉じてから onClick。長押ししたまま動かして、指を離した所でも選べる)
+// key は項目を見分ける値。メニューの外で使ったときは、押すだけの部品になる
+@Composable
+fun Modifier.piyoMenuSelectable(key: Any, enabled: Boolean = true, onClick: () -> Unit): Modifier {
+    val close = LocalPiyoMenuClose.current
+    val drag = LocalPiyoMenuDrag.current
+    val source = remember { MutableInteractionSource() }
+    return this
+        .dragSelectItem(drag, key, enabled) {
+            close()
+            onClick()
+        }
+        .clickable(source, null, enabled = enabled, role = Role.Button) {
+            close()
+            onClick()
+        }
+}
+
+// 長押ししたまま動かしている指が、この項目の上にあるか(自作の項目を、そのとき強調するのに使う)
+@Composable
+fun piyoMenuPreviewing(key: Any): Boolean = LocalPiyoMenuDrag.current?.preview == key
+
 // メニューの項目の区切り線
 @Composable
 fun PiyoMenuDivider(modifier: Modifier = Modifier) {

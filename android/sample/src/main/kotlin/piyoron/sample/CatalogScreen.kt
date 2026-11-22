@@ -1,5 +1,6 @@
 package piyoron.sample
 
+import piyoron.components.PiyoTextField
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
@@ -169,6 +170,20 @@ private fun CatalogContent(
             PiyoMultiChipGroup(listOf("文書", "画像", "動画"), extras, { extras = it })
             Caption("無効")
             PiyoChipGroup(listOf("選べない", "選択中"), "選択中", {}, enabled = false)
+        }
+
+        Section("入力欄") {
+            var name by rememberSaveable { mutableStateOf("") }
+            var query by rememberSaveable { mutableStateOf("") }
+            var memo by rememberSaveable { mutableStateOf("") }
+            Caption("1行")
+            PiyoTextField(name, { name = it }, placeholder = "名前")
+            Caption("左右に印")
+            PiyoTextField(query, { query = it }, placeholder = "探す", leading = { PiyoText("Q") }, trailing = { PiyoText("円") })
+            Caption("複数行")
+            PiyoTextField(memo, { memo = it }, placeholder = "メモ", singleLine = false, minHeight = 96.dp)
+            Caption("無効")
+            PiyoTextField("入力できない", {}, enabled = false)
         }
 
         Section("タブ") {

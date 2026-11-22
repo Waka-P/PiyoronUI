@@ -26,7 +26,7 @@
   "bubble": {
     "seed": "#71ADDA",
     "overrides": {"contentSelected": "#3376A6"},
-    "toneUsesEdge": true,
+    "toneUsesEdge": true, "toneFill": ["#696EC6", "#5276BB", "#477CA2", "#008387"],
     "edge": [
       { "angle": 0, "color": "#C5C1F5" },
       { "angle": 35, "color": "#9FCEF2" },

@@ -19,7 +19,7 @@ import piyoron.tokens.PiyoPreset
 import piyoron.tokens.PiyoTokens
 import piyoron.tokens.piyoColorRoles
 
-// 形の組。カードの角は cardRoundness(短い辺に対する半径の割合)で、大きさに合わせて決まる
+// 形の組。カードの角は cardRoundness(基準の大きさでの、短い辺に対する半径の割合)と cardRoundnessGrowth(大きさに対する増え方)で決まる
 @Immutable
 data class PiyoShapes(
     val small: Shape = RoundedCornerShape(PiyoTokens.Radius.Sm),
@@ -28,19 +28,27 @@ data class PiyoShapes(
     val pill: Shape = RoundedCornerShape(50),
     val circle: Shape = CircleShape,
     val cardRoundness: Float = PiyoTokens.Card.Roundness,
+    val cardRoundnessGrowth: Float = PiyoTokens.Card.RoundnessGrowth,
 ) {
-    val card: Shape = piyoCardShape(cardRoundness)
+    val card: Shape = piyoCardShape(cardRoundness, cardRoundnessGrowth)
 }
 
-// 丸み度合いから、大きさに合わせて角が決まる形を作る(0 で角ばり、0.5 で短い辺が半円)
-fun piyoCardShape(roundness: Float): Shape = RoundedCornerShape(ShorterSideCorner(roundness.coerceIn(0f, 0.5f)))
+// 丸み度合いから、大きさに合わせて角が決まる形を作る
+// 角の半径 = 度合い x 基準の長さ x (短い辺 / 基準の長さ)^growth。growth が 1 なら短い辺に比例、0 なら固定。半径は短い辺の半分まで
+fun piyoCardShape(roundness: Float, growth: Float = PiyoTokens.Card.RoundnessGrowth): Shape =
+    RoundedCornerShape(GrowingCorner(roundness.coerceIn(0f, 0.5f), growth.coerceIn(0f, 1f)))
 
-// 短い辺に割合を掛けた角の半径
+// 大きさに合わせてゆるやかに増える角の半径
 @Immutable
-private data class ShorterSideCorner(private val fraction: Float) : CornerSize {
+private data class GrowingCorner(private val roundness: Float, private val growth: Float) : CornerSize {
 
     // 形の大きさから半径(px)を求める
-    override fun toPx(shapeSize: Size, density: Density): Float = shapeSize.minDimension * fraction
+    override fun toPx(shapeSize: Size, density: Density): Float {
+        val side = shapeSize.minDimension
+        if (side <= 0f) return 0f
+        val base = with(density) { PiyoTokens.Card.RoundnessBase.toPx() }
+        return minOf(side / 2f, roundness * base * Math.pow((side / base).toDouble(), growth.toDouble()).toFloat())
+    }
 }
 
 internal val LocalPiyoColors = staticCompositionLocalOf { piyoColorRoles(PiyoPreset.Ocean.seed) }

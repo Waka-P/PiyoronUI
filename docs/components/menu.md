@@ -37,6 +37,21 @@ PiyoMenu(Icons.Gear, "表示", minWidth = 220.dp) {
 }
 ```
 
+自作の行も、`PiyoMenuItem` と同じく、押すと閉じてから動き、長押ししたまま動かして指を離した所でも選べるようにできる。`Modifier.piyoMenuSelectable(key) { ... }` を付ける。指が乗っている間に強調したいときは `piyoMenuPreviewing(key)` で分かる。
+
+```kotlin
+PiyoMenu(Icons.Sort, "並べ替え") {
+    sorts.forEach { s ->
+        val previewing = piyoMenuPreviewing(s)
+        Row(
+            Modifier
+                .background(if (s == current || previewing) tint else Color.Transparent, shape)
+                .piyoMenuSelectable(s) { current = s }
+        ) { PiyoText(s.label) }
+    }
+}
+```
+
 面も変えられる。
 
 | 引数 | 既定 | 内容 |

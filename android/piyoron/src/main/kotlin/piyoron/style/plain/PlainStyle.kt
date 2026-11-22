@@ -1,5 +1,6 @@
 package piyoron.style.plain
 
+import piyoron.core.mixSrgb
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
@@ -20,7 +21,7 @@ import piyoron.tokens.PiyoColorRoles
 import piyoron.tokens.PiyoTokens
 import piyoron.tokens.PlainTokens
 
-// 飾りのない平らなスタイル(役割の色で塗るだけ。浮くメニューと押せるカードだけ細い枠)
+// 飾りのない平らなスタイル(役割の色で塗るだけ。浮くメニュー、押せるカード、入力欄だけ細い枠)
 internal object PlainStyle : PiyoStyle {
 
     // role ごとに平らな面を描く
@@ -29,7 +30,11 @@ internal object PlainStyle : PiyoStyle {
         val roles = Piyo.colors
         val duration = if (Piyo.reduceMotion) 0 else if (role == SurfaceRole.MenuItem) PiyoTokens.Menu.ItemDuration else PiyoTokens.Duration.Toggle
         val color = animateColorAsState(fill ?: plainFill(roles, role, state, tone), tween(duration), label = "plain").value
-        val edge = if (role == SurfaceRole.Menu || role == SurfaceRole.ClickableCard) roles.ringShadow else null
+        val edge = when {
+            role == SurfaceRole.Field && state.focused -> roles.primary
+            role == SurfaceRole.Field || role == SurfaceRole.Menu || role == SurfaceRole.ClickableCard -> roles.ringShadow
+            else -> null
+        }
         return drawBehind {
             val outline = shape.createOutline(size, layoutDirection, this)
             drawOutline(outline, color)
@@ -44,9 +49,10 @@ internal object PlainStyle : PiyoStyle {
 
 // role と状態ごとの塗りの色
 private fun plainFill(roles: PiyoColorRoles, role: SurfaceRole, state: PiyoState, tone: PiyoTone): Color = when (role) {
-    SurfaceRole.Button, SurfaceRole.Field -> when (tone) {
+    SurfaceRole.Field -> mixSrgb(roles.toneEdge?.let { it[it.size / 2].second } ?: roles.primary, roles.surface, if (state.focused) 0.1f else 0.2f)
+    SurfaceRole.Button -> when (tone) {
         PiyoTone.Default -> roles.fillSelectedBottom
-        PiyoTone.Primary -> if (state.hovered) roles.primaryStrong else roles.primary
+        PiyoTone.Primary -> roles.toneFill?.let { it[it.size / 2] } ?: if (state.hovered) roles.primaryStrong else roles.primary
         PiyoTone.Danger -> if (state.hovered) roles.dangerStrong else roles.danger
     }
     SurfaceRole.Chip -> if (state.selected) roles.fillSelectedBottom else roles.background

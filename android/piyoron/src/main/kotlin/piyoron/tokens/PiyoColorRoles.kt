@@ -42,6 +42,8 @@ data class PiyoColorRoles(
     val edgeStops: List<Pair<Float, Color>>,
     // 色付きの枠(選んだもの、主な操作)にも枠の色の並びを使うとき、その並び
     val toneEdge: List<Pair<Float, Color>>? = null,
+    // 主な操作の塗りをグラデーションにするとき、その色の並び(斜めに流す。白い文字が読める濃さ)
+    val toneFill: List<Color>? = null,
 )
 
 // シード色から全roleを作る。danger / ok / warn は任意で上書きできる
@@ -54,6 +56,7 @@ internal fun generateRoles(
     overrides: Map<String, Color> = emptyMap(),
     edge: List<Pair<Float, Color>>? = null,
     toneUsesEdge: Boolean = false,
+    toneFill: List<Color>? = null,
 ): PiyoColorRoles {
     val o = overrides.mapValues { Rgba.of(it.value) }
     val seedRole = o["seed"] ?: Rgba.of(seed).quantize()
@@ -117,5 +120,6 @@ internal fun generateRoles(
         warn = warn.toColor(),
         edgeStops = stops,
         toneEdge = if (toneUsesEdge) stops else null,
+        toneFill = toneFill,
     )
 }

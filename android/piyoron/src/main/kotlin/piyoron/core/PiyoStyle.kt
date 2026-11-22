@@ -64,7 +64,8 @@ fun Modifier.piyoSurface(
 internal fun baseContentColor(role: SurfaceRole, state: PiyoState, tone: PiyoTone): Color {
     val roles = Piyo.colors
     val target = when (role) {
-        SurfaceRole.Button, SurfaceRole.Field -> if (tone == PiyoTone.Default) roles.contentSelected else roles.contentOnPrimary
+        SurfaceRole.Button -> if (tone == PiyoTone.Default) roles.contentSelected else roles.contentOnPrimary
+        SurfaceRole.Field -> roles.contentDefault
         SurfaceRole.Chip -> when {
             state.selected -> roles.contentSelected
             state.hovered -> roles.primary

@@ -1,14 +1,18 @@
-// カードの角の丸みを、大きさに合わせて決める(短い辺 x 丸み度合い)
+// カードの角の丸みを、大きさに合わせて決める(度合い x 基準の長さ x (短い辺 / 基準の長さ)^growth。Android の piyoCardShape と同じ)
 // CSS では部品が自分の大きさを知れないので、ここで測って --piyo-card-radius と枠のマスク(--piyo-card-edge-mask)を入れる
 // 読み込むと自動で始まる。あとから足したカードや、大きさが変わったカードにも効く
 
 // 対象のカード
 const SELECTOR = '.piyo-card';
 
-// 丸み度合いから角の半径(px)を求める(度合いは 0 から 0.5 に収める)
-export function cardRadius(width, height, roundness) {
+// 丸み度合いから角の半径(px)を求める(度合いは 0 から 0.5、growth は 0 から 1 に収め、半径は短い辺の半分まで)
+export function cardRadius(width, height, roundness, growth = 0.3, base = 150) {
   const r = Math.min(Math.max(Number(roundness) || 0, 0), 0.5);
-  return Math.round(Math.min(width, height) * r * 10) / 10;
+  const g = Math.min(Math.max(Number(growth), 0), 1);
+  const side = Math.min(width, height);
+  if (side <= 0) return 0;
+  const radius = Math.min(side / 2, r * base * Math.pow(side / base, g));
+  return Math.round(radius * 10) / 10;
 }
 
 // 半径 r の形の内側に、太さ width の帯を残すマスク(tools/build/css.js の edgeMask と同じ作り)
@@ -23,7 +27,9 @@ function apply(el, width, height) {
   const style = getComputedStyle(el);
   const roundness = parseFloat(style.getPropertyValue('--piyo-card-roundness'));
   if (Number.isNaN(roundness)) return;
-  const r = cardRadius(width, height, roundness);
+  const growth = parseFloat(style.getPropertyValue('--piyo-card-roundness-growth'));
+  const base = parseFloat(style.getPropertyValue('--piyo-card-roundness-base'));
+  const r = cardRadius(width, height, roundness, Number.isNaN(growth) ? 0.3 : growth, Number.isNaN(base) ? 150 : base);
   const edge = parseFloat(style.getPropertyValue('--piyo-glass-edge-width')) || 1;
   if (el.style.getPropertyValue('--piyo-card-radius') === `${r}px`) return;
   el.style.setProperty('--piyo-card-radius', `${r}px`);

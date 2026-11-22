@@ -142,6 +142,10 @@ export function buildCss(t) {
         [`--${prefix}-glass-tone-edge-primary`, `var(--${prefix}-glass-edge)`],
         [`--${prefix}-glass-tabs-thumb-edge`, `var(--${prefix}-glass-edge)`],
       ])),
+    ...Object.entries(t.presets).filter(([, p]) => p.toneFill).map(([name, p]) =>
+      block(`${name}: 主な操作の塗りをグラデーションにする(押したときは少し暗く)`, `[data-${attr}-palette="${name}"]`, [
+        [`--${prefix}-glass-tone-primary-fill`, `linear-gradient(120deg, ${p.toneFill.join(', ')})`],
+        [`--${prefix}-glass-tone-primary-fill-hover`, `linear-gradient(rgb(0 0 0 / 0.1), rgb(0 0 0 / 0.1)), linear-gradient(120deg, ${p.toneFill.join(', ')})`],      ])),
   ];
   return parts.join('\n');
 }

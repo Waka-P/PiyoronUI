@@ -1,5 +1,7 @@
 package piyoron.style.glass
 
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -50,7 +52,8 @@ internal object GlassStyle : PiyoStyle {
         val roles = Piyo.colors
         val glass = remember(roles) { glassColors(roles) }
         val look = when (role) {
-            SurfaceRole.Button, SurfaceRole.Field -> buttonLook(roles, glass, state, tone)
+            SurfaceRole.Button -> buttonLook(roles, glass, state, tone)
+            SurfaceRole.Field -> fieldLook(roles, glass, state)
             SurfaceRole.Chip -> chipLook(roles, glass, state)
             SurfaceRole.TabTrack -> trackLook(roles, glass)
             SurfaceRole.TabThumb -> thumbLook(roles, glass)
@@ -141,7 +144,7 @@ private fun buttonLook(roles: PiyoColorRoles, glass: GlassColors, state: PiyoSta
             edge = sweepEdge(roles.edgeStops),
         )
         PiyoTone.Primary -> GlassLook(
-            fill = solidFill(if (hover) glass.tonePrimaryFillHover else glass.tonePrimaryFill),
+            fill = roles.toneFill?.let { toneGradientFill(it, hover) } ?: solidFill(if (hover) glass.tonePrimaryFillHover else glass.tonePrimaryFill),
             shadows = shadows,
             ring = ring,
             edge = sweepEdge(glass.toneEdgePrimary),
@@ -153,6 +156,41 @@ private fun buttonLook(roles: PiyoColorRoles, glass: GlassColors, state: PiyoSta
             edge = sweepEdge(glass.toneEdgeDanger),
         )
     }
+}
+
+// 入力欄(タグより濃い塗り、内側の影で少し凹ませる。浮かせる外の影は付けない。フォーカス中はボタンと同じ枠のグラデーション)
+// 枠の色の並びを主な操作にも使うプリセット(しゃぼん)は、塗りにもその並びをごく薄く混ぜる
+@Composable
+private fun fieldLook(roles: PiyoColorRoles, glass: GlassColors, state: PiyoState): GlassLook {
+    val spec = tween<Float>(if (Piyo.reduceMotion) 0 else PiyoTokens.Duration.Toggle)
+    val tint by animateFloatAsState(if (state.focused) GlassTokens.Field.TintFocus else GlassTokens.Field.Tint, spec, label = "fieldTint")
+    val edgeWidth = GlassTokens.Edge.Width
+    val base = mixSrgb(roles.primary, roles.surface, tint * 0.5f)
+    val rainbow = roles.toneEdge?.map { it.second }
+    val fill: DrawScope.(Shape) -> Unit = if (rainbow == null) {
+        solidFill(mixSrgb(roles.primary, roles.surface, tint))
+    } else {
+        { shape ->
+            fillShape(shape, SolidColor(base))
+            fillShape(shape, Brush.linearGradient(rainbow.map { it.copy(alpha = tint * 1.2f) }, start = Offset.Zero, end = Offset(size.width, size.height)))
+        }
+    }
+    return GlassLook(
+        fill = fill,
+        shadows = glass.fieldShadow,
+        ring = null,
+        edge = if (state.focused) {
+            { shape -> strokeConicInside(shape, GlassTokens.Field.EdgeFocusWidth.toPx(), roles.edgeStops, 1f) }
+        } else {
+            { shape -> strokeInside(shape, edgeWidth.toPx(), SolidColor(glass.fieldEdge)) }
+        },
+    )
+}
+
+// 主な操作をグラデーションで塗る(斜めに流す。押したときは少し暗く)
+private fun toneGradientFill(colors: List<Color>, hover: Boolean): DrawScope.(Shape) -> Unit = { shape ->
+    fillShape(shape, Brush.linearGradient(colors, start = Offset.Zero, end = Offset(size.width, size.height)))
+    if (hover) fillShape(shape, SolidColor(Color.Black.copy(alpha = 0.1f)))
 }
 
 // 1色で塗る

@@ -94,6 +94,21 @@
       "ringOffsetX": { "$type": "dimension", "$value": 0.5 },
       "ringOffsetY": { "$type": "dimension", "$value": 0.8 }
     },
+    "field": {
+      "$description": "入力欄。塗りはタグより濃く、影は内側に入れて少し凹んで見せる(浮かせない)",
+      "tint": { "$type": "number", "$value": 0.1 },
+      "tintFocus": { "$type": "number", "$value": 0.05 },
+      "edge": { "$type": "color", "$value": { "from": "{color.primaryStrong}", "alpha": 0.18 } },
+      "edgeFocus": { "$type": "color", "$value": { "from": "{color.primary}", "alpha": 0.85 } },
+      "edgeFocusWidth": { "$type": "dimension", "$value": 1 },
+      "shadow": {
+        "$type": "shadow",
+        "$value": [
+          { "color": { "from": "{color.primaryStrong}", "alpha": 0.2 }, "x": 0, "y": 1.5, "blur": 3, "spread": 0, "inset": true },
+          { "color": { "from": "{color.surface}", "alpha": 0.8 }, "x": 0, "y": -1, "blur": 0.5, "spread": 0, "inset": true }
+        ]
+      }
+    },
     "tabs": {
       "trackFill": {
         "$type": "gradient",
