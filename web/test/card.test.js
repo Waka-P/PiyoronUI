@@ -14,9 +14,10 @@ test('widthDecides', () => {
   assert.equal(cardRadius(380, 120, 0.0833), cardRadius(380, 400, 0.0833));
 });
 
-// 背の低いカードは、高さの 3 割まで
-test('heightCap', () => {
-  assert.equal(cardRadius(380, 60, 0.0833), 18);
+// 背の低いカードでも横幅で決まり、開いて背が伸びても同じ(短い辺の半分まで)
+test('shortCardKeepsRadius', () => {
+  assert.equal(cardRadius(380, 60, 0.0833), cardRadius(380, 300, 0.0833));
+  assert.equal(cardRadius(380, 20, 0.0833), 10);
 });
 
 // growth が 1 なら比例、0 なら固定

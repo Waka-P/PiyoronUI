@@ -95,8 +95,6 @@ object PiyoTokens {
         val RoundnessBase = 240.dp
         // 横幅が広くなったときの、角の半径の増え方(1 で比例、0 で固定)
         val RoundnessGrowth = 0.3f
-        // 角の半径の上限(高さに対する割合。背の低いカードが丸くなりすぎないように)
-        val RoundnessHeightCap = 0.3f
     }
 
     object Menu {

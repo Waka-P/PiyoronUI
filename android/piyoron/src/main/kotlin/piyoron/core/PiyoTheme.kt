@@ -37,7 +37,7 @@ data class PiyoShapes(
 fun piyoCardShape(roundness: Float, growth: Float = PiyoTokens.Card.RoundnessGrowth): Shape =
     RoundedCornerShape(GrowingCorner(roundness.coerceIn(0f, 0.5f), growth.coerceIn(0f, 1f)))
 
-// 横幅に合わせてゆるやかに増える角の半径(高さが変わっても変わらない。背の低いカードは高さで上限)
+// 横幅に合わせてゆるやかに増える角の半径(高さが変わっても変わらない。短い辺の半分まで)
 @Immutable
 private data class GrowingCorner(private val roundness: Float, private val growth: Float) : CornerSize {
 
@@ -47,7 +47,7 @@ private data class GrowingCorner(private val roundness: Float, private val growt
         if (width <= 0f || shapeSize.height <= 0f) return 0f
         val base = with(density) { PiyoTokens.Card.RoundnessBase.toPx() }
         val byWidth = roundness * base * Math.pow((width / base).toDouble(), growth.toDouble()).toFloat()
-        return minOf(byWidth, shapeSize.height * PiyoTokens.Card.RoundnessHeightCap, shapeSize.minDimension / 2f)
+        return minOf(byWidth, shapeSize.minDimension / 2f)
     }
 }
 

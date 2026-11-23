@@ -38,10 +38,11 @@ class CardShapeTest {
         assertEquals(20f, radius(PiyoTokens.Card.Roundness, 240f, 200f), 0.1f)
     }
 
-    // 背の低いカードは、高さの 3 割までにする
+    // 背の低いカードでも横幅で決まり、開いて背が伸びても同じ(半径は短い辺の半分まで)
     @Test
-    fun heightCap() {
-        assertEquals(18f, radius(PiyoTokens.Card.Roundness, 380f, 60f), 0.01f)
+    fun shortCardKeepsRadius() {
+        assertEquals(radius(PiyoTokens.Card.Roundness, 380f, 60f), radius(PiyoTokens.Card.Roundness, 380f, 300f), 0.01f)
+        assertEquals(10f, radius(PiyoTokens.Card.Roundness, 380f, 20f), 0.01f)
     }
 
     // growth が 1 なら横幅に比例、0 なら固定の半径

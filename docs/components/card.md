@@ -35,16 +35,16 @@ PiyoTheme(shapes = PiyoShapes(cardRoundness = 0.2f)) { ... }   // カードの�
 | 項目 | 値 | トークン |
 |---|---|---|
 | 余白 | 左右 24dp、上下 20.8dp(参照実装の 1.5rem / 1.3rem) | `card.paddingX` / `paddingY` |
-| 形 | 角の半径 = 丸み度合い x 基準の横幅 x (横幅 / 基準の横幅)^増え方。高さの 3 割まで(既定 0.0833、240、0.3、0.3) | `card.roundness` / `roundnessBase` / `roundnessGrowth` / `roundnessHeightCap` |
+| 形 | 角の半径 = 丸み度合い x 基準の横幅 x (横幅 / 基準の横幅)^増え方(既定 0.0833、240、0.3) | `card.roundness` / `roundnessBase` / `roundnessGrowth` |
 
 ## 角の丸み(丸み度合い)
 
 | 項目 | 内容 |
 |---|---|
-| 決め方 | 角の半径 = 丸み度合い x 基準の横幅 x (横幅 / 基準の横幅)^増え方。高さの 3 割と、短い辺の半分までに収める |
-| 既定 | 度合い 0.0833、基準の横幅 240、増え方 0.3、高さの上限 0.3。カタログのジニーの「お知らせ」(240 x 150)は角丸 20 のまま。画面幅いっぱい(約 380)のカードは約 23 |
-| 横幅で決める理由 | 中身が開いて高さが変わっても、角の丸みが変わらない。画面幅いっぱいのカードは、高さによらずどれも同じ丸みになる |
-| 変え方 | Compose は `PiyoShapes(cardRoundness = ..., cardRoundnessGrowth = ...)`、形だけなら `piyoCardShape(0.1f, 0.3f)`。Web は `--piyo-card-roundness`、`--piyo-card-roundness-growth`、`--piyo-card-roundness-height-cap` |
+| 決め方 | 角の半径 = 丸み度合い x 基準の横幅 x (横幅 / 基準の横幅)^増え方。短い辺の半分までに収める(それより背が低いと形にならないため) |
+| 既定 | 度合い 0.0833、基準の横幅 240、増え方 0.3。カタログのジニーの「お知らせ」(240 x 150)は角丸 20 のまま。画面幅いっぱい(約 380)のカードは約 23 |
+| 横幅で決める理由 | 中身が開いて高さが変わっても、角の丸みが変わらない。画面幅いっぱいのカードは、高さによらずどれも同じ丸みになる。高さで上限を付けると、背の低いカードが開いたときに丸みが増えるので、付けない |
+| 変え方 | Compose は `PiyoShapes(cardRoundness = ..., cardRoundnessGrowth = ...)`、形だけなら `piyoCardShape(0.1f, 0.3f)`。Web は `--piyo-card-roundness`、`--piyo-card-roundness-growth` |
 | 理由 | 比例させると、相似形ではあっても、目は角の半径そのもので丸さを感じるので、大きいカードほど丸く見えた。固定だと、とても小さい面ととても大きい面で差が出る。その間を取り、半径をゆるやかに増やす |
 
 ## 押せるカード
