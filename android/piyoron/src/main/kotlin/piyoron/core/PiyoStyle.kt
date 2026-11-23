@@ -72,7 +72,8 @@ internal fun baseContentColor(role: SurfaceRole, state: PiyoState, tone: PiyoTon
             else -> roles.contentMuted
         }
         SurfaceRole.TabTrack, SurfaceRole.TabThumb -> if (state.selected) roles.contentSelected else roles.contentMuted
-        SurfaceRole.Card, SurfaceRole.ClickableCard, SurfaceRole.Menu, SurfaceRole.Divider -> roles.contentDefault
+        SurfaceRole.Card, SurfaceRole.ClickableCard -> if (tone == PiyoTone.Default) roles.contentDefault else roles.contentOnPrimary
+        SurfaceRole.Menu, SurfaceRole.Divider -> roles.contentDefault
         SurfaceRole.MenuItem -> when {
             tone == PiyoTone.Danger -> roles.danger
             state.hovered || state.focused || state.pressed -> roles.primaryStrong

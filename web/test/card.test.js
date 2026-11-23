@@ -4,32 +4,25 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { cardRadius, cardEdgeMask } from '../src/card.js';
 
-// 基準のカード(240x150、度合い 0.1333)は角丸 20
+// 基準のカード(240x150、度合い 0.0833)は角丸 20
 test('baseCard', () => {
-  assert.equal(cardRadius(240, 150, 0.1333), 20);
+  assert.equal(cardRadius(240, 150, 0.0833), 20);
 });
 
-// 短い辺で決まる(向きを変えても同じ)
-test('shorterSide', () => {
-  assert.equal(cardRadius(150, 600, 0.2), cardRadius(600, 150, 0.2));
+// 横幅で決まり、高さが変わっても変わらない
+test('widthDecides', () => {
+  assert.equal(cardRadius(380, 120, 0.0833), cardRadius(380, 400, 0.0833));
 });
 
-// 既定では、半径はゆるやかに増える(小さいカードは割合として丸い)
-test('growsGently', () => {
-  assert.equal(cardRadius(300, 60, 0.1333), 15.2);
-  assert.equal(cardRadius(400, 250, 0.1333), 23.3);
+// 背の低いカードは、高さの 3 割まで
+test('heightCap', () => {
+  assert.equal(cardRadius(380, 60, 0.0833), 18);
 });
 
 // growth が 1 なら比例、0 なら固定
 test('growthEnds', () => {
-  assert.equal(cardRadius(600, 200, 0.2, 1), 40);
-  assert.equal(cardRadius(600, 200, 0.2, 0), 30);
-});
-
-// 度合いは 0 から 0.5 に収める
-test('clamped', () => {
-  assert.equal(cardRadius(100, 80, 0.9), 40);
-  assert.equal(cardRadius(100, 80, -1), 0);
+  assert.equal(cardRadius(400, 300, 0.1, 1), 40);
+  assert.equal(cardRadius(400, 300, 0.1, 0), 24);
 });
 
 // 枠のマスクは半径と太さを持つ
@@ -39,8 +32,8 @@ test('edgeMask', () => {
   assert.ok(mask.includes('stroke-width="2"'));
 });
 
-// 基準の長さが 0 以下なら、既定の 150 で求める(角が壊れない)
+// 基準の横幅が 0 以下なら、既定の 240 で求める(角が壊れない)
 test('badBase', () => {
-  assert.equal(cardRadius(400, 250, 0.1333, 0.3, 0), cardRadius(400, 250, 0.1333));
-  assert.equal(cardRadius(400, 250, 0.1333, 0.3, -5), cardRadius(400, 250, 0.1333));
+  assert.equal(cardRadius(400, 250, 0.0833, 0.3, 0), cardRadius(400, 250, 0.0833));
+  assert.equal(cardRadius(400, 250, 0.0833, 0.3, -5), cardRadius(400, 250, 0.0833));
 });

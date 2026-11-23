@@ -1,6 +1,7 @@
 package piyoron.components
 
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -19,6 +20,7 @@ import piyoron.core.PiyoTone
 import piyoron.core.SurfaceRole
 import piyoron.core.disabledAlpha
 import piyoron.core.focusRing
+import piyoron.core.piyoAnimateSize
 import piyoron.core.piyoSurface
 import piyoron.core.piyoPress
 import piyoron.core.rememberPiyoState
@@ -30,24 +32,31 @@ object PiyoCardDefaults {
     val ContentPadding = PaddingValues(horizontal = PiyoTokens.Card.PaddingX, vertical = PiyoTokens.Card.PaddingY)
 }
 
-// カード(中身を縦に並べる面)
+// カード(中身を縦に並べる面)。tone が Primary なら主な色で塗ったカード。中身で大きさが変わるとなめらかに変わる(animateSize で外せる)
 @Composable
 fun PiyoCard(
     modifier: Modifier = Modifier,
     shape: Shape = Piyo.shapes.card,
+    tone: PiyoTone = PiyoTone.Default,
+    animateSize: Boolean = true,
     contentPadding: PaddingValues = PiyoCardDefaults.ContentPadding,
     content: @Composable ColumnScope.() -> Unit,
 ) {
-    CardFrame(modifier, shape, PiyoState(), SurfaceRole.Card, contentPadding, content)
+    CardFrame(modifier, shape, PiyoState(), SurfaceRole.Card, tone, animateSize, contentPadding, content)
 }
 
-// 押せるカード(押下の動きはボタンと同じ)
+// 押せるカード(押下の動きはボタンと同じ。onLongClick で長押しも受ける)
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun PiyoCard(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
+    onLongClick: (() -> Unit)? = null,
+    onLongClickLabel: String? = null,
     shape: Shape = Piyo.shapes.card,
+    tone: PiyoTone = PiyoTone.Default,
+    animateSize: Boolean = true,
     contentPadding: PaddingValues = PiyoCardDefaults.ContentPadding,
     interactionSource: MutableInteractionSource? = null,
     content: @Composable ColumnScope.() -> Unit,
@@ -56,13 +65,23 @@ fun PiyoCard(
     val state = rememberPiyoState(source, enabled = enabled)
     CardFrame(
         modifier
-            .clickable(interactionSource = source, indication = null, enabled = enabled, role = Role.Button, onClick = onClick)
+            .combinedClickable(
+                interactionSource = source,
+                indication = null,
+                enabled = enabled,
+                role = Role.Button,
+                onLongClickLabel = onLongClickLabel,
+                onLongClick = onLongClick,
+                onClick = onClick,
+            )
             .disabledAlpha(enabled)
             .piyoPress(source, enabled)
             .focusRing(state.focused, shape),
         shape,
         state,
         SurfaceRole.ClickableCard,
+        tone,
+        animateSize,
         contentPadding,
         content,
     )
@@ -75,15 +94,18 @@ private fun CardFrame(
     shape: Shape,
     state: PiyoState,
     role: SurfaceRole,
+    tone: PiyoTone,
+    animateSize: Boolean,
     contentPadding: PaddingValues,
     content: @Composable ColumnScope.() -> Unit,
 ) {
-    val color = Piyo.style.contentColor(role, state, PiyoTone.Default)
+    val color = Piyo.style.contentColor(role, state, tone)
     CompositionLocalProvider(LocalPiyoContentColor provides color) {
         Column(
             modifier = modifier
                 .reportGenieAnchor(shape)
-                .piyoSurface(shape, role, state)
+                .piyoSurface(shape, role, state, tone)
+                .piyoAnimateSize(animateSize)
                 .padding(contentPadding),
             content = content,
         )

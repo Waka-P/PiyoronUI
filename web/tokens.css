@@ -16,6 +16,8 @@
   --piyo-duration-toggle: 180ms;
   --piyo-duration-segmented: 250ms;
   --piyo-easing-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --piyo-resize-duration: 220ms;
+  --piyo-resize-easing: cubic-bezier(0.2, 0.8, 0.2, 1);
   --piyo-font-family: "Zen Kaku Gothic New", "Hiragino Sans", "Meiryo", sans-serif;
   --piyo-press-hover-grow: 1.5px;
   --piyo-press-active-shrink: 1.1px;
@@ -39,9 +41,10 @@
   --piyo-chip-gap: 8px;
   --piyo-card-padding-x: 24px;
   --piyo-card-padding-y: 20.8px;
-  --piyo-card-roundness: 0.1333;
-  --piyo-card-roundness-base: 150px;
+  --piyo-card-roundness: 0.0833;
+  --piyo-card-roundness-base: 240px;
   --piyo-card-roundness-growth: 0.3;
+  --piyo-card-roundness-height-cap: 0.3;
   --piyo-menu-min-width: 140px;
   --piyo-menu-padding: 5px;
   --piyo-menu-radius: 14px;

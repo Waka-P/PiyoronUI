@@ -25,41 +25,42 @@ class CardShapeTest {
         assertEquals(20f, radius(PiyoTokens.Card.Roundness, 240f, 150f), 0.1f)
     }
 
-    // 短い辺で決まる(向きを変えても同じ)
+    // 横幅で決まり、中身で高さが変わっても角は変わらない
     @Test
-    fun shorterSide() {
-        assertEquals(radius(0.2f, 150f, 600f), radius(0.2f, 600f, 150f), 0.01f)
+    fun widthDecides() {
+        assertEquals(radius(PiyoTokens.Card.Roundness, 380f, 120f), radius(PiyoTokens.Card.Roundness, 380f, 400f), 0.01f)
     }
 
-    // 既定では、小さいカードは割合として丸く、大きいカードは割合として角ばる(半径はゆるやかに増える)
+    // 横幅が広いほど、半径はゆるやかに増える(既定)
     @Test
     fun growsGently() {
-        val small = radius(PiyoTokens.Card.Roundness, 300f, 60f)
-        val large = radius(PiyoTokens.Card.Roundness, 400f, 250f)
-        assertEquals(15.2f, small, 0.2f)
-        assertEquals(23.3f, large, 0.2f)
-        assert(small / 60f > large / 250f)
+        assertEquals(23.0f, radius(PiyoTokens.Card.Roundness, 380f, 200f), 0.2f)
+        assertEquals(20f, radius(PiyoTokens.Card.Roundness, 240f, 200f), 0.1f)
     }
 
-    // growth が 1 なら短い辺に比例、0 なら固定の半径
+    // 背の低いカードは、高さの 3 割までにする
+    @Test
+    fun heightCap() {
+        assertEquals(18f, radius(PiyoTokens.Card.Roundness, 380f, 60f), 0.01f)
+    }
+
+    // growth が 1 なら横幅に比例、0 なら固定の半径
     @Test
     fun growthEnds() {
-        assertEquals(30f, radius(0.2f, 600f, 150f * 1f, growth = 1f) * 1f, 0.01f)
-        assertEquals(40f, radius(0.2f, 600f, 200f, growth = 1f), 0.01f)
-        assertEquals(30f, radius(0.2f, 600f, 200f, growth = 0f), 0.01f)
+        assertEquals(40f, radius(0.1f, 400f, 300f, growth = 1f), 0.01f)
+        assertEquals(24f, radius(0.1f, 400f, 300f, growth = 0f), 0.01f)
     }
 
-    // 度合いは 0 から 0.5 に収め、半径は短い辺の半分まで
+    // 度合いは 0 から 0.5 に収める
     @Test
     fun clamped() {
-        assertEquals(40f, radius(0.9f, 100f, 80f), 0.01f)
         assertEquals(0f, radius(-1f, 100f, 80f), 0.01f)
     }
 
     // テーマの形の組から度合いを変えられる
     @Test
     fun themeShapes() {
-        val outline = PiyoShapes(cardRoundness = 0.25f, cardRoundnessGrowth = 1f).card.createOutline(Size(200f, 100f), LayoutDirection.Ltr, density) as Outline.Rounded
-        assertEquals(25f, outline.roundRect.topLeftCornerRadius.x, 0.01f)
+        val outline = PiyoShapes(cardRoundness = 0.05f, cardRoundnessGrowth = 1f).card.createOutline(Size(200f, 100f), LayoutDirection.Ltr, density) as Outline.Rounded
+        assertEquals(10f, outline.roundRect.topLeftCornerRadius.x, 0.01f)
     }
 }

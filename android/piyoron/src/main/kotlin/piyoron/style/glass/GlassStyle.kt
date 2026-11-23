@@ -57,8 +57,8 @@ internal object GlassStyle : PiyoStyle {
             SurfaceRole.Chip -> chipLook(roles, glass, state)
             SurfaceRole.TabTrack -> trackLook(roles, glass)
             SurfaceRole.TabThumb -> thumbLook(roles, glass)
-            SurfaceRole.Card -> cardLook(roles, glass, clickable = false)
-            SurfaceRole.ClickableCard -> cardLook(roles, glass, clickable = true)
+            SurfaceRole.Card -> cardLook(roles, glass, clickable = false, tone = tone)
+            SurfaceRole.ClickableCard -> cardLook(roles, glass, clickable = true, tone = tone)
             SurfaceRole.Menu -> menuLook(glass)
             SurfaceRole.MenuItem -> menuItemLook(glass, state, tone)
             SurfaceRole.Divider -> GlassLook(fill = solidFill(glass.menuDivider), shadows = emptyList(), ring = null, edge = null)
@@ -282,14 +282,32 @@ private fun menuItemLook(glass: GlassColors, state: PiyoState, tone: PiyoTone): 
 }
 
 // カード(斜めのグラデーション、薄い枠)。押せないカードは枠と線状の影をさらに薄くし、押せるカードと見分けやすくする
-private fun cardLook(roles: PiyoColorRoles, glass: GlassColors, clickable: Boolean) = GlassLook(
-    fill = gradientFill(glass.cardFill),
-    shadows = emptyList(),
-    ring = Ring(
+private fun cardLook(roles: PiyoColorRoles, glass: GlassColors, clickable: Boolean, tone: PiyoTone = PiyoTone.Default): GlassLook {
+    val ring = Ring(
         if (clickable) roles.ringShadow else roles.ringShadow.copy(alpha = roles.ringShadow.alpha * GlassTokens.Card.StaticRingOpacity),
         GlassTokens.Card.RingWidth,
         GlassTokens.Card.RingBlur,
         DpOffset(GlassTokens.Card.RingOffsetX, GlassTokens.Card.RingOffsetY),
-    ),
-    edge = sweepEdge(roles.edgeStops, if (clickable) GlassTokens.Card.EdgeOpacity else GlassTokens.Card.StaticEdgeOpacity),
-)
+    )
+    return when (tone) {
+        PiyoTone.Default -> GlassLook(
+            fill = gradientFill(glass.cardFill),
+            shadows = emptyList(),
+            ring = ring,
+            edge = sweepEdge(roles.edgeStops, if (clickable) GlassTokens.Card.EdgeOpacity else GlassTokens.Card.StaticEdgeOpacity),
+        )
+        PiyoTone.Primary -> GlassLook(
+            fill = roles.toneFill?.takeIf { it.size >= 2 }?.let { toneGradientFill(it, roles.toneFillAt, hover = false) }
+                ?: gradientFill(evenGradient(GlassTokens.Tone.FillAngle, listOf(roles.primary, roles.primaryStrong))),
+            shadows = emptyList(),
+            ring = ring,
+            edge = sweepEdge(glass.toneEdgePrimary),
+        )
+        PiyoTone.Danger -> GlassLook(
+            fill = solidFill(glass.toneDangerFill),
+            shadows = emptyList(),
+            ring = ring,
+            edge = sweepEdge(glass.toneEdgeDanger),
+        )
+    }
+}

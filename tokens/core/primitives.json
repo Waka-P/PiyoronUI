@@ -21,6 +21,10 @@
   "easing": {
     "standard": {"$type": "cubicBezier", "$value": [0.4, 0, 0.2, 1]}
   },
+  "resize": {
+    "duration": {"$type": "duration", "$description": "中身で大きさが変わるときの時間(カードなど。メニューと同じ)", "$value": 220},
+    "easing": {"$type": "cubicBezier", "$description": "中身で大きさが変わるときのイージング(初めが速く、なめらかに止まる)", "$value": [0.2, 0.8, 0.2, 1]}
+  },
   "font": {
     "family": {"$type": "fontFamily", "$value": ["Zen Kaku Gothic New", "Hiragino Sans", "Meiryo", "sans-serif"]}
   },
@@ -57,9 +61,10 @@
   "card": {
     "paddingX": {"$type": "dimension", "$description": "カードの左右の余白(参照実装の 1.5rem)", "$value": 24},
     "paddingY": {"$type": "dimension", "$description": "カードの上下の余白(参照実装の 1.3rem)", "$value": 20.8},
-    "roundness": {"$type": "number", "$description": "カードの丸み度合い(短い辺が基準の長さのときの、短い辺に対する角の半径の割合。カタログのジニーの「お知らせ」240x150 の角丸 20 が基準)", "$value": 0.1333},
-    "roundnessBase": {"$type": "dimension", "$description": "丸み度合いを測る基準の短い辺の長さ(「お知らせ」の 150)", "$value": 150},
-    "roundnessGrowth": {"$type": "number", "$description": "短い辺が長くなったときの、角の半径の増え方(1 で比例、0 で固定。小さいほど大きさによらず同じ丸さに見える)", "$value": 0.3}
+    "roundness": {"$type": "number", "$description": "カードの丸み度合い(横幅が基準の長さのときの、横幅に対する角の半径の割合。カタログのジニーの「お知らせ」240x150 の角丸 20 が基準)", "$value": 0.0833},
+    "roundnessBase": {"$type": "dimension", "$description": "丸み度合いを測る基準の横幅(「お知らせ」の 240)", "$value": 240},
+    "roundnessGrowth": {"$type": "number", "$description": "横幅が広くなったときの、角の半径の増え方(1 で比例、0 で固定)", "$value": 0.3},
+    "roundnessHeightCap": {"$type": "number", "$description": "角の半径の上限(高さに対する割合。背の低いカードが丸くなりすぎないように)", "$value": 0.3}
   },
   "menu": {
     "minWidth": {"$type": "dimension", "$value": 140},

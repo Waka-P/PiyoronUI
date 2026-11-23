@@ -19,7 +19,7 @@ import piyoron.tokens.PiyoPreset
 import piyoron.tokens.PiyoTokens
 import piyoron.tokens.piyoColorRoles
 
-// 形の組。カードの角は cardRoundness(基準の大きさでの、短い辺に対する半径の割合)と cardRoundnessGrowth(大きさに対する増え方)で決まる
+// 形の組。カードの角は cardRoundness(基準の横幅での、横幅に対する半径の割合)と cardRoundnessGrowth(横幅に対する増え方)で決まる
 @Immutable
 data class PiyoShapes(
     val small: Shape = RoundedCornerShape(PiyoTokens.Radius.Sm),
@@ -37,16 +37,17 @@ data class PiyoShapes(
 fun piyoCardShape(roundness: Float, growth: Float = PiyoTokens.Card.RoundnessGrowth): Shape =
     RoundedCornerShape(GrowingCorner(roundness.coerceIn(0f, 0.5f), growth.coerceIn(0f, 1f)))
 
-// 大きさに合わせてゆるやかに増える角の半径
+// 横幅に合わせてゆるやかに増える角の半径(高さが変わっても変わらない。背の低いカードは高さで上限)
 @Immutable
 private data class GrowingCorner(private val roundness: Float, private val growth: Float) : CornerSize {
 
     // 形の大きさから半径(px)を求める
     override fun toPx(shapeSize: Size, density: Density): Float {
-        val side = shapeSize.minDimension
-        if (side <= 0f) return 0f
+        val width = shapeSize.width
+        if (width <= 0f || shapeSize.height <= 0f) return 0f
         val base = with(density) { PiyoTokens.Card.RoundnessBase.toPx() }
-        return minOf(side / 2f, roundness * base * Math.pow((side / base).toDouble(), growth.toDouble()).toFloat())
+        val byWidth = roundness * base * Math.pow((width / base).toDouble(), growth.toDouble()).toFloat()
+        return minOf(byWidth, shapeSize.height * PiyoTokens.Card.RoundnessHeightCap, shapeSize.minDimension / 2f)
     }
 }
 

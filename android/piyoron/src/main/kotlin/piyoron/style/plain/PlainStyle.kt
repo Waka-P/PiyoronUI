@@ -56,7 +56,12 @@ private fun plainFill(roles: PiyoColorRoles, role: SurfaceRole, state: PiyoState
         PiyoTone.Danger -> if (state.hovered) roles.dangerStrong else roles.danger
     }
     SurfaceRole.Chip -> if (state.selected) roles.fillSelectedBottom else roles.background
-    SurfaceRole.TabTrack, SurfaceRole.Card, SurfaceRole.ClickableCard, SurfaceRole.Divider -> roles.background
+    SurfaceRole.Card, SurfaceRole.ClickableCard -> when (tone) {
+        PiyoTone.Default -> roles.background
+        PiyoTone.Primary -> roles.toneFill?.takeIf { it.isNotEmpty() }?.let { plainToneFill(it, hovered = false) } ?: roles.primary
+        PiyoTone.Danger -> roles.danger
+    }
+    SurfaceRole.TabTrack, SurfaceRole.Divider -> roles.background
     SurfaceRole.TabThumb, SurfaceRole.Menu -> roles.surface
     SurfaceRole.MenuItem -> {
         val active = state.enabled && (state.hovered || state.focused || state.pressed)

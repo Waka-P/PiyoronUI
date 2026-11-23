@@ -34,6 +34,13 @@ object PiyoTokens {
         val Standard = CubicBezierEasing(0.4f, 0f, 0.2f, 1f)
     }
 
+    object Resize {
+        // 中身で大きさが変わるときの時間(カードなど。メニューと同じ)
+        val Duration = 220
+        // 中身で大きさが変わるときのイージング(初めが速く、なめらかに止まる)
+        val Easing = CubicBezierEasing(0.2f, 0.8f, 0.2f, 1f)
+    }
+
     object Font {
         val Family = listOf("Zen Kaku Gothic New", "Hiragino Sans", "Meiryo", "sans-serif")
     }
@@ -82,12 +89,14 @@ object PiyoTokens {
         val PaddingX = 24.dp
         // カードの上下の余白(参照実装の 1.3rem)
         val PaddingY = 20.8.dp
-        // カードの丸み度合い(短い辺が基準の長さのときの、短い辺に対する角の半径の割合。カタログのジニーの「お知らせ」240x150 の角丸 20 が基準)
-        val Roundness = 0.1333f
-        // 丸み度合いを測る基準の短い辺の長さ(「お知らせ」の 150)
-        val RoundnessBase = 150.dp
-        // 短い辺が長くなったときの、角の半径の増え方(1 で比例、0 で固定。小さいほど大きさによらず同じ丸さに見える)
+        // カードの丸み度合い(横幅が基準の長さのときの、横幅に対する角の半径の割合。カタログのジニーの「お知らせ」240x150 の角丸 20 が基準)
+        val Roundness = 0.0833f
+        // 丸み度合いを測る基準の横幅(「お知らせ」の 240)
+        val RoundnessBase = 240.dp
+        // 横幅が広くなったときの、角の半径の増え方(1 で比例、0 で固定)
         val RoundnessGrowth = 0.3f
+        // 角の半径の上限(高さに対する割合。背の低いカードが丸くなりすぎないように)
+        val RoundnessHeightCap = 0.3f
     }
 
     object Menu {

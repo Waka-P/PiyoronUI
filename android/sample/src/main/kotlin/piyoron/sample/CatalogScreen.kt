@@ -272,6 +272,13 @@ private fun CatalogContent(
             }
         }
 
+        Section("塗りカード") {
+            PiyoCard(Modifier.fillMaxWidth(), tone = PiyoTone.Primary) {
+                PiyoText("請求対象額")
+                PiyoText("¥12,800")
+            }
+        }
+
         Section("カード") {
             var opened by rememberSaveable { mutableIntStateOf(0) }
             PiyoCard(Modifier.fillMaxWidth()) {
