@@ -8,7 +8,7 @@ Jetpack Compose と Web(CSS、JS、React)で同じ見た目と動きを使える
 
 | 項目 | 値 |
 |---|---|
-| 最新版 | 0.2.4 |
+| 最新版 | 0.2.5 |
 | Android | minSdk 26、Jetpack Compose(Material は使わない) |
 | Web | CSS 変数、`color-mix`、`scale` / `translate` が使えるブラウザ。React 19 以上(React 版を使うとき) |
 | ライセンス | MIT |
@@ -40,7 +40,7 @@ dependencyResolutionManagement {
 
 // app/build.gradle.kts
 dependencies {
-    implementation("com.github.Waka-P:PiyoronUI:0.2.4")
+    implementation("com.github.Waka-P:PiyoronUI:0.2.5")
 }
 ```
 

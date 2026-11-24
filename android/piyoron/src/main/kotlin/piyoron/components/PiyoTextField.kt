@@ -1,5 +1,11 @@
 package piyoron.components
 
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.text.TextLayoutResult
+import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.takeOrElse
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -64,10 +70,13 @@ fun PiyoTextField(
     visualTransformation: VisualTransformation = VisualTransformation.None,
     leading: (@Composable () -> Unit)? = null,
     trailing: (@Composable () -> Unit)? = null,
+    drawBehindText: (DrawScope.(TextLayoutResult) -> Unit)? = null,
 ) {
     val source = remember { MutableInteractionSource() }
     val state = rememberPiyoState(source, enabled = enabled)
     val style = textStyle.copy(color = textStyle.color.takeOrElse { Piyo.colors.contentDefault }, textAlign = textAlign)
+    var layout by remember { mutableStateOf<TextLayoutResult?>(null) }
+    val behind = drawBehindText?.let { draw -> { scope: DrawScope -> layout?.let { scope.draw(it) }; Unit } }
     BasicTextField(
         value = value,
         onValueChange = onValueChange,
@@ -80,11 +89,12 @@ fun PiyoTextField(
         visualTransformation = visualTransformation,
         interactionSource = source,
         cursorBrush = SolidColor(Piyo.colors.primary),
-        decorationBox = { inner -> FieldFrame(state, shape, value.isEmpty(), placeholder, style, minHeight, singleLine, leading, trailing, inner) },
+        onTextLayout = { layout = it },
+        decorationBox = { inner -> FieldFrame(state, shape, value.isEmpty(), placeholder, style, minHeight, singleLine, leading, trailing, behind, inner) },
     )
 }
 
-// 入力欄(カーソルや選んだ範囲も扱う TextFieldValue)
+// 入力欄(カーソルや選んだ範囲も扱う TextFieldValue)。drawBehindText で文字の後ろに描ける(文字の配置を受け取る)
 @Composable
 fun PiyoTextField(
     value: TextFieldValue,
@@ -102,10 +112,13 @@ fun PiyoTextField(
     visualTransformation: VisualTransformation = VisualTransformation.None,
     leading: (@Composable () -> Unit)? = null,
     trailing: (@Composable () -> Unit)? = null,
+    drawBehindText: (DrawScope.(TextLayoutResult) -> Unit)? = null,
 ) {
     val source = remember { MutableInteractionSource() }
     val state = rememberPiyoState(source, enabled = enabled)
     val style = textStyle.copy(color = textStyle.color.takeOrElse { Piyo.colors.contentDefault }, textAlign = textAlign)
+    var layout by remember { mutableStateOf<TextLayoutResult?>(null) }
+    val behind = drawBehindText?.let { draw -> { scope: DrawScope -> layout?.let { scope.draw(it) }; Unit } }
     BasicTextField(
         value = value,
         onValueChange = onValueChange,
@@ -118,7 +131,8 @@ fun PiyoTextField(
         visualTransformation = visualTransformation,
         interactionSource = source,
         cursorBrush = SolidColor(Piyo.colors.primary),
-        decorationBox = { inner -> FieldFrame(state, shape, value.text.isEmpty(), placeholder, style, minHeight, singleLine, leading, trailing, inner) },
+        onTextLayout = { layout = it },
+        decorationBox = { inner -> FieldFrame(state, shape, value.text.isEmpty(), placeholder, style, minHeight, singleLine, leading, trailing, behind, inner) },
     )
 }
 
@@ -134,6 +148,7 @@ private fun FieldFrame(
     singleLine: Boolean,
     leading: (@Composable () -> Unit)?,
     trailing: (@Composable () -> Unit)?,
+    behind: ((DrawScope) -> Unit)?,
     inner: @Composable () -> Unit,
 ) {
     Row(
@@ -163,7 +178,8 @@ private fun FieldFrame(
                     maxLines = if (singleLine) 1 else Int.MAX_VALUE,
                 )
             }
-            inner()
+            // 文字の後ろに描くものがあれば、入力の文字と同じ位置で描く
+            Box(if (behind != null) Modifier.drawBehind { behind(this) } else Modifier) { inner() }
         }
         CompositionLocalProvider(LocalPiyoContentColor provides Piyo.colors.contentMuted) {
             trailing?.invoke()
