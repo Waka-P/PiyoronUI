@@ -78,6 +78,7 @@ internal fun PiyoOverlayHost(content: @Composable () -> Unit) {
         Box(
             modifier = Modifier
                 .onGloballyPositioned { overlay.origin = it.positionInRoot() }
+                .piyoClearFocusOnTap()
                 .pointerInput(overlay) {
                     awaitPointerEventScope {
                         while (true) {
