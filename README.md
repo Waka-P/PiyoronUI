@@ -1,21 +1,32 @@
 # Piyoron UI
 
-お気に入りのUIを元にした、自分用のデザインシステムとUIライブラリ。スタイルは「普通(Plain)」(既定)と「ガラス風(Glass)」。Jetpack Compose 版と Web 版(CSS、JS、React)がある。
+Jetpack Compose と Web(CSS、JS、React)で同じ見た目と動きを使える、デザインシステムと UI ライブラリ。
 
-名前の設定は `piyoron.config.json`、`android/gradle.properties`、このファイルに集約している。
+- 見た目のスタイルは「普通(Plain)」(既定)と「ガラス風(Glass)」の2つ。テーマの1行で切り替わる
+- 色はシード色1色から作る。文字のコントラスト(WCAG AA)を自動で満たす
+- 押したときの動き、メニュー、ひょうたん型のタブ、ジニー効果などの動きを含む
+
+| 項目 | 値 |
+|---|---|
+| 最新版 | 0.2.4 |
+| Android | minSdk 26、Jetpack Compose(Material は使わない) |
+| Web | CSS 変数、`color-mix`、`scale` / `translate` が使えるブラウザ。React 19 以上(React 版を使うとき) |
+| ライセンス | MIT |
 
 ## 特徴
 
-- **部品は振る舞いだけ、見た目はスタイル。** ボタンやタブは状態・読み上げ・動きを持ち、塗り・枠・影はスタイルが描く。スタイルを足せば全部品の見た目が変わる
-- **見た目の元はトークン(JSON)1か所。** CSS 変数と Kotlin の定数を同じ JSON から作る
-- **色はシード色1色から作る。** OKLCH で役割(role)ごとの色を生成し、文字のコントラスト(AA)を自動で満たす。手で整えたプリセットもある
-- **動きのエフェクト。** パネルを吸い込むジニー効果と、くびれのあるひょうたん型のタブ。スタイルから独立していて、どの画面にも付けられる
+| 考え方 | 内容 |
+|---|---|
+| 部品は振る舞い、見た目はスタイル | ボタンやタブは状態・読み上げ・動きを持ち、塗り・枠・影はスタイルが描く。スタイルを替えると全部品の見た目が変わる |
+| 見た目の元は1か所 | トークン(JSON)から CSS 変数と Kotlin の定数を作る。Android と Web で値がずれない |
+| 色はシード色から | OKLCH で役割(主な色、面、文字、危険など)ごとの色を作る。手で整えたプリセットもある |
+| 動きは部品から独立 | 押したときの動き、大きさの変化、ジニー効果、ひょうたん型のタブを、どの要素にも付けられる |
 
-## 使い方(Compose)
+## はじめかた(Compose)
 
 ### 入れる
 
-JitPack から入れる。バージョンは GitHub のタグ名。
+[JitPack](https://jitpack.io/#Waka-P/PiyoronUI) から入れる。バージョンは GitHub のタグ名。
 
 ```kotlin
 // settings.gradle.kts
@@ -33,41 +44,72 @@ dependencies {
 }
 ```
 
-Compose のバージョンはライブラリが BOM ごと持ってくるので、書かなくてよい。minSdk 26。
+Compose のバージョンはライブラリが BOM ごと持ってくるので、書かなくてよい。
 
-### テーマ
+### テーマで包む
 
 ```kotlin
-PiyoTheme(seed = Color(0xFF2293C7)) { ... }   // シード色から(style を省くと Plain。飾りのない平らな面)
-PiyoTheme(seed = seed, style = PiyoStyle.Glass) { ... }   // ガラス風にする
-PiyoTheme(preset = PiyoPreset.Mint) { ... }    // プリセット: Ocean, Mint, Rose, Violet, Amber, Gold, Bubble
-PiyoTheme(seed = seed, shapes = PiyoShapes(cardRoundness = 0.2f)) { ... }   // カードの丸み度合い(短い辺に対する角の半径の割合)
-Piyo.colors.primary                            // 色の取り出し
+setContent {
+    PiyoTheme(seed = Color(0xFF2293C7)) {
+        // 画面
+    }
+}
 ```
 
-シード色の保存は呼び出し側で行う(DataStore など)。端末の「アニメーションを削除」を既定で読み、動きを止める(`reduceMotion` で上書きできる)。
+| 書き方 | 内容 |
+|---|---|
+| `PiyoTheme(seed = color)` | シード色から色を作る(スタイルを省くと Plain) |
+| `PiyoTheme(seed = color, style = PiyoStyle.Glass)` | ガラス風にする |
+| `PiyoTheme(preset = PiyoPreset.Mint)` | プリセット: Ocean、Mint、Rose、Violet、Amber、Gold、Bubble |
+| `PiyoTheme(seed = color, shapes = PiyoShapes(cardRoundness = 0.1f))` | カードの丸みを変える |
+| `PiyoTheme(seed = color, pressMotion = PiyoPressMotion(touchShrink = 3.dp))` | 押したときの動きの既定を変える |
+| `Piyo.colors.primary`、`Piyo.shapes.pill` | テーマの色や形を取り出す |
+
+- 端末の「アニメーションを削除」を既定で読み、動きを止める(`reduceMotion` で上書きできる)
+- テーマの中で入力欄の外(押せるもの以外)を押すと、フォーカスが外れてキーボードが閉じる
+- シード色の保存は使う側で行う(DataStore など)
 
 ### 部品
 
 ```kotlin
 PiyoButton("保存", onClick = {})
-PiyoButton("確定", onClick = {}, tone = PiyoTone.Primary)
+PiyoButton("確定", onClick = {}, tone = PiyoTone.Primary)      // tone: Default、Primary、Danger
 PiyoIconButton(icon, "追加", onClick = {})
-PiyoChipGroup(listOf("新しい順", "古い順"), selected, { selected = it })
-PiyoMultiChipGroup(listOf("文書", "画像"), selectedSet, { selectedSet = it })
+
+PiyoChipGroup(listOf("新しい順", "古い順"), selected, { selected = it })   // 1つ選ぶ
+PiyoMultiChipGroup(listOf("文書", "画像"), selectedSet, { selectedSet = it })   // いくつでも選ぶ
 PiyoTabs(listOf("すべて", "未読", "既読"), index, { index = it })
+
+PiyoTextField(text, { text = it }, placeholder = "名前")
+PiyoTextField(query, { query = it }, placeholder = "探す", shape = Piyo.shapes.pill, leading = { PiyoIcon(searchIcon, null) })
+
 PiyoCard { PiyoText("お知らせ") }
-PiyoMenuGroup(side = PiyoMenuSide.Bottom, alignment = PiyoMenuAlignment.EndEdge) {   // 開いている間にほかのボタンへ移ると、滑って切り替わる
+PiyoCard(onClick = {}, onLongClick = {}) { PiyoText("押せるカード") }
+PiyoCard(tone = PiyoTone.Primary) { PiyoText("目立たせたい金額") }   // 塗りのカード
+
+PiyoMenuGroup {   // 開いている間にほかのボタンへ移ると、滑って切り替わる
     Row {
         PiyoMenu(copyIcon, "コピー") { PiyoMenuItem("テキスト", onClick = {}, detail = "本文と日付") }
         PiyoMenu(moreIcon, "その他") { PiyoMenuItem("削除", onClick = {}, tone = PiyoTone.Danger) }
     }
 }
+
+PiyoText("文字")
+PiyoIcon(icon, "説明")
 ```
+
+| 部品 | メモ |
+|---|---|
+| ボタン | [docs/components/button.md](docs/components/button.md) |
+| 選ぶボタン | [docs/components/chip.md](docs/components/chip.md) |
+| タブ | [docs/components/tabs.md](docs/components/tabs.md) |
+| 入力欄 | [docs/components/text-field.md](docs/components/text-field.md) |
+| カード | [docs/components/card.md](docs/components/card.md) |
+| メニュー | [docs/components/menu.md](docs/components/menu.md)。メニューの中身を自作するときは `Modifier.piyoMenuSelectable()` で、長押ししたまま指を動かして選ぶ操作に対応できる |
 
 ### 押したときの動き
 
-ボタンと同じ「乗せると大きく、押すと縮む」動きを、どの要素にも付けられる。文字やアイコンも位置がずれずに中心から拡大・縮小する。
+ボタンと同じ「乗せると大きく、押すと縮む」動きを、どの要素にも付けられる。文字やアイコンも中心から拡大・縮小する。
 
 ```kotlin
 // 押せるようにして動きを付ける(波紋は出さない)。見た目の modifier より前に付ける
@@ -77,10 +119,7 @@ Box(Modifier.size(96.dp).piyoClickable(onClick = {}).clip(shape).background(brus
 Modifier.clickable(source, indication = null) { }.piyoPress(source)
 
 // 量(dp)と速さ(ミリ秒)を変える。省いた値は既定(ボタンと同じ)
-Modifier.piyoClickable(onClick = {}, motion = PiyoPressMotion(hoverGrow = 4.dp, touchShrink = 6.dp, activeDuration = 120))
-
-// アプリ全体(Piyoron の部品も含む)の既定を変える
-PiyoTheme(seed = seed, pressMotion = PiyoPressMotion(touchShrink = 3.dp)) { ... }
+Modifier.piyoClickable(onClick = {}, motion = PiyoPressMotion(hoverGrow = 4.dp, touchShrink = 6.dp))
 ```
 
 | 値 | 意味 | 既定 |
@@ -91,24 +130,27 @@ PiyoTheme(seed = seed, pressMotion = PiyoPressMotion(touchShrink = 3.dp)) { ... 
 | `hoverDuration` | 乗せたとき、離して戻るときの長さ | 180ms |
 | `activeDuration` | 押したときの長さ | 70ms |
 
-- 量は倍率ではなく、縁が動く量。部品の大きさによらず同じだけ動く(大きいカードでも動きすぎない)
-- 動かさないときは `PiyoPressMotion.None`。端末の「アニメーションを削除」では動かない
-- 背景や枠の modifier より前に付ける(後ろに付けると、背景や枠が拡大・縮小しない)
+- 量は倍率ではなく、縁が動く量。大きいカードでも動きすぎない
+- 動かさないときは `PiyoPressMotion.None`
+
+### そのほかの便利な Modifier
+
+| 書き方 | 内容 |
+|---|---|
+| `Modifier.piyoAnimateSize()` | 中身で大きさが変わるとき、なめらかに変える(カードには既定で付いている。`PiyoCard(animateSize = false)` で外す) |
+| `Modifier.piyoClearFocusOnTap()` | 押せるもの以外を押したらフォーカスを外す。テーマの中では既定で効くので、ダイアログなど別の窓の中身に付ける |
 
 ### エフェクト
 
 ```kotlin
-// ひょうたん型のタブ(縦・横)
+// ひょうたん型のタブ(縦・横)。大きさは buttonSize で変える(既定は 48dp)
 GourdTabRail(tabs, index, { index = it }, orientation = Orientation.Horizontal)
 
-// 外枠、印、アイコンの色を差し替える(ガラスにしないとき)
+// 外枠、印、アイコンの色を差し替える
 GourdTabRail(tabs, index, { index = it },
     track = { shape -> Modifier.background(trackColor, shape) },
     indicator = { shape -> Box(Modifier.fillMaxSize().background(thumbColor, shape)) },
     iconColors = GourdIconColors(selected = onThumb, unselected = muted))
-
-// 大きさを変える(余白、アイコン、印の動きも同じ割合で変わる。既定は 48dp)
-GourdTabRail(tabs, index, { index = it }, buttonSize = 60.dp)
 
 // ひょうたんとパネル。表示中のタブをもう一度押すとジニー効果で開閉する
 GourdRailPanel(tabs, index, { index = it }, panelOpen = open, onPanelOpenChange = { open = it },
@@ -120,7 +162,20 @@ PiyoIconButton(icon, "お知らせ", { visible = !visible }, modifier = Modifier
 GenieVisibility(visible, anchor) { /* カードの中身 */ }
 ```
 
-## 使い方(Web)
+形と動きの説明は [docs/effects/README.md](docs/effects/README.md)。
+
+## はじめかた(Web)
+
+npm には出していない。リポジトリから作って使う。
+
+```sh
+git clone https://github.com/Waka-P/PiyoronUI.git
+cd PiyoronUI/web
+npm install
+npm run build      # web/dist に JS を出す
+```
+
+`web/tokens.css`、`web/piyoron.css`、`web/dist/` を自分のプロジェクトに置いて読み込む。
 
 ```html
 <html data-piyoron-style="plain">   <!-- ガラス風は "glass" -->
@@ -130,37 +185,43 @@ GenieVisibility(visible, anchor) { /* カードの中身 */ }
 <button class="piyo-btn piyo-primary">確定</button>
 ```
 
-- CSS だけの部品: `.piyo-btn`、`.piyo-chip`、`.piyo-tabs`、`.piyo-card`
-- 押したときの動き: 任意の要素に `.piyo-pressable`。量と速さは `--piyo-press-*` で変える(JS は `setPiyoPress(el, { touchShrink: 6 })`、React は `<PiyoPressable motion={...}>`)
-- JS の部品: メニュー、ひょうたん、ひょうたんとパネル、ジニー(`import { PiyoMenu } from 'piyoron'`)
-- React 版: `import { PiyoButton, PiyoMenu } from 'piyoron/react'`
-
-詳しくは `docs/web.md`。
-
-## 構成
-
-| 場所 | 中身 |
+| 使い方 | 部品 |
 |---|---|
-| `tokens/` | 見た目の元データ(JSON)。書き方は `tokens/schema.md` |
-| `tools/` | 色の生成、CSS / Kotlin の書き出し、テスト、確認用のプレビュー |
-| `web/tokens.css` | 生成した CSS 変数 |
-| `web/piyoron.css` | 部品の CSS |
-| `web/src` | JS(色、メニュー、ひょうたん)と React 版(`web/src/react`) |
-| `web/demo` | Web のカタログ(素の HTML と React。Android のサンプルと同じ構成) |
-| `android/piyoron` | Compose ライブラリ(`core`、`components`、`style.plain`、`style.glass`、`effects`、`tokens` のパッケージ) |
-| `android/sample` | カタログアプリ(全部品、エフェクト、色の切り替え) |
-| `docs/` | 分解メモ(スタイル、部品、エフェクト) |
+| CSS だけ | `.piyo-btn`、`.piyo-chip`、`.piyo-tabs`、`.piyo-card` |
+| 押したときの動き | 任意の要素に `.piyo-pressable`。量と速さは `--piyo-press-*` で変える |
+| JS | メニュー、ひょうたん、ひょうたんとパネル、ジニー(`import { PiyoMenu } from 'piyoron'`) |
+| React | `import { PiyoButton, PiyoMenu } from 'piyoron/react'` |
+
+詳しくは [docs/web.md](docs/web.md)。
+
+## 見本を動かす
+
+| 見本 | 動かし方 |
+|---|---|
+| Android のカタログアプリ(全部品、エフェクト、色の切り替え) | `cd android && ./gradlew :sample:installDebug` |
+| Web のカタログ(素の HTML と React) | `cd web && npm install && npm run dev` で `/demo/index.html`、`/demo/react.html` を開く |
 
 ## ドキュメント
 
 | ファイル | 内容 |
 |---|---|
-| `docs/styles/plain.md` | Plain の分解メモ(役割ごとの色) |
-| `docs/styles/glass.md` | Glass の分解メモ(どの値か、なぜこの見た目か、Android での描き方) |
-| `docs/components/` | 部品ごとのメモ |
-| `docs/effects/README.md` | ジニーとひょうたんの形と動き、重さへの対策 |
-| `docs/web.md` | Web 版の使い方、変わる形の描き方、Android 版との違い |
-| `tokens/schema.md` | トークンの書き方 |
+| [docs/styles/plain.md](docs/styles/plain.md) | Plain の色の役割 |
+| [docs/styles/glass.md](docs/styles/glass.md) | Glass の作り(どの値か、なぜこの見た目か、Android での描き方) |
+| [docs/components/](docs/components/README.md) | 部品ごとの使い方と決めごと |
+| [docs/effects/README.md](docs/effects/README.md) | ジニーとひょうたんの形と動き、重さへの対策 |
+| [docs/web.md](docs/web.md) | Web 版の使い方、Android 版との違い |
+| [tokens/schema.md](tokens/schema.md) | トークンの書き方 |
+
+## 構成
+
+| 場所 | 中身 |
+|---|---|
+| `tokens/` | 見た目の元データ(JSON) |
+| `tools/` | 色の生成、CSS / Kotlin の書き出し、テスト、確認用のプレビュー |
+| `web/` | CSS(`tokens.css` は生成物、`piyoron.css` は部品)、JS と React 版(`src/`)、カタログ(`demo/`) |
+| `android/piyoron` | Compose ライブラリ(`core`、`components`、`style.plain`、`style.glass`、`effects`、`tokens` のパッケージ) |
+| `android/sample` | カタログアプリ |
+| `docs/` | スタイル、部品、エフェクトの説明 |
 
 ## 開発
 
@@ -169,21 +230,13 @@ GenieVisibility(visible, anchor) { /* カードの中身 */ }
 | `npm run tokens` | トークンから CSS と Kotlin を作り直す |
 | `npm run colors -- "#D6457C"` | シード色から全 role を JSON で出す(`--preset mint` も可) |
 | `npm test` | 色生成、生成物、Web の形と置き場所のテスト(JS) |
-| `cd web && npm install && npm run dev` | Web のカタログを開く(`/demo/index.html`、`/demo/react.html`) |
-| `cd web && npm run build` | Web のライブラリを `web/dist` に出す |
-| `cd android && ./gradlew :piyoron:testDebugUnitTest` | 色生成と形の計算のテスト(Kotlin。色は JS と同じ結果か) |
-| `cd android && ./gradlew :sample:installDebug` | サンプルを入れる |
+| `cd android && ./gradlew :piyoron:testDebugUnitTest` | 色生成と形の計算のテスト(Kotlin。色が JS と同じ結果か) |
 | `cd android && ./gradlew :piyoron:publishToMavenLocal` | ライブラリを手元の Maven に出す(JitPack も同じ処理。`jitpack.yml`) |
 
-Node.js 24、JDK 17 以上(Android Studio 付属の JBR で可)が要る。生成した Kotlin はリポジトリに含めるので、ライブラリのビルドだけなら Node.js は要らない。
-
-## 対応範囲
-
-| 項目 | 値 |
-|---|---|
-| Android | minSdk 26 |
-| Web | ブラウザの CSS 変数、`color-mix`、`scale` / `translate` プロパティが使えること |
+- Node.js 24、JDK 17 以上(Android Studio 付属の JBR で可)が要る
+- 生成した Kotlin はリポジトリに含めるので、ライブラリのビルドだけなら Node.js は要らない
+- 名前(`Piyo` や CSS の接頭辞など)の設定は `piyoron.config.json` と `android/gradle.properties` にまとめている
 
 ## ライセンス
 
-MIT(`LICENSE`)
+MIT([LICENSE](LICENSE))
